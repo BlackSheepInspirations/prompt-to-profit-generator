@@ -1,0 +1,3540 @@
+"use strict";
+
+/* =========================================================
+   PROMPT TO PROFIT GENERATOR
+   Complete application behavior
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded", initializeApplication);
+
+
+/* =========================================================
+   1. APPLICATION CONFIGURATION
+   ========================================================= */
+
+const APP_STORAGE_KEYS = {
+  project: "promptToProfit.currentProject",
+  productProfiles: "promptToProfit.productProfiles",
+  brandProfiles: "promptToProfit.brandProfiles",
+  savedPackages: "promptToProfit.savedPackages"
+};
+
+const MAX_SELECTED_GENERATORS = 4;
+
+const GENERATOR_DEFINITIONS = {
+  "product-description": {
+    label: "Product Description",
+    category: "Sales Copy",
+    goal: "Write a persuasive product description",
+    fields: [
+      {
+        key: "length",
+        label: "Description Length",
+        type: "select",
+        options: ["Short", "Medium", "Detailed"],
+        defaultValue: "Medium"
+      },
+      {
+        key: "structure",
+        label: "Description Structure",
+        type: "select",
+        options: [
+          "Benefit-led paragraphs",
+          "Headline, summary, and bullets",
+          "Problem, solution, and benefits"
+        ],
+        defaultValue: "Headline, summary, and bullets"
+      },
+      {
+        key: "cta",
+        label: "Call to Action",
+        type: "text",
+        defaultValue: "Encourage the buyer to purchase now"
+      }
+    ]
+  },
+
+  "product-listing": {
+    label: "Product Listing",
+    category: "Sales Copy",
+    goal: "Create a complete marketplace-ready product listing",
+    fields: [
+      {
+        key: "marketplace",
+        label: "Marketplace",
+        type: "select",
+        options: ["Etsy", "Shopify", "Amazon", "General Marketplace"],
+        defaultValue: "General Marketplace"
+      },
+      {
+        key: "format",
+        label: "Listing Format",
+        type: "select",
+        options: [
+          "Title, description, and bullets",
+          "SEO title and full listing",
+          "Conversion-focused listing"
+        ],
+        defaultValue: "SEO title and full listing"
+      },
+      {
+        key: "keywordFocus",
+        label: "Keyword Focus",
+        type: "text",
+        defaultValue: "Use natural buyer-search language"
+      }
+    ]
+  },
+
+  "sales-page": {
+    label: "Sales Page",
+    category: "Sales Copy",
+    goal: "Create a conversion-focused sales page",
+    fields: [
+      {
+        key: "pageLength",
+        label: "Page Length",
+        type: "select",
+        options: ["Short-form", "Standard", "Long-form"],
+        defaultValue: "Standard"
+      },
+      {
+        key: "framework",
+        label: "Sales Structure",
+        type: "select",
+        options: [
+          "Problem, agitation, solution",
+          "Benefits, proof, offer",
+          "Story, value, action"
+        ],
+        defaultValue: "Benefits, proof, offer"
+      },
+      {
+        key: "cta",
+        label: "Primary Action",
+        type: "text",
+        defaultValue: "Purchase the product"
+      }
+    ]
+  },
+
+  "social-posts": {
+    label: "Social Posts",
+    category: "Social Content",
+    goal: "Create platform-ready promotional social posts",
+    fields: [
+      {
+        key: "platform",
+        label: "Social Platform",
+        type: "select",
+        options: [
+          "Instagram",
+          "Facebook",
+          "LinkedIn",
+          "Threads",
+          "Multi-platform"
+        ],
+        defaultValue: "Multi-platform"
+      },
+      {
+        key: "postStyle",
+        label: "Post Style",
+        type: "select",
+        options: [
+          "Educational",
+          "Promotional",
+          "Story-led",
+          "Community-focused"
+        ],
+        defaultValue: "Promotional"
+      },
+      {
+        key: "cta",
+        label: "Call to Action",
+        type: "text",
+        defaultValue: "Invite the audience to learn more"
+      }
+    ]
+  },
+
+  "hooks-captions": {
+    label: "Hooks & Captions",
+    category: "Social Content",
+    goal: "Create attention-grabbing hooks and supporting captions",
+    fields: [
+      {
+        key: "hookStyle",
+        label: "Hook Style",
+        type: "select",
+        options: [
+          "Curiosity",
+          "Problem-aware",
+          "Bold statement",
+          "Transformation",
+          "Contrarian"
+        ],
+        defaultValue: "Curiosity"
+      },
+      {
+        key: "captionLength",
+        label: "Caption Length",
+        type: "select",
+        options: ["Short", "Medium", "Long"],
+        defaultValue: "Medium"
+      },
+      {
+        key: "cta",
+        label: "Caption Action",
+        type: "text",
+        defaultValue: "Prompt the viewer to comment, save, or click"
+      }
+    ]
+  },
+
+  tiktok: {
+    label: "TikTok",
+    category: "Social Content",
+    goal: "Create a TikTok concept with hook, scenes, and caption",
+    fields: [
+      {
+        key: "videoLength",
+        label: "Video Length",
+        type: "select",
+        options: ["15 seconds", "30 seconds", "45 seconds", "60 seconds"],
+        defaultValue: "30 seconds"
+      },
+      {
+        key: "presentation",
+        label: "Presentation Style",
+        type: "select",
+        options: [
+          "Faceless",
+          "Talking head",
+          "Product demonstration",
+          "Text-led"
+        ],
+        defaultValue: "Faceless"
+      },
+      {
+        key: "opening",
+        label: "Opening Style",
+        type: "select",
+        options: [
+          "Immediate visual hook",
+          "Spoken hook",
+          "Problem scenario",
+          "Before-and-after"
+        ],
+        defaultValue: "Immediate visual hook"
+      }
+    ]
+  },
+
+  pinterest: {
+    label: "Pinterest",
+    category: "Social Content",
+    goal: "Create a Pinterest pin concept, title, and description",
+    fields: [
+      {
+        key: "pinType",
+        label: "Pin Type",
+        type: "select",
+        options: [
+          "Product pin",
+          "Educational pin",
+          "List-style pin",
+          "Promotional pin"
+        ],
+        defaultValue: "Product pin"
+      },
+      {
+        key: "orientation",
+        label: "Orientation",
+        type: "select",
+        options: ["Vertical 2:3", "Long vertical", "Square"],
+        defaultValue: "Vertical 2:3"
+      },
+      {
+        key: "overlay",
+        label: "Overlay Text Direction",
+        type: "text",
+        defaultValue: "Use one clear, benefit-led headline"
+      }
+    ]
+  },
+
+  seo: {
+    label: "SEO",
+    category: "Discovery",
+    goal: "Create search-focused SEO copy",
+    fields: [
+      {
+        key: "asset",
+        label: "SEO Asset",
+        type: "select",
+        options: [
+          "Product page",
+          "Blog post",
+          "Marketplace listing",
+          "Landing page"
+        ],
+        defaultValue: "Product page"
+      },
+      {
+        key: "intent",
+        label: "Search Intent",
+        type: "select",
+        options: ["Commercial", "Transactional", "Informational"],
+        defaultValue: "Commercial"
+      },
+      {
+        key: "location",
+        label: "Location or Market",
+        type: "text",
+        defaultValue: "Broad English-speaking market"
+      }
+    ]
+  },
+
+  tags: {
+    label: "Tags",
+    category: "Discovery",
+    goal: "Create relevant marketplace and social discovery tags",
+    fields: [
+      {
+        key: "tagType",
+        label: "Tag Type",
+        type: "select",
+        options: [
+          "Marketplace tags",
+          "Social hashtags",
+          "Search keyword phrases",
+          "Mixed discovery terms"
+        ],
+        defaultValue: "Mixed discovery terms"
+      },
+      {
+        key: "count",
+        label: "Number of Tags",
+        type: "select",
+        options: ["10", "13", "20", "30"],
+        defaultValue: "13"
+      },
+      {
+        key: "specificity",
+        label: "Keyword Specificity",
+        type: "select",
+        options: ["Broad", "Balanced", "Long-tail"],
+        defaultValue: "Balanced"
+      }
+    ]
+  },
+
+  "product-mockups": {
+    label: "Product Mockups",
+    category: "Visual Creation",
+    goal: "Create a professional product mockup image prompt",
+    fields: [
+      {
+        key: "setting",
+        label: "Mockup Setting",
+        type: "select",
+        options: [
+          "Clean studio",
+          "Lifestyle scene",
+          "Flat lay",
+          "Retail display",
+          "Editorial setup"
+        ],
+        defaultValue: "Lifestyle scene"
+      },
+      {
+        key: "camera",
+        label: "Camera Angle",
+        type: "select",
+        options: [
+          "Front view",
+          "Three-quarter view",
+          "Top-down",
+          "Close-up",
+          "Eye-level"
+        ],
+        defaultValue: "Three-quarter view"
+      },
+      {
+        key: "lighting",
+        label: "Lighting",
+        type: "select",
+        options: [
+          "Soft natural light",
+          "Bright studio light",
+          "Warm ambient light",
+          "Dramatic directional light"
+        ],
+        defaultValue: "Soft natural light"
+      }
+    ]
+  },
+
+  ads: {
+    label: "Advertisement Graphics",
+    category: "Visual Creation",
+    goal: "Create a conversion-focused advertisement graphic prompt",
+    fields: [
+      {
+        key: "placement",
+        label: "Ad Placement",
+        type: "select",
+        options: [
+          "Instagram feed",
+          "Instagram story",
+          "Facebook feed",
+          "Pinterest",
+          "Website banner"
+        ],
+        defaultValue: "Instagram feed"
+      },
+      {
+        key: "objective",
+        label: "Ad Objective",
+        type: "select",
+        options: [
+          "Product awareness",
+          "Direct sale",
+          "Lead generation",
+          "Launch announcement"
+        ],
+        defaultValue: "Direct sale"
+      },
+      {
+        key: "headline",
+        label: "Ad Headline Direction",
+        type: "text",
+        defaultValue: "Use a concise, benefit-led headline"
+      }
+    ]
+  },
+
+  flyers: {
+    label: "Flyers",
+    category: "Visual Creation",
+    goal: "Create a professional promotional flyer prompt",
+    fields: [
+      {
+        key: "flyerUse",
+        label: "Flyer Use",
+        type: "select",
+        options: [
+          "Product promotion",
+          "Event promotion",
+          "Service offer",
+          "Launch announcement"
+        ],
+        defaultValue: "Product promotion"
+      },
+      {
+        key: "format",
+        label: "Flyer Format",
+        type: "select",
+        options: ["Portrait", "Square", "Landscape"],
+        defaultValue: "Portrait"
+      },
+      {
+        key: "informationDensity",
+        label: "Information Density",
+        type: "select",
+        options: ["Minimal", "Balanced", "Detailed"],
+        defaultValue: "Balanced"
+      }
+    ]
+  },
+
+  "lead-magnet-covers": {
+    label: "Lead Magnet Covers",
+    category: "Visual Creation",
+    goal: "Create a high-value lead magnet cover prompt",
+    fields: [
+      {
+        key: "assetType",
+        label: "Lead Magnet Type",
+        type: "select",
+        options: [
+          "Guide",
+          "Checklist",
+          "Workbook",
+          "Template pack",
+          "Mini course"
+        ],
+        defaultValue: "Guide"
+      },
+      {
+        key: "coverStyle",
+        label: "Cover Style",
+        type: "select",
+        options: [
+          "Clean professional",
+          "Bold modern",
+          "Editorial",
+          "Minimal premium"
+        ],
+        defaultValue: "Clean professional"
+      },
+      {
+        key: "titleTreatment",
+        label: "Title Treatment",
+        type: "text",
+        defaultValue: "Use a large, highly readable title"
+      }
+    ]
+  },
+
+  "notebook-covers": {
+    label: "Notebook Covers",
+    category: "Visual Creation",
+    goal: "Create a print-ready notebook cover prompt",
+    fields: [
+      {
+        key: "coverStyle",
+        label: "Cover Style",
+        type: "select",
+        options: [
+          "Typography-led",
+          "Pattern-based",
+          "Illustrated",
+          "Minimal",
+          "Luxury"
+        ],
+        defaultValue: "Typography-led"
+      },
+      {
+        key: "trim",
+        label: "Cover Format",
+        type: "select",
+        options: ["Front cover", "Full wrap", "Square cover"],
+        defaultValue: "Front cover"
+      },
+      {
+        key: "coverText",
+        label: "Exact Cover Text",
+        type: "text",
+        defaultValue: ""
+      }
+    ]
+  },
+
+  infographics: {
+    label: "Infographics",
+    category: "Visual Creation",
+    goal: "Create a clear, educational infographic prompt",
+    fields: [
+      {
+        key: "structure",
+        label: "Infographic Structure",
+        type: "select",
+        options: [
+          "Step-by-step",
+          "Comparison",
+          "Checklist",
+          "Statistics",
+          "Process diagram"
+        ],
+        defaultValue: "Step-by-step"
+      },
+      {
+        key: "density",
+        label: "Content Density",
+        type: "select",
+        options: ["Simple", "Balanced", "Detailed"],
+        defaultValue: "Balanced"
+      },
+      {
+        key: "orientation",
+        label: "Orientation",
+        type: "select",
+        options: ["Vertical", "Square", "Landscape"],
+        defaultValue: "Vertical"
+      }
+    ]
+  },
+
+  "creative-direction": {
+    label: "Creative Direction",
+    category: "Strategy",
+    goal: "Create a complete visual and creative direction brief",
+    fields: [
+      {
+        key: "campaignType",
+        label: "Creative Project",
+        type: "select",
+        options: [
+          "Product launch",
+          "Brand campaign",
+          "Seasonal campaign",
+          "Content series",
+          "Evergreen promotion"
+        ],
+        defaultValue: "Product launch"
+      },
+      {
+        key: "detailLevel",
+        label: "Brief Detail",
+        type: "select",
+        options: ["Concise", "Standard", "Comprehensive"],
+        defaultValue: "Standard"
+      },
+      {
+        key: "deliverableFocus",
+        label: "Deliverable Focus",
+        type: "text",
+        defaultValue: "Create one cohesive direction across all assets"
+      }
+    ]
+  },
+
+  "hero-banner": {
+    label: "Hero Banner",
+    category: "Visual Creation",
+    goal: "Create a website hero banner image and copy prompt",
+    fields: [
+      {
+        key: "layout",
+        label: "Banner Layout",
+        type: "select",
+        options: [
+          "Product left, text right",
+          "Text left, product right",
+          "Centered composition",
+          "Full-bleed image"
+        ],
+        defaultValue: "Text left, product right"
+      },
+      {
+        key: "objective",
+        label: "Banner Objective",
+        type: "select",
+        options: [
+          "Introduce product",
+          "Promote offer",
+          "Announce launch",
+          "Capture leads"
+        ],
+        defaultValue: "Introduce product"
+      },
+      {
+        key: "cta",
+        label: "Button Text Direction",
+        type: "text",
+        defaultValue: "Use one clear action button"
+      }
+    ]
+  },
+
+  "video-motion": {
+    label: "Video & Motion Graphics",
+    category: "Video",
+    goal: "Create a motion graphic or short video generation prompt",
+    fields: [
+      {
+        key: "duration",
+        label: "Duration",
+        type: "select",
+        options: ["5 seconds", "10 seconds", "15 seconds", "30 seconds"],
+        defaultValue: "10 seconds"
+      },
+      {
+        key: "motionStyle",
+        label: "Motion Style",
+        type: "select",
+        options: [
+          "Smooth product animation",
+          "Kinetic typography",
+          "Cinematic movement",
+          "Fast social edit"
+        ],
+        defaultValue: "Smooth product animation"
+      },
+      {
+        key: "aspectRatio",
+        label: "Aspect Ratio",
+        type: "select",
+        options: ["9:16", "1:1", "16:9", "4:5"],
+        defaultValue: "9:16"
+      }
+    ]
+  },
+
+  "video-scripts": {
+    label: "Short-Form Video Scripts",
+    category: "Video",
+    goal: "Create a complete short-form video script",
+    fields: [
+      {
+        key: "duration",
+        label: "Script Length",
+        type: "select",
+        options: ["15 seconds", "30 seconds", "45 seconds", "60 seconds"],
+        defaultValue: "30 seconds"
+      },
+      {
+        key: "scriptStyle",
+        label: "Script Style",
+        type: "select",
+        options: [
+          "Direct response",
+          "Educational",
+          "Story-led",
+          "Demonstration",
+          "Problem and solution"
+        ],
+        defaultValue: "Direct response"
+      },
+      {
+        key: "sceneDetail",
+        label: "Scene Detail",
+        type: "select",
+        options: ["Simple", "Standard", "Shot-by-shot"],
+        defaultValue: "Shot-by-shot"
+      }
+    ]
+  },
+
+  voiceover: {
+    label: "Voiceover Scripts",
+    category: "Video",
+    goal: "Create a natural promotional voiceover script",
+    fields: [
+      {
+        key: "duration",
+        label: "Voiceover Length",
+        type: "select",
+        options: ["15 seconds", "30 seconds", "45 seconds", "60 seconds"],
+        defaultValue: "30 seconds"
+      },
+      {
+        key: "delivery",
+        label: "Delivery Style",
+        type: "select",
+        options: [
+          "Warm and conversational",
+          "Energetic",
+          "Professional",
+          "Calm and premium"
+        ],
+        defaultValue: "Warm and conversational"
+      },
+      {
+        key: "speaker",
+        label: "Speaker Perspective",
+        type: "select",
+        options: ["Brand voice", "Customer voice", "Creator voice"],
+        defaultValue: "Brand voice"
+      }
+    ]
+  },
+
+  "product-demo": {
+    label: "Product Demo",
+    category: "Video",
+    goal: "Create a product demonstration video plan",
+    fields: [
+      {
+        key: "demoType",
+        label: "Demo Type",
+        type: "select",
+        options: [
+          "How it works",
+          "Before and after",
+          "Feature walkthrough",
+          "Use-case demonstration"
+        ],
+        defaultValue: "Feature walkthrough"
+      },
+      {
+        key: "duration",
+        label: "Demo Length",
+        type: "select",
+        options: ["15 seconds", "30 seconds", "60 seconds", "90 seconds"],
+        defaultValue: "30 seconds"
+      },
+      {
+        key: "format",
+        label: "Production Format",
+        type: "select",
+        options: [
+          "Faceless",
+          "Hands-only",
+          "Presenter-led",
+          "Screen recording"
+        ],
+        defaultValue: "Faceless"
+      }
+    ]
+  },
+
+  "launch-campaign": {
+    label: "Launch Campaign",
+    category: "Launch",
+    goal: "Create a coordinated product launch campaign",
+    fields: [
+      {
+        key: "launchLength",
+        label: "Campaign Length",
+        type: "select",
+        options: ["3 days", "5 days", "7 days", "14 days"],
+        defaultValue: "7 days"
+      },
+      {
+        key: "launchStage",
+        label: "Launch Stage",
+        type: "select",
+        options: [
+          "Pre-launch",
+          "Launch week",
+          "Post-launch",
+          "Full campaign"
+        ],
+        defaultValue: "Full campaign"
+      },
+      {
+        key: "channel",
+        label: "Primary Channel",
+        type: "select",
+        options: [
+          "Instagram",
+          "TikTok",
+          "Email",
+          "Pinterest",
+          "Multi-channel"
+        ],
+        defaultValue: "Multi-channel"
+      }
+    ]
+  },
+
+  carousel: {
+    label: "Carousel Launch",
+    category: "Launch",
+    goal: "Create a slide-by-slide product launch carousel",
+    fields: [
+      {
+        key: "slideCount",
+        label: "Number of Slides",
+        type: "select",
+        options: ["5", "7", "8", "10"],
+        defaultValue: "7"
+      },
+      {
+        key: "carouselStyle",
+        label: "Carousel Style",
+        type: "select",
+        options: [
+          "Problem to solution",
+          "Feature breakdown",
+          "Story-led launch",
+          "Educational launch"
+        ],
+        defaultValue: "Problem to solution"
+      },
+      {
+        key: "finalAction",
+        label: "Final Slide Action",
+        type: "text",
+        defaultValue: "Invite the viewer to purchase or learn more"
+      }
+    ]
+  },
+
+  "launch-announcement": {
+    label: "Launch Announcement",
+    category: "Launch",
+    goal: "Create a compelling product launch announcement",
+    fields: [
+      {
+        key: "channel",
+        label: "Announcement Channel",
+        type: "select",
+        options: [
+          "Social post",
+          "Email",
+          "Website",
+          "Press-style announcement"
+        ],
+        defaultValue: "Social post"
+      },
+      {
+        key: "energy",
+        label: "Announcement Energy",
+        type: "select",
+        options: ["Excited", "Premium", "Warm", "Bold"],
+        defaultValue: "Excited"
+      },
+      {
+        key: "cta",
+        label: "Launch Action",
+        type: "text",
+        defaultValue: "Direct the audience to view the product"
+      }
+    ]
+  },
+
+  "b-roll": {
+    label: "B-Roll",
+    category: "Video",
+    goal: "Create a practical B-roll shot list",
+    fields: [
+      {
+        key: "shotCount",
+        label: "Number of Shots",
+        type: "select",
+        options: ["5", "8", "10", "15"],
+        defaultValue: "8"
+      },
+      {
+        key: "setting",
+        label: "Filming Setting",
+        type: "select",
+        options: [
+          "Studio",
+          "Home lifestyle",
+          "Workspace",
+          "Outdoor",
+          "Retail environment"
+        ],
+        defaultValue: "Home lifestyle"
+      },
+      {
+        key: "shotStyle",
+        label: "Shot Style",
+        type: "select",
+        options: [
+          "Clean product detail",
+          "Cinematic",
+          "Casual creator",
+          "Fast-paced social"
+        ],
+        defaultValue: "Clean product detail"
+      }
+    ]
+  },
+
+  "cinematic-reveal": {
+    label: "Cinematic Reveal",
+    category: "Video",
+    goal: "Create a cinematic product reveal prompt",
+    fields: [
+      {
+        key: "duration",
+        label: "Reveal Length",
+        type: "select",
+        options: ["5 seconds", "10 seconds", "15 seconds", "30 seconds"],
+        defaultValue: "10 seconds"
+      },
+      {
+        key: "revealStyle",
+        label: "Reveal Style",
+        type: "select",
+        options: [
+          "Slow luxury reveal",
+          "Dramatic light reveal",
+          "Fast energetic reveal",
+          "Minimal studio reveal"
+        ],
+        defaultValue: "Slow luxury reveal"
+      },
+      {
+        key: "cameraMotion",
+        label: "Camera Motion",
+        type: "select",
+        options: [
+          "Slow push-in",
+          "Orbit",
+          "Macro pull-back",
+          "Top-down transition"
+        ],
+        defaultValue: "Slow push-in"
+      }
+    ]
+  }
+};
+
+const RANDOM_OPTIONS = {
+  productType: [
+    "Digital download",
+    "Physical product",
+    "Print-on-demand product",
+    "Service",
+    "Course",
+    "Template",
+    "Workbook",
+    "Membership"
+  ],
+  marketingGoal: [
+    "Launch a new product",
+    "Increase direct sales",
+    "Build product awareness",
+    "Grow an email list",
+    "Re-engage past buyers"
+  ],
+  buyerMotivation: [
+    "Save time",
+    "Make money",
+    "Feel organized",
+    "Solve a frustrating problem",
+    "Express personal identity",
+    "Create a professional result"
+  ],
+  pricingTier: ["Budget", "Mid-range", "Premium", "Luxury"],
+  offerType: [
+    "Single product",
+    "Bundle",
+    "Limited-time offer",
+    "Introductory offer",
+    "Evergreen offer"
+  ],
+  pricingUsage: [
+    "Mention the exact price",
+    "Emphasize value without stating the price",
+    "Compare value to the cost",
+    "Do not mention pricing"
+  ],
+  brandTone: [
+    "Warm and encouraging",
+    "Bold and direct",
+    "Professional and polished",
+    "Playful and energetic",
+    "Calm and premium",
+    "Educational and practical"
+  ],
+  visualStyle: [
+    "Clean modern",
+    "Bold editorial",
+    "Soft feminine",
+    "Minimal luxury",
+    "Colorful playful",
+    "Natural lifestyle",
+    "High-contrast commercial"
+  ],
+  aiPlatform: [
+    "ChatGPT",
+    "Claude",
+    "Gemini",
+    "Midjourney",
+    "DALL-E",
+    "Adobe Firefly",
+    "Canva",
+    "Kittl",
+    "Any AI platform"
+  ]
+};
+
+
+/* =========================================================
+   2. APPLICATION STATE
+   ========================================================= */
+
+const appState = {
+  selectedGenerators: [],
+  generatorSettings: {},
+  generatedOptions: {},
+  selectedOptions: {},
+  lastGeneratedSignature: "",
+  modalAction: null,
+  activeAccordion: null,
+  isGenerating: false
+};
+
+
+/* =========================================================
+   3. INITIALIZATION
+   ========================================================= */
+
+function initializeApplication() {
+  normalizeGeneratorCheckboxes();
+  initializeGeneratorSettings();
+  bindGlobalEvents();
+  restoreCurrentProject();
+  synchronizeSelectedGenerators();
+  renderGeneratorPanels();
+  updateSelectionLimit();
+  updateIngredientReview();
+  updateValidationSummary();
+  updateGeneratedVisibility();
+}
+
+
+/* =========================================================
+   4. ELEMENT HELPERS
+   ========================================================= */
+
+function getElement(id) {
+  return document.getElementById(id);
+}
+
+function getGeneratorCheckboxes() {
+  const explicitCheckboxes = Array.from(
+    document.querySelectorAll(
+      'input[type="checkbox"][data-generator], input[type="checkbox"][data-generator-id]'
+    )
+  );
+
+  if (explicitCheckboxes.length > 0) {
+    return explicitCheckboxes;
+  }
+
+  return Array.from(
+    document.querySelectorAll(".generator-card input[type='checkbox']")
+  );
+}
+
+function normalizeGeneratorCheckboxes() {
+  getGeneratorCheckboxes().forEach((checkbox) => {
+    const key = resolveGeneratorKey(checkbox);
+
+    if (!key) {
+      return;
+    }
+
+    checkbox.dataset.generator = key;
+    checkbox.value = key;
+  });
+}
+
+function resolveGeneratorKey(checkbox) {
+  const explicitKey =
+    checkbox.dataset.generator ||
+    checkbox.dataset.generatorId ||
+    checkbox.value ||
+    "";
+
+  const normalizedExplicit = normalizeKey(explicitKey);
+
+  if (GENERATOR_DEFINITIONS[normalizedExplicit]) {
+    return normalizedExplicit;
+  }
+
+  const card = checkbox.closest(".generator-card");
+  const visibleText = card?.textContent?.trim() || checkbox.name || checkbox.id;
+  const normalizedText = normalizeKey(visibleText);
+
+  const aliasMap = {
+    "product-description": "product-description",
+    "product-listing": "product-listing",
+    "sales-page": "sales-page",
+    "social-posts": "social-posts",
+    "hooks-captions": "hooks-captions",
+    "hooks-and-captions": "hooks-captions",
+    tiktok: "tiktok",
+    pinterest: "pinterest",
+    seo: "seo",
+    tags: "tags",
+    "product-mockups": "product-mockups",
+    "advertisement-graphics": "ads",
+    advertisements: "ads",
+    ads: "ads",
+    flyers: "flyers",
+    "lead-magnet-covers": "lead-magnet-covers",
+    "notebook-covers": "notebook-covers",
+    infographics: "infographics",
+    "creative-direction": "creative-direction",
+    "hero-banner": "hero-banner",
+    "video-motion": "video-motion",
+    "video-and-motion-graphics": "video-motion",
+    "short-form-video-scripts": "video-scripts",
+    "video-scripts": "video-scripts",
+    "voiceover-scripts": "voiceover",
+    voiceover: "voiceover",
+    "product-demo": "product-demo",
+    "launch-campaign": "launch-campaign",
+    "carousel-launch": "carousel",
+    carousel: "carousel",
+    "launch-announcement": "launch-announcement",
+    "b-roll": "b-roll",
+    "cinematic-reveal": "cinematic-reveal"
+  };
+
+  return aliasMap[normalizedText] || "";
+}
+
+function normalizeKey(value) {
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function initializeGeneratorSettings() {
+  Object.entries(GENERATOR_DEFINITIONS).forEach(([key, definition]) => {
+    if (!appState.generatorSettings[key]) {
+      appState.generatorSettings[key] = {};
+    }
+
+    definition.fields.forEach((field) => {
+      if (appState.generatorSettings[key][field.key] === undefined) {
+        appState.generatorSettings[key][field.key] =
+          field.defaultValue ?? "";
+      }
+    });
+  });
+}
+
+
+/* =========================================================
+   5. EVENT BINDING
+   ========================================================= */
+
+function bindGlobalEvents() {
+  document.addEventListener("change", handleDocumentChange);
+  document.addEventListener("input", handleDocumentInput);
+  document.addEventListener("click", handleDocumentClick);
+  document.addEventListener("keydown", handleDocumentKeydown);
+
+  const form = getElement("generatorForm");
+
+  if (form) {
+    form.addEventListener("submit", handleFormSubmit);
+  }
+
+  window.addEventListener("beforeunload", saveCurrentProject);
+}
+
+function handleDocumentChange(event) {
+  const target = event.target;
+
+  if (!(target instanceof HTMLElement)) {
+    return;
+  }
+
+  if (
+    target.matches(
+      'input[type="checkbox"][data-generator], input[type="checkbox"][data-generator-id], .generator-card input[type="checkbox"]'
+    )
+  ) {
+    handleGeneratorSelection(target);
+    return;
+  }
+
+  if (target.matches("[data-generator-setting]")) {
+    updateGeneratorSetting(target);
+  }
+
+  if (target.matches("[data-lock-target]")) {
+    updateLockState(target);
+  }
+
+  if (target.matches("[data-option-select]")) {
+    handleGeneratedOptionSelection(target);
+  }
+
+  markResultsOutdated();
+  updateIngredientReview();
+  updateValidationSummary();
+  saveCurrentProject();
+}
+
+function handleDocumentInput(event) {
+  const target = event.target;
+
+  if (!(target instanceof HTMLElement)) {
+    return;
+  }
+
+  if (target.matches("[data-generator-setting]")) {
+    updateGeneratorSetting(target);
+  }
+
+  markResultsOutdated();
+  updateIngredientReview();
+  updateValidationSummary();
+  saveCurrentProject();
+}
+
+function handleDocumentClick(event) {
+  const button = event.target.closest("button");
+
+  if (!button) {
+    return;
+  }
+
+  const action = button.dataset.action || "";
+
+  switch (action) {
+    case "toggle-generator-panel":
+      toggleGeneratorPanel(button);
+      break;
+
+    case "randomize-category":
+      randomizeCategory(button.dataset.category || "");
+      break;
+
+    case "randomize-all":
+      randomizeAllUnlockedFields();
+      break;
+
+    case "clear-category":
+      requestClearCategory(button.dataset.category || "");
+      break;
+
+    case "copy-output":
+      copyOutput(button.dataset.target || "");
+      break;
+
+    case "select-output":
+      selectGeneratedOption(
+        button.dataset.generator || "",
+        Number(button.dataset.optionIndex)
+      );
+      break;
+
+    case "create-variations":
+      createAdditionalVariations(button.dataset.generator || "");
+      break;
+
+    case "save-package":
+      saveFinalPackage();
+      break;
+
+    case "save-project":
+      saveProjectWithFeedback();
+      break;
+
+    case "load-project":
+      restoreCurrentProject(true);
+      break;
+
+    case "save-product-profile":
+      saveProductProfile();
+      break;
+
+    case "save-brand-profile":
+      saveBrandProfile();
+      break;
+
+    case "apply-product-profile":
+      applySavedProfile("product");
+      break;
+
+    case "apply-brand-profile":
+      applySavedProfile("brand");
+      break;
+
+    case "confirm-modal":
+      confirmModalAction();
+      break;
+
+    case "cancel-modal":
+      closeModal();
+      break;
+
+    default:
+      handleKnownButtonIds(button);
+      break;
+  }
+}
+
+function handleKnownButtonIds(button) {
+  const buttonId = button.id;
+
+  const actionMap = {
+    generateBtn: generatePromptOptions,
+    clearAllBtn: requestClearAll,
+    randomizeBtn: randomizeAllUnlockedFields,
+    randomizeAllBtn: randomizeAllUnlockedFields,
+    saveProjectBtn: saveProjectWithFeedback,
+    loadProjectBtn: () => restoreCurrentProject(true),
+    saveProductProfileBtn: saveProductProfile,
+    applyProductProfileBtn: () => applySavedProfile("product"),
+    saveBrandProfileBtn: saveBrandProfile,
+    applyBrandProfileBtn: () => applySavedProfile("brand"),
+    copyStandaloneBtn: () => copyOutput("standalonePromptOutput"),
+    copySeparateBtn: () => copyOutput("separatePromptsOutput"),
+    copyCombinedBtn: () => copyOutput("combinedPromptOutput"),
+    copyHybridBtn: () => copyOutput("hybridPromptOutput"),
+    copyFinalPackageBtn: () => copyOutput("finalPromptPackage"),
+    savePackageBtn: saveFinalPackage,
+    modalConfirmBtn: confirmModalAction,
+    modalCancelBtn: closeModal
+  };
+
+  if (actionMap[buttonId]) {
+    actionMap[buttonId]();
+  }
+}
+
+function handleDocumentKeydown(event) {
+  if (event.key === "Escape" && isModalOpen()) {
+    closeModal();
+  }
+
+  if (
+    event.key === "Enter" &&
+    event.target.matches("[data-generator-panel-heading]")
+  ) {
+    event.preventDefault();
+    toggleGeneratorPanel(event.target);
+  }
+}
+
+function handleFormSubmit(event) {
+  event.preventDefault();
+  generatePromptOptions();
+}
+
+
+/* =========================================================
+   6. GENERATOR SELECTION
+   ========================================================= */
+
+function handleGeneratorSelection(checkbox) {
+  const key = resolveGeneratorKey(checkbox);
+
+  if (!key) {
+    return;
+  }
+
+  const currentlySelected = getGeneratorCheckboxes().filter(
+    (item) => item.checked
+  );
+
+  if (
+    checkbox.checked &&
+    currentlySelected.length > MAX_SELECTED_GENERATORS
+  ) {
+    checkbox.checked = false;
+    showToast(
+      `Choose up to ${MAX_SELECTED_GENERATORS} generators at one time.`,
+      "warning"
+    );
+    return;
+  }
+
+  synchronizeSelectedGenerators();
+  renderGeneratorPanels();
+  updateSelectionLimit();
+  updateIngredientReview();
+  updateValidationSummary();
+  markResultsOutdated();
+  saveCurrentProject();
+}
+
+function synchronizeSelectedGenerators() {
+  appState.selectedGenerators = getGeneratorCheckboxes()
+    .filter((checkbox) => checkbox.checked)
+    .map(resolveGeneratorKey)
+    .filter((key) => Boolean(GENERATOR_DEFINITIONS[key]));
+}
+
+function updateSelectionLimit() {
+  const checkboxes = getGeneratorCheckboxes();
+  const count = appState.selectedGenerators.length;
+  const limitReached = count >= MAX_SELECTED_GENERATORS;
+
+  checkboxes.forEach((checkbox) => {
+    const key = resolveGeneratorKey(checkbox);
+
+    checkbox.disabled =
+      limitReached &&
+      !checkbox.checked &&
+      !appState.selectedGenerators.includes(key);
+
+    const card = checkbox.closest(".generator-card");
+
+    if (card) {
+      card.setAttribute(
+        "aria-disabled",
+        checkbox.disabled ? "true" : "false"
+      );
+    }
+  });
+
+  const countElements = [
+    getElement("selectionCount"),
+    getElement("generatorSelectionCount"),
+    document.querySelector(".selection-count")
+  ].filter(Boolean);
+
+  countElements.forEach((element) => {
+    element.textContent = `${count} of ${MAX_SELECTED_GENERATORS} selected`;
+  });
+
+  const message = getElement("generatorSelectionMessage");
+
+  if (message) {
+    message.textContent =
+      count === 0
+        ? "Select at least one generator."
+        : count === MAX_SELECTED_GENERATORS
+          ? "Maximum selection reached."
+          : `You may select ${MAX_SELECTED_GENERATORS - count} more.`;
+  }
+}
+
+
+/* =========================================================
+   7. GENERATOR CONFIGURATION PANELS
+   ========================================================= */
+
+function renderGeneratorPanels() {
+  const container =
+    getElement("generatorPanels") ||
+    document.querySelector(".generator-panels");
+
+  if (!container) {
+    return;
+  }
+
+  if (appState.selectedGenerators.length === 0) {
+    container.innerHTML = `
+      <p class="empty-state">
+        Select generators above to open their individual configuration panels.
+      </p>
+    `;
+    return;
+  }
+
+  container.innerHTML = appState.selectedGenerators
+    .map((generatorKey, index) =>
+      createGeneratorPanelMarkup(generatorKey, index)
+    )
+    .join("");
+
+  if (
+    !appState.activeAccordion ||
+    !appState.selectedGenerators.includes(appState.activeAccordion)
+  ) {
+    appState.activeAccordion = appState.selectedGenerators[0];
+  }
+
+  applyAccordionState();
+}
+
+function createGeneratorPanelMarkup(generatorKey, index) {
+  const definition = GENERATOR_DEFINITIONS[generatorKey];
+  const settings = appState.generatorSettings[generatorKey] || {};
+  const contentId = `generator-panel-content-${generatorKey}`;
+  const headingId = `generator-panel-heading-${generatorKey}`;
+
+  return `
+    <article class="generator-panel" data-generator-panel="${escapeHtml(generatorKey)}">
+      <button
+        type="button"
+        class="generator-panel__heading"
+        id="${headingId}"
+        data-action="toggle-generator-panel"
+        data-generator="${escapeHtml(generatorKey)}"
+        data-generator-panel-heading
+        aria-expanded="${index === 0 ? "true" : "false"}"
+        aria-controls="${contentId}"
+      >
+        <span>
+          <strong>${escapeHtml(definition.label)}</strong>
+          <span class="field-note">${escapeHtml(definition.category)}</span>
+        </span>
+        <span aria-hidden="true" data-accordion-symbol>+</span>
+      </button>
+
+      <div
+        class="generator-panel__content"
+        id="${contentId}"
+        role="region"
+        aria-labelledby="${headingId}"
+      >
+        <div class="form-grid">
+          ${definition.fields
+            .map((field) =>
+              createGeneratorFieldMarkup(
+                generatorKey,
+                field,
+                settings[field.key]
+              )
+            )
+            .join("")}
+
+          <div class="field-group field-group--full">
+            <label for="generator-${generatorKey}-instructions">
+              Additional Instructions
+            </label>
+            <textarea
+              id="generator-${generatorKey}-instructions"
+              data-generator-setting="${escapeHtml(generatorKey)}"
+              data-setting-key="additionalInstructions"
+              placeholder="Add any details unique to this generator."
+            >${escapeHtml(settings.additionalInstructions || "")}</textarea>
+          </div>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function createGeneratorFieldMarkup(generatorKey, field, currentValue) {
+  const fieldId = `generator-${generatorKey}-${field.key}`;
+  const safeValue = currentValue ?? "";
+
+  if (field.type === "select") {
+    return `
+      <div class="field-group">
+        <label for="${fieldId}">${escapeHtml(field.label)}</label>
+        <select
+          id="${fieldId}"
+          data-generator-setting="${escapeHtml(generatorKey)}"
+          data-setting-key="${escapeHtml(field.key)}"
+        >
+          ${field.options
+            .map(
+              (option) => `
+                <option
+                  value="${escapeHtml(option)}"
+                  ${option === safeValue ? "selected" : ""}
+                >
+                  ${escapeHtml(option)}
+                </option>
+              `
+            )
+            .join("")}
+        </select>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="field-group">
+      <label for="${fieldId}">${escapeHtml(field.label)}</label>
+      <input
+        type="text"
+        id="${fieldId}"
+        value="${escapeHtml(safeValue)}"
+        data-generator-setting="${escapeHtml(generatorKey)}"
+        data-setting-key="${escapeHtml(field.key)}"
+      >
+    </div>
+  `;
+}
+
+function toggleGeneratorPanel(button) {
+  const generatorKey = button.dataset.generator;
+
+  if (!generatorKey) {
+    return;
+  }
+
+  appState.activeAccordion =
+    appState.activeAccordion === generatorKey ? null : generatorKey;
+
+  applyAccordionState();
+}
+
+function applyAccordionState() {
+  document
+    .querySelectorAll("[data-generator-panel]")
+    .forEach((panel) => {
+      const generatorKey = panel.dataset.generatorPanel;
+      const heading = panel.querySelector("[data-generator-panel-heading]");
+      const content = panel.querySelector(".generator-panel__content");
+      const symbol = panel.querySelector("[data-accordion-symbol]");
+      const isOpen = appState.activeAccordion === generatorKey;
+
+      if (heading) {
+        heading.setAttribute("aria-expanded", String(isOpen));
+      }
+
+      if (content) {
+        content.hidden = !isOpen;
+      }
+
+      if (symbol) {
+        symbol.textContent = isOpen ? "−" : "+";
+      }
+    });
+}
+
+function updateGeneratorSetting(control) {
+  const generatorKey = control.dataset.generatorSetting;
+  const settingKey = control.dataset.settingKey;
+
+  if (!generatorKey || !settingKey) {
+    return;
+  }
+
+  if (!appState.generatorSettings[generatorKey]) {
+    appState.generatorSettings[generatorKey] = {};
+  }
+
+  appState.generatorSettings[generatorKey][settingKey] =
+    control.value.trim();
+}
+
+
+/* =========================================================
+   8. LOCKS AND RANDOMIZATION
+   ========================================================= */
+
+function updateLockState(lockControl) {
+  const targetId = lockControl.dataset.lockTarget;
+  const target = getElement(targetId);
+
+  if (!target) {
+    return;
+  }
+
+  const isLocked = lockControl.checked;
+
+  target.dataset.locked = String(isLocked);
+  target.classList.toggle("is-locked", isLocked);
+  target.setAttribute("aria-readonly", String(isLocked));
+}
+
+function isFieldLocked(field) {
+  if (!field) {
+    return false;
+  }
+
+  if (field.dataset.locked === "true") {
+    return true;
+  }
+
+  const lock = document.querySelector(
+    `[data-lock-target="${CSS.escape(field.id)}"]`
+  );
+
+  return Boolean(lock?.checked);
+}
+
+function randomizeCategory(categoryName) {
+  const category = document.querySelector(
+    `[data-category="${CSS.escape(categoryName)}"]`
+  );
+
+  if (!category) {
+    showToast("That category could not be found.", "error");
+    return;
+  }
+
+  const fields = Array.from(
+    category.querySelectorAll("input, select, textarea")
+  ).filter(isRandomizableField);
+
+  randomizeFields(fields);
+  completeRandomization();
+}
+
+function randomizeAllUnlockedFields() {
+  const fields = Array.from(
+    document.querySelectorAll(
+      "#generatorForm input, #generatorForm select, #generatorForm textarea"
+    )
+  ).filter(isRandomizableField);
+
+  randomizeFields(fields);
+  completeRandomization();
+}
+
+function isRandomizableField(field) {
+  if (
+    field.disabled ||
+    isFieldLocked(field) ||
+    field.type === "file" ||
+    field.type === "checkbox" ||
+    field.type === "radio" ||
+    field.readOnly
+  ) {
+    return false;
+  }
+
+  return Boolean(
+    RANDOM_OPTIONS[field.id] ||
+    field.matches("[data-random-options]") ||
+    field.matches("[data-generator-setting]")
+  );
+}
+
+function randomizeFields(fields) {
+  fields.forEach((field) => {
+    const explicitOptions = parseRandomOptions(field);
+    const globalOptions = RANDOM_OPTIONS[field.id] || [];
+    const options =
+      explicitOptions.length > 0 ? explicitOptions : globalOptions;
+
+    if (options.length > 0) {
+      field.value = randomItem(options);
+      field.dispatchEvent(new Event("change", { bubbles: true }));
+      return;
+    }
+
+    if (field.matches("[data-generator-setting]")) {
+      randomizeGeneratorSettingField(field);
+    }
+  });
+}
+
+function parseRandomOptions(field) {
+  const rawOptions = field.dataset.randomOptions;
+
+  if (!rawOptions) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(rawOptions);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return rawOptions
+      .split("|")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+}
+
+function randomizeGeneratorSettingField(field) {
+  if (field.tagName === "SELECT") {
+    const options = Array.from(field.options).filter(
+      (option) => !option.disabled && option.value
+    );
+
+    if (options.length > 0) {
+      field.value = randomItem(options).value;
+      updateGeneratorSetting(field);
+    }
+  }
+}
+
+function completeRandomization() {
+  markResultsOutdated();
+  updateIngredientReview();
+  updateValidationSummary();
+  saveCurrentProject();
+  showToast("Unlocked fields were randomized.", "success");
+}
+
+function randomItem(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+
+/* =========================================================
+   9. CLEAR ACTIONS AND MODAL
+   ========================================================= */
+
+function requestClearAll() {
+  openConfirmationModal(
+    "Clear all information?",
+    "This removes the current inputs, selections, configurations, and generated results.",
+    clearAllData
+  );
+}
+
+function requestClearCategory(categoryName) {
+  const category = document.querySelector(
+    `[data-category="${CSS.escape(categoryName)}"]`
+  );
+
+  if (!category) {
+    showToast("That category could not be found.", "error");
+    return;
+  }
+
+  openConfirmationModal(
+    "Clear this category?",
+    "Unlocked information in this category will be removed.",
+    () => clearCategory(category)
+  );
+}
+
+function clearCategory(category) {
+  const controls = category.querySelectorAll(
+    "input, select, textarea"
+  );
+
+  controls.forEach((control) => {
+    if (isFieldLocked(control)) {
+      return;
+    }
+
+    resetControl(control);
+  });
+
+  markResultsOutdated();
+  updateIngredientReview();
+  updateValidationSummary();
+  saveCurrentProject();
+  closeModal();
+  showToast("Category cleared.", "success");
+}
+
+function clearAllData() {
+  const form = getElement("generatorForm");
+
+  if (form) {
+    form.reset();
+  }
+
+  getGeneratorCheckboxes().forEach((checkbox) => {
+    checkbox.checked = false;
+    checkbox.disabled = false;
+  });
+
+  Object.keys(appState.generatorSettings).forEach((generatorKey) => {
+    appState.generatorSettings[generatorKey] = {};
+
+    GENERATOR_DEFINITIONS[generatorKey].fields.forEach((field) => {
+      appState.generatorSettings[generatorKey][field.key] =
+        field.defaultValue ?? "";
+    });
+  });
+
+  appState.selectedGenerators = [];
+  appState.generatedOptions = {};
+  appState.selectedOptions = {};
+  appState.lastGeneratedSignature = "";
+  appState.activeAccordion = null;
+
+  localStorage.removeItem(APP_STORAGE_KEYS.project);
+
+  clearOutputElements();
+  renderGeneratorPanels();
+  updateSelectionLimit();
+  updateIngredientReview();
+  updateValidationSummary();
+  updateGeneratedVisibility();
+  closeModal();
+  showToast("All information was cleared.", "success");
+}
+
+function resetControl(control) {
+  if (control.type === "checkbox" || control.type === "radio") {
+    control.checked = false;
+    return;
+  }
+
+  if (control.tagName === "SELECT") {
+    control.selectedIndex = 0;
+    return;
+  }
+
+  control.value = "";
+}
+
+function openConfirmationModal(title, message, action) {
+  const modal =
+    getElement("confirmationModal") ||
+    document.querySelector(".modal");
+
+  if (!modal) {
+    const confirmed = window.confirm(`${title}\n\n${message}`);
+
+    if (confirmed) {
+      action();
+    }
+
+    return;
+  }
+
+  const titleElement =
+    getElement("modalTitle") ||
+    modal.querySelector("h2");
+
+  const messageElement =
+    getElement("modalMessage") ||
+    modal.querySelector("p");
+
+  if (titleElement) {
+    titleElement.textContent = title;
+  }
+
+  if (messageElement) {
+    messageElement.textContent = message;
+  }
+
+  appState.modalAction = action;
+  modal.hidden = false;
+  modal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+
+  const focusTarget =
+    getElement("modalCancelBtn") ||
+    modal.querySelector("button");
+
+  focusTarget?.focus();
+}
+
+function confirmModalAction() {
+  const action = appState.modalAction;
+  appState.modalAction = null;
+
+  if (typeof action === "function") {
+    action();
+  }
+
+  closeModal();
+}
+
+function closeModal() {
+  const modal =
+    getElement("confirmationModal") ||
+    document.querySelector(".modal");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.hidden = true;
+  modal.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+  appState.modalAction = null;
+}
+
+function isModalOpen() {
+  const modal =
+    getElement("confirmationModal") ||
+    document.querySelector(".modal");
+
+  return Boolean(modal && !modal.hidden);
+}
+
+
+/* =========================================================
+   10. DATA COLLECTION
+   ========================================================= */
+
+function collectProjectData() {
+  return {
+    product: {
+      name: readValue("productName"),
+      type: readValue("productType"),
+      description: readValue("productDescription"),
+      features: readValue("productFeatures"),
+      benefits: readValue("productBenefits"),
+      format: readValue("productFormat")
+    },
+
+    audience: {
+      targetAudience: readValue("targetAudience"),
+      customerProblem: readValue("customerProblem"),
+      desiredOutcome: readValue("desiredOutcome"),
+      marketingGoal: readValue("marketingGoal"),
+      buyerMotivation: readValue("buyerMotivation")
+    },
+
+    pricing: {
+      currentPrice: readValue("currentPrice"),
+      pricingTier: readValue("pricingTier"),
+      offerType: readValue("offerType"),
+      pricingUsage: readValue("pricingUsage"),
+      offerDetails: readValue("offerDetails")
+    },
+
+    brand: {
+      brandName: readValue("brandName"),
+      brandTone: readValue("brandTone"),
+      visualStyle: readValue("visualStyle"),
+      primaryColor: readValue("primaryColor"),
+      secondaryColor: readValue("secondaryColor"),
+      brandKeywords: readValue("brandKeywords"),
+      wordsToAvoid: readValue("wordsToAvoid")
+    },
+
+    reference: {
+      usage: readValue("referenceImageUsage"),
+      notes: readValue("referenceImageNotes"),
+      fileName: getElement("referenceImageUpload")?.files?.[0]?.name || ""
+    },
+
+    delivery: {
+      aiPlatform: readValue("aiPlatform") || "Any AI platform",
+      deliveryMode: readValue("deliveryMode") || "Separate prompts",
+      optionCount: clampNumber(readValue("optionCount"), 1, 5, 3),
+      exactText: readValue("exactText"),
+      globalInstructions: readValue("globalInstructions")
+    },
+
+    selectedGenerators: [...appState.selectedGenerators],
+    generatorSettings: structuredCloneSafe(appState.generatorSettings),
+    timestamp: new Date().toISOString()
+  };
+}
+
+function readValue(id) {
+  const element = getElement(id);
+
+  if (!element) {
+    return "";
+  }
+
+  if (element.type === "checkbox") {
+    return element.checked;
+  }
+
+  if (element.multiple) {
+    return Array.from(element.selectedOptions)
+      .map((option) => option.value)
+      .join(", ");
+  }
+
+  return String(element.value || "").trim();
+}
+
+function writeValue(id, value) {
+  const element = getElement(id);
+
+  if (!element || value === undefined || value === null) {
+    return;
+  }
+
+  if (element.type === "checkbox") {
+    element.checked = Boolean(value);
+    return;
+  }
+
+  element.value = value;
+}
+
+function clampNumber(value, minimum, maximum, fallback) {
+  const number = Number.parseInt(value, 10);
+
+  if (Number.isNaN(number)) {
+    return fallback;
+  }
+
+  return Math.min(maximum, Math.max(minimum, number));
+}
+
+function structuredCloneSafe(value) {
+  if (typeof structuredClone === "function") {
+    return structuredClone(value);
+  }
+
+  return JSON.parse(JSON.stringify(value));
+}
+
+
+/* =========================================================
+   11. VALIDATION
+   ========================================================= */
+
+function validateProject(data = collectProjectData()) {
+  const errors = [];
+
+  clearFieldErrors();
+
+  if (!data.product.name) {
+    errors.push({
+      fieldId: "productName",
+      message: "Enter a product name."
+    });
+  }
+
+  if (!data.product.type) {
+    errors.push({
+      fieldId: "productType",
+      message: "Choose a product type."
+    });
+  }
+
+  if (!data.product.description) {
+    errors.push({
+      fieldId: "productDescription",
+      message: "Add a product description."
+    });
+  }
+
+  if (!data.audience.targetAudience) {
+    errors.push({
+      fieldId: "targetAudience",
+      message: "Describe the target audience."
+    });
+  }
+
+  if (!data.brand.brandTone) {
+    errors.push({
+      fieldId: "brandTone",
+      message: "Choose or enter a brand tone."
+    });
+  }
+
+  if (!data.brand.visualStyle) {
+    errors.push({
+      fieldId: "visualStyle",
+      message: "Choose or enter a visual style."
+    });
+  }
+
+  if (data.selectedGenerators.length === 0) {
+    errors.push({
+      fieldId: "",
+      message: "Select at least one generator."
+    });
+  }
+
+  if (data.selectedGenerators.length > MAX_SELECTED_GENERATORS) {
+    errors.push({
+      fieldId: "",
+      message: `Choose no more than ${MAX_SELECTED_GENERATORS} generators.`
+    });
+  }
+
+  errors.forEach((error) => {
+    if (error.fieldId) {
+      markFieldError(error.fieldId);
+    }
+  });
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+}
+
+function markFieldError(fieldId) {
+  const field = getElement(fieldId);
+
+  if (!field) {
+    return;
+  }
+
+  field.classList.add("is-error");
+  field.setAttribute("aria-invalid", "true");
+}
+
+function clearFieldErrors() {
+  document.querySelectorAll(".is-error").forEach((element) => {
+    element.classList.remove("is-error");
+    element.removeAttribute("aria-invalid");
+  });
+}
+
+function updateValidationSummary() {
+  const summary = getElement("validationSummary");
+
+  if (!summary) {
+    return;
+  }
+
+  const result = validateProject();
+
+  summary.classList.remove("is-valid", "is-invalid");
+
+  if (result.isValid) {
+    summary.classList.add("is-valid");
+    summary.textContent = "Your information is ready to generate.";
+    return;
+  }
+
+  summary.classList.add("is-invalid");
+  summary.textContent =
+    "Complete the required fields, then generate your prompts.";
+}
+
+function focusFirstValidationError(errors) {
+  const firstFieldError = errors.find((error) => error.fieldId);
+
+  if (firstFieldError) {
+    const field = getElement(firstFieldError.fieldId);
+    field?.focus();
+    field?.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+    return;
+  }
+
+  const library =
+    getElement("generatorLibrarySection") ||
+    document.querySelector("[data-section='generator-library']");
+
+  library?.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+
+/* =========================================================
+   12. INGREDIENT REVIEW
+   ========================================================= */
+
+function updateIngredientReview() {
+  const data = collectProjectData();
+
+  updateReviewElement(
+    "productReview",
+    [
+      data.product.name,
+      data.product.type,
+      data.product.description
+    ],
+    "Add product information to preview it here."
+  );
+
+  updateReviewElement(
+    "audienceReview",
+    [
+      data.audience.targetAudience,
+      data.audience.marketingGoal,
+      data.audience.buyerMotivation
+    ],
+    "Add audience and positioning information."
+  );
+
+  updateReviewElement(
+    "pricingReview",
+    [
+      formatPrice(data.pricing.currentPrice),
+      data.pricing.pricingTier,
+      data.pricing.offerType,
+      data.pricing.pricingUsage
+    ],
+    "Add pricing or offer information."
+  );
+
+  updateReviewElement(
+    "brandReview",
+    [
+      data.brand.brandName,
+      data.brand.brandTone,
+      data.brand.visualStyle,
+      data.brand.brandKeywords
+    ],
+    "Add brand direction."
+  );
+
+  updateReviewElement(
+    "generatorReview",
+    data.selectedGenerators.map(
+      (key) => GENERATOR_DEFINITIONS[key]?.label || key
+    ),
+    "Select up to four generators."
+  );
+
+  updateReviewElement(
+    "deliveryReview",
+    [
+      data.delivery.aiPlatform,
+      data.delivery.deliveryMode,
+      `${data.delivery.optionCount} option${
+        data.delivery.optionCount === 1 ? "" : "s"
+      }`
+    ],
+    "Choose the platform and delivery format."
+  );
+}
+
+function updateReviewElement(id, values, emptyMessage) {
+  const element = getElement(id);
+
+  if (!element) {
+    return;
+  }
+
+  const usableValues = values.filter(Boolean);
+
+  element.innerHTML =
+    usableValues.length > 0
+      ? `<ul>${usableValues
+          .map((value) => `<li>${escapeHtml(value)}</li>`)
+          .join("")}</ul>`
+      : `<p class="empty-state">${escapeHtml(emptyMessage)}</p>`;
+}
+
+function formatPrice(value) {
+  if (!value) {
+    return "";
+  }
+
+  const cleanedValue = String(value).replace(/[$,\s]/g, "");
+  const number = Number(cleanedValue);
+
+  if (Number.isNaN(number)) {
+    return value;
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+  }).format(number);
+}
+
+
+/* =========================================================
+   13. PROMPT GENERATION
+   ========================================================= */
+
+async function generatePromptOptions() {
+  if (appState.isGenerating) {
+    return;
+  }
+
+  const data = collectProjectData();
+  const validation = validateProject(data);
+
+  updateValidationSummary();
+
+  if (!validation.isValid) {
+    const message = validation.errors
+      .map((error) => error.message)
+      .join(" ");
+
+    showToast(message, "error");
+    focusFirstValidationError(validation.errors);
+    return;
+  }
+
+  setGeneratingState(true);
+
+  await delay(350);
+
+  appState.generatedOptions = {};
+  appState.selectedOptions = {};
+
+  data.selectedGenerators.forEach((generatorKey) => {
+    appState.generatedOptions[generatorKey] =
+      createGeneratorOptions(generatorKey, data);
+
+    appState.selectedOptions[generatorKey] = 0;
+  });
+
+  appState.lastGeneratedSignature = createProjectSignature(data);
+
+  renderGeneratedOptions();
+  assembleAllOutputs(data);
+  renderQualityResult(data);
+  updateGeneratedVisibility();
+  setGeneratingState(false);
+  saveCurrentProject();
+
+  const resultsSection = getElement("resultsSection");
+
+  resultsSection?.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+
+  showToast("Your prompt options are ready.", "success");
+}
+
+function createGeneratorOptions(generatorKey, data) {
+  const count = data.delivery.optionCount;
+
+  return Array.from({ length: count }, (_, index) =>
+    buildPrompt(generatorKey, data, index)
+  );
+}
+
+function buildPrompt(generatorKey, data, variationIndex) {
+  const definition = GENERATOR_DEFINITIONS[generatorKey];
+  const settings = data.generatorSettings[generatorKey] || {};
+  const variation = getVariationDirection(variationIndex);
+  const ingredients = buildSharedIngredients(data);
+  const generatorInstructions = buildGeneratorInstructions(
+    generatorKey,
+    settings
+  );
+  const referenceInstructions = buildReferenceInstructions(data.reference);
+  const exactTextInstructions = buildExactTextInstructions(
+    data.delivery.exactText
+  );
+  const platformInstructions = buildPlatformInstructions(
+    data.delivery.aiPlatform
+  );
+  const outputRequirements = buildOutputRequirements(
+    generatorKey,
+    data,
+    variation
+  );
+
+  return [
+    `${definition.goal} for "${data.product.name}".`,
+    "",
+    `Product and business context:`,
+    ingredients,
+    "",
+    `Generator direction:`,
+    generatorInstructions,
+    "",
+    `Creative variation:`,
+    variation,
+    "",
+    referenceInstructions,
+    exactTextInstructions,
+    platformInstructions,
+    outputRequirements,
+    data.delivery.globalInstructions
+      ? `Additional instructions: ${data.delivery.globalInstructions}`
+      : "",
+    "",
+    "Return a polished, specific, commercially useful result. Avoid filler, vague claims, unsupported guarantees, copied brand language, and unnecessary repetition."
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function buildSharedIngredients(data) {
+  const lines = [
+    `Product name: ${data.product.name}`,
+    `Product type: ${data.product.type}`,
+    `Product description: ${data.product.description}`,
+    data.product.features
+      ? `Key features: ${data.product.features}`
+      : "",
+    data.product.benefits
+      ? `Primary benefits: ${data.product.benefits}`
+      : "",
+    data.product.format
+      ? `Product format or delivery: ${data.product.format}`
+      : "",
+    `Target audience: ${data.audience.targetAudience}`,
+    data.audience.customerProblem
+      ? `Customer problem: ${data.audience.customerProblem}`
+      : "",
+    data.audience.desiredOutcome
+      ? `Desired outcome: ${data.audience.desiredOutcome}`
+      : "",
+    data.audience.marketingGoal
+      ? `Marketing goal: ${data.audience.marketingGoal}`
+      : "",
+    data.audience.buyerMotivation
+      ? `Buyer motivation: ${data.audience.buyerMotivation}`
+      : "",
+    data.pricing.currentPrice
+      ? `Current price: ${formatPrice(data.pricing.currentPrice)}`
+      : "",
+    data.pricing.pricingTier
+      ? `Pricing position: ${data.pricing.pricingTier}`
+      : "",
+    data.pricing.offerType
+      ? `Offer type: ${data.pricing.offerType}`
+      : "",
+    data.pricing.pricingUsage
+      ? `Pricing instruction: ${data.pricing.pricingUsage}`
+      : "",
+    data.pricing.offerDetails
+      ? `Offer details: ${data.pricing.offerDetails}`
+      : "",
+    data.brand.brandName
+      ? `Brand name: ${data.brand.brandName}`
+      : "",
+    `Brand tone: ${data.brand.brandTone}`,
+    `Visual style: ${data.brand.visualStyle}`,
+    data.brand.primaryColor
+      ? `Primary brand color: ${data.brand.primaryColor}`
+      : "",
+    data.brand.secondaryColor
+      ? `Secondary brand color: ${data.brand.secondaryColor}`
+      : "",
+    data.brand.brandKeywords
+      ? `Brand keywords: ${data.brand.brandKeywords}`
+      : "",
+    data.brand.wordsToAvoid
+      ? `Words and phrases to avoid: ${data.brand.wordsToAvoid}`
+      : ""
+  ];
+
+  return lines.filter(Boolean).map((line) => `- ${line}`).join("\n");
+}
+
+function buildGeneratorInstructions(generatorKey, settings) {
+  const definition = GENERATOR_DEFINITIONS[generatorKey];
+  const fieldLines = definition.fields.map((field) => {
+    const value = settings[field.key] || field.defaultValue || "";
+    return `- ${field.label}: ${value || "Use professional judgment"}`;
+  });
+
+  if (settings.additionalInstructions) {
+    fieldLines.push(
+      `- Additional instructions: ${settings.additionalInstructions}`
+    );
+  }
+
+  return fieldLines.join("\n");
+}
+
+function buildReferenceInstructions(reference) {
+  if (!reference.fileName && !reference.notes && !reference.usage) {
+    return "Reference image: No reference image was provided. Create an original direction without imitating protected work.";
+  }
+
+  return [
+    "Reference image guidance:",
+    reference.fileName
+      ? `- Uploaded file: ${reference.fileName}`
+      : "",
+    reference.usage
+      ? `- Approved use: ${reference.usage}`
+      : "",
+    reference.notes
+      ? `- Observations to use: ${reference.notes}`
+      : "",
+    "- Borrow only general qualities such as mood, composition, color relationship, or level of polish.",
+    "- Do not reproduce logos, characters, branded trade dress, distinctive artwork, or a recognizable person's likeness without permission."
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function buildExactTextInstructions(exactText) {
+  if (!exactText) {
+    return "";
+  }
+
+  return `Exact wording requirement: The exact text must read: "${exactText}" in full, with no changes, additions, paraphrasing, or repeated copies.`;
+}
+
+function buildPlatformInstructions(platform) {
+  return `Optimize the final prompt for ${platform || "any AI platform"}. Use plain language that another AI tool can follow without hidden assumptions.`;
+}
+
+function buildOutputRequirements(generatorKey, data, variation) {
+  const visualGenerators = new Set([
+    "product-mockups",
+    "ads",
+    "flyers",
+    "lead-magnet-covers",
+    "notebook-covers",
+    "infographics",
+    "hero-banner",
+    "video-motion",
+    "cinematic-reveal"
+  ]);
+
+  const videoGenerators = new Set([
+    "tiktok",
+    "video-motion",
+    "video-scripts",
+    "voiceover",
+    "product-demo",
+    "b-roll",
+    "cinematic-reveal"
+  ]);
+
+  const launchGenerators = new Set([
+    "launch-campaign",
+    "carousel",
+    "launch-announcement"
+  ]);
+
+  const requirements = [
+    "Output requirements:",
+    `- Use the ${variation.toLowerCase()} direction consistently.`,
+    "- Keep the product, audience, brand tone, pricing position, and goal aligned.",
+    "- Make the result specific enough to use with minimal editing."
+  ];
+
+  if (visualGenerators.has(generatorKey)) {
+    requirements.push(
+      "- Describe the focal point, composition, background, lighting, color treatment, typography placement when relevant, and intended canvas orientation.",
+      "- Protect thumbnail readability and commercial usability.",
+      "- Do not add unrequested text, watermarks, logos, or mockup labels."
+    );
+  }
+
+  if (videoGenerators.has(generatorKey)) {
+    requirements.push(
+      "- Include a clear opening hook, visual progression, pacing, and closing action.",
+      "- Keep scene directions practical enough to film or generate."
+    );
+  }
+
+  if (launchGenerators.has(generatorKey)) {
+    requirements.push(
+      "- Build a clear sequence from awareness to interest to action.",
+      "- Avoid repeating the same message in every asset."
+    );
+  }
+
+  if (data.pricing.pricingUsage) {
+    requirements.push(
+      `- Follow this pricing rule exactly: ${data.pricing.pricingUsage}.`
+    );
+  }
+
+  return requirements.join("\n");
+}
+
+function getVariationDirection(index) {
+  const variations = [
+    "Lead with the buyer's clearest practical benefit",
+    "Use a more emotional and transformation-focused angle",
+    "Use a polished, premium, authority-led angle",
+    "Use a direct, high-energy conversion angle",
+    "Use a simple, beginner-friendly educational angle"
+  ];
+
+  return variations[index % variations.length];
+}
+
+function createProjectSignature(data) {
+  return JSON.stringify({
+    product: data.product,
+    audience: data.audience,
+    pricing: data.pricing,
+    brand: data.brand,
+    reference: data.reference,
+    delivery: data.delivery,
+    selectedGenerators: data.selectedGenerators,
+    generatorSettings: data.generatorSettings
+  });
+}
+
+
+/* =========================================================
+   14. GENERATED OPTION RENDERING
+   ========================================================= */
+
+function renderGeneratedOptions() {
+  const container = getElement("generatorOptionsOutput");
+
+  if (!container) {
+    return;
+  }
+
+  container.innerHTML = appState.selectedGenerators
+    .map((generatorKey) => {
+      const definition = GENERATOR_DEFINITIONS[generatorKey];
+      const options = appState.generatedOptions[generatorKey] || [];
+
+      return `
+        <section class="generator-output-group" data-output-generator="${escapeHtml(generatorKey)}">
+          <div class="output-heading">
+            <h3>${escapeHtml(definition.label)}</h3>
+            <button
+              type="button"
+              data-action="create-variations"
+              data-generator="${escapeHtml(generatorKey)}"
+            >
+              Create Variations
+            </button>
+          </div>
+
+          <div class="generator-output-options">
+            ${options
+              .map((prompt, index) =>
+                createOutputCardMarkup(generatorKey, prompt, index)
+              )
+              .join("")}
+          </div>
+        </section>
+      `;
+    })
+    .join("");
+}
+
+function createOutputCardMarkup(generatorKey, prompt, index) {
+  const optionId = `generated-${generatorKey}-${index}`;
+  const isSelected =
+    appState.selectedOptions[generatorKey] === index;
+
+  return `
+    <article class="output-card ${isSelected ? "is-selected" : ""}">
+      <div class="output-heading">
+        <h3>Option ${index + 1}</h3>
+
+        <div class="action-row">
+          <button
+            type="button"
+            data-action="select-output"
+            data-generator="${escapeHtml(generatorKey)}"
+            data-option-index="${index}"
+            aria-pressed="${isSelected ? "true" : "false"}"
+          >
+            ${isSelected ? "Selected" : "Use This Option"}
+          </button>
+
+          <button
+            type="button"
+            data-action="copy-output"
+            data-target="${optionId}"
+          >
+            Copy
+          </button>
+        </div>
+      </div>
+
+      <textarea
+        id="${optionId}"
+        readonly
+        aria-label="${escapeHtml(
+          `${GENERATOR_DEFINITIONS[generatorKey].label} option ${index + 1}`
+        )}"
+      >${escapeHtml(prompt)}</textarea>
+    </article>
+  `;
+}
+
+function handleGeneratedOptionSelection(control) {
+  const generatorKey = control.dataset.generator;
+  const optionIndex = Number(control.value);
+
+  selectGeneratedOption(generatorKey, optionIndex);
+}
+
+function selectGeneratedOption(generatorKey, optionIndex) {
+  const options = appState.generatedOptions[generatorKey];
+
+  if (!options || !options[optionIndex]) {
+    return;
+  }
+
+  appState.selectedOptions[generatorKey] = optionIndex;
+
+  renderGeneratedOptions();
+  assembleAllOutputs(collectProjectData());
+  saveCurrentProject();
+  showToast("Prompt option selected.", "success");
+}
+
+function createAdditionalVariations(generatorKey) {
+  const data = collectProjectData();
+  const currentOptions = appState.generatedOptions[generatorKey] || [];
+  const requestedCount = data.delivery.optionCount;
+
+  const additionalOptions = Array.from(
+    { length: requestedCount },
+    (_, index) =>
+      buildPrompt(
+        generatorKey,
+        data,
+        currentOptions.length + index
+      )
+  );
+
+  appState.generatedOptions[generatorKey] = [
+    ...currentOptions,
+    ...additionalOptions
+  ];
+
+  renderGeneratedOptions();
+  assembleAllOutputs(data);
+  saveCurrentProject();
+  showToast("Additional variations created.", "success");
+}
+
+
+/* =========================================================
+   15. OUTPUT ASSEMBLY
+   ========================================================= */
+
+function assembleAllOutputs(data) {
+  const selectedPrompts = appState.selectedGenerators
+    .map((generatorKey) => {
+      const options = appState.generatedOptions[generatorKey] || [];
+      const selectedIndex =
+        appState.selectedOptions[generatorKey] ?? 0;
+      const prompt = options[selectedIndex];
+
+      if (!prompt) {
+        return null;
+      }
+
+      return {
+        generatorKey,
+        label: GENERATOR_DEFINITIONS[generatorKey].label,
+        prompt
+      };
+    })
+    .filter(Boolean);
+
+  const standaloneOutput =
+    selectedPrompts.length === 1
+      ? selectedPrompts[0].prompt
+      : selectedPrompts
+          .map(
+            (item) =>
+              `${item.label.toUpperCase()}\n\n${item.prompt}`
+          )
+          .join("\n\n");
+
+  const separateOutput = selectedPrompts
+    .map(
+      (item, index) =>
+        `PROMPT ${index + 1}: ${item.label}\n\n${item.prompt}`
+    )
+    .join("\n\n----------------------------------------\n\n");
+
+  const combinedOutput = buildCombinedPrompt(data, selectedPrompts);
+  const hybridOutput = buildHybridPrompt(data, selectedPrompts);
+
+  setOutputValue("standalonePromptOutput", standaloneOutput);
+  setOutputValue("separatePromptsOutput", separateOutput);
+  setOutputValue("combinedPromptOutput", combinedOutput);
+  setOutputValue("hybridPromptOutput", hybridOutput);
+
+  const mode = normalizeKey(data.delivery.deliveryMode);
+  let finalPackage = separateOutput;
+
+  if (mode.includes("standalone")) {
+    finalPackage = standaloneOutput;
+  } else if (mode.includes("combined")) {
+    finalPackage = combinedOutput;
+  } else if (mode.includes("hybrid")) {
+    finalPackage = hybridOutput;
+  }
+
+  setOutputValue("finalPromptPackage", finalPackage);
+}
+
+function buildCombinedPrompt(data, selectedPrompts) {
+  if (selectedPrompts.length === 0) {
+    return "";
+  }
+
+  return [
+    `Create a coordinated prompt package for "${data.product.name}".`,
+    "",
+    "The package must contain the following deliverables in this order:",
+    selectedPrompts
+      .map(
+        (item, index) =>
+          `${index + 1}. ${item.label}`
+      )
+      .join("\n"),
+    "",
+    "Use one shared product position, audience, brand tone, visual direction, and offer strategy across every deliverable. Keep each deliverable distinct and avoid repeating identical wording.",
+    "",
+    "DELIVERABLE INSTRUCTIONS",
+    "",
+    selectedPrompts
+      .map(
+        (item, index) =>
+          `${index + 1}. ${item.label.toUpperCase()}\n${item.prompt}`
+      )
+      .join("\n\n")
+  ].join("\n");
+}
+
+function buildHybridPrompt(data, selectedPrompts) {
+  if (selectedPrompts.length === 0) {
+    return "";
+  }
+
+  const overview = [
+    `PROJECT OVERVIEW`,
+    `Product: ${data.product.name}`,
+    `Audience: ${data.audience.targetAudience}`,
+    `Goal: ${data.audience.marketingGoal || "Create commercially useful assets"}`,
+    `Brand tone: ${data.brand.brandTone}`,
+    `Visual style: ${data.brand.visualStyle}`,
+    `Platform: ${data.delivery.aiPlatform}`
+  ].join("\n");
+
+  const separatePrompts = selectedPrompts
+    .map(
+      (item, index) =>
+        `PROMPT ${index + 1}: ${item.label}\n\n${item.prompt}`
+    )
+    .join("\n\n----------------------------------------\n\n");
+
+  return `${overview}\n\n${separatePrompts}`;
+}
+
+function setOutputValue(id, value) {
+  const element = getElement(id);
+
+  if (!element) {
+    return;
+  }
+
+  if (
+    element instanceof HTMLTextAreaElement ||
+    element instanceof HTMLInputElement
+  ) {
+    element.value = value;
+  } else {
+    element.textContent = value;
+  }
+}
+
+function getOutputValue(id) {
+  const element = getElement(id);
+
+  if (!element) {
+    return "";
+  }
+
+  if (
+    element instanceof HTMLTextAreaElement ||
+    element instanceof HTMLInputElement
+  ) {
+    return element.value;
+  }
+
+  return element.textContent || "";
+}
+
+function clearOutputElements() {
+  [
+    "standalonePromptOutput",
+    "separatePromptsOutput",
+    "combinedPromptOutput",
+    "hybridPromptOutput",
+    "finalPromptPackage"
+  ].forEach((id) => setOutputValue(id, ""));
+
+  const optionContainer = getElement("generatorOptionsOutput");
+
+  if (optionContainer) {
+    optionContainer.innerHTML = "";
+  }
+
+  const qualityResult = getElement("qualityResult");
+
+  if (qualityResult) {
+    qualityResult.innerHTML = "";
+  }
+}
+
+
+/* =========================================================
+   16. QUALITY REVIEW
+   ========================================================= */
+
+function renderQualityResult(data) {
+  const container = getElement("qualityResult");
+
+  if (!container) {
+    return;
+  }
+
+  const checks = [
+    {
+      label: "Clear product",
+      passed: Boolean(
+        data.product.name && data.product.description
+      )
+    },
+    {
+      label: "Defined audience",
+      passed: Boolean(data.audience.targetAudience)
+    },
+    {
+      label: "Brand direction",
+      passed: Boolean(
+        data.brand.brandTone && data.brand.visualStyle
+      )
+    },
+    {
+      label: "Commercial goal",
+      passed: Boolean(
+        data.audience.marketingGoal ||
+          data.pricing.offerType
+      )
+    },
+    {
+      label: "Generator direction",
+      passed: data.selectedGenerators.every((key) =>
+        Boolean(appState.generatorSettings[key])
+      )
+    }
+  ];
+
+  const passedCount = checks.filter((check) => check.passed).length;
+  const score = Math.round(
+    (passedCount / checks.length) * 100
+  );
+
+  const status =
+    score === 100
+      ? "Ready"
+      : score >= 80
+        ? "Strong"
+        : score >= 60
+          ? "Needs Review"
+          : "Incomplete";
+
+  container.className = "quality-result";
+
+  if (score >= 80) {
+    container.classList.add("is-success");
+  } else if (score >= 60) {
+    container.classList.add("is-warning");
+  } else {
+    container.classList.add("is-error");
+  }
+
+  container.innerHTML = `
+    <h3>Quality Result: ${escapeHtml(status)} (${score}%)</h3>
+    <ul>
+      ${checks
+        .map(
+          (check) => `
+            <li>
+              ${check.passed ? "Complete" : "Update needed"}:
+              ${escapeHtml(check.label)}
+            </li>
+          `
+        )
+        .join("")}
+    </ul>
+  `;
+}
+
+
+/* =========================================================
+   17. COPY AND SAVE
+   ========================================================= */
+
+async function copyOutput(targetId) {
+  const text = getOutputValue(targetId);
+
+  if (!text.trim()) {
+    showToast("There is no generated content to copy.", "warning");
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast("Copied to your clipboard.", "success");
+  } catch {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const temporaryTextarea = document.createElement("textarea");
+  temporaryTextarea.value = text;
+  temporaryTextarea.setAttribute("readonly", "");
+  temporaryTextarea.style.position = "fixed";
+  temporaryTextarea.style.opacity = "0";
+  document.body.appendChild(temporaryTextarea);
+  temporaryTextarea.select();
+
+  try {
+    document.execCommand("copy");
+    showToast("Copied to your clipboard.", "success");
+  } catch {
+    showToast("The content could not be copied.", "error");
+  } finally {
+    temporaryTextarea.remove();
+  }
+}
+
+function saveFinalPackage() {
+  const packageText = getOutputValue("finalPromptPackage");
+
+  if (!packageText.trim()) {
+    showToast("Generate a prompt package before saving.", "warning");
+    return;
+  }
+
+  const savedPackages = readStorageArray(
+    APP_STORAGE_KEYS.savedPackages
+  );
+
+  savedPackages.unshift({
+    id: createId(),
+    productName: readValue("productName") || "Untitled Product",
+    deliveryMode: readValue("deliveryMode"),
+    content: packageText,
+    savedAt: new Date().toISOString()
+  });
+
+  localStorage.setItem(
+    APP_STORAGE_KEYS.savedPackages,
+    JSON.stringify(savedPackages.slice(0, 25))
+  );
+
+  showToast("Prompt package saved on this device.", "success");
+}
+
+
+/* =========================================================
+   18. PROJECT PERSISTENCE
+   ========================================================= */
+
+function saveCurrentProject() {
+  try {
+    const project = {
+      data: collectProjectData(),
+      generatedOptions: appState.generatedOptions,
+      selectedOptions: appState.selectedOptions,
+      lastGeneratedSignature: appState.lastGeneratedSignature
+    };
+
+    localStorage.setItem(
+      APP_STORAGE_KEYS.project,
+      JSON.stringify(project)
+    );
+  } catch {
+    /* Local persistence is helpful but not required to continue. */
+  }
+}
+
+function saveProjectWithFeedback() {
+  saveCurrentProject();
+  showToast("Project saved on this device.", "success");
+}
+
+function restoreCurrentProject(showFeedback = false) {
+  const stored = localStorage.getItem(APP_STORAGE_KEYS.project);
+
+  if (!stored) {
+    if (showFeedback) {
+      showToast("No saved project was found.", "warning");
+    }
+
+    return;
+  }
+
+  try {
+    const project = JSON.parse(stored);
+    const data = project.data || project;
+
+    restoreProjectFields(data);
+
+    appState.generatorSettings = {
+      ...appState.generatorSettings,
+      ...(data.generatorSettings || {})
+    };
+
+    appState.generatedOptions = project.generatedOptions || {};
+    appState.selectedOptions = project.selectedOptions || {};
+    appState.lastGeneratedSignature =
+      project.lastGeneratedSignature || "";
+
+    initializeGeneratorSettings();
+    synchronizeSelectedGenerators();
+    renderGeneratorPanels();
+    updateSelectionLimit();
+    updateIngredientReview();
+    updateValidationSummary();
+
+    if (Object.keys(appState.generatedOptions).length > 0) {
+      renderGeneratedOptions();
+      assembleAllOutputs(collectProjectData());
+      renderQualityResult(collectProjectData());
+    }
+
+    updateGeneratedVisibility();
+
+    if (showFeedback) {
+      showToast("Saved project loaded.", "success");
+    }
+  } catch {
+    if (showFeedback) {
+      showToast("The saved project could not be loaded.", "error");
+    }
+  }
+}
+
+function restoreProjectFields(data) {
+  const mappings = {
+    productName: data.product?.name,
+    productType: data.product?.type,
+    productDescription: data.product?.description,
+    productFeatures: data.product?.features,
+    productBenefits: data.product?.benefits,
+    productFormat: data.product?.format,
+
+    targetAudience: data.audience?.targetAudience,
+    customerProblem: data.audience?.customerProblem,
+    desiredOutcome: data.audience?.desiredOutcome,
+    marketingGoal: data.audience?.marketingGoal,
+    buyerMotivation: data.audience?.buyerMotivation,
+
+    currentPrice: data.pricing?.currentPrice,
+    pricingTier: data.pricing?.pricingTier,
+    offerType: data.pricing?.offerType,
+    pricingUsage: data.pricing?.pricingUsage,
+    offerDetails: data.pricing?.offerDetails,
+
+    brandName: data.brand?.brandName,
+    brandTone: data.brand?.brandTone,
+    visualStyle: data.brand?.visualStyle,
+    primaryColor: data.brand?.primaryColor,
+    secondaryColor: data.brand?.secondaryColor,
+    brandKeywords: data.brand?.brandKeywords,
+    wordsToAvoid: data.brand?.wordsToAvoid,
+
+    referenceImageUsage: data.reference?.usage,
+    referenceImageNotes: data.reference?.notes,
+
+    aiPlatform: data.delivery?.aiPlatform,
+    deliveryMode: data.delivery?.deliveryMode,
+    optionCount: data.delivery?.optionCount,
+    exactText: data.delivery?.exactText,
+    globalInstructions: data.delivery?.globalInstructions
+  };
+
+  Object.entries(mappings).forEach(([id, value]) => {
+    writeValue(id, value);
+  });
+
+  const selectedGenerators = data.selectedGenerators || [];
+
+  getGeneratorCheckboxes().forEach((checkbox) => {
+    const key = resolveGeneratorKey(checkbox);
+    checkbox.checked = selectedGenerators.includes(key);
+  });
+}
+
+
+/* =========================================================
+   19. PRODUCT AND BRAND PROFILES
+   ========================================================= */
+
+function saveProductProfile() {
+  const data = collectProjectData();
+  const profileName = window.prompt(
+    "Name this product profile:",
+    data.product.name || "Product Profile"
+  );
+
+  if (!profileName?.trim()) {
+    return;
+  }
+
+  const profiles = readStorageArray(
+    APP_STORAGE_KEYS.productProfiles
+  );
+
+  profiles.push({
+    id: createId(),
+    name: profileName.trim(),
+    product: data.product,
+    audience: data.audience,
+    pricing: data.pricing
+  });
+
+  localStorage.setItem(
+    APP_STORAGE_KEYS.productProfiles,
+    JSON.stringify(profiles)
+  );
+
+  showToast("Product profile saved.", "success");
+}
+
+function saveBrandProfile() {
+  const data = collectProjectData();
+  const profileName = window.prompt(
+    "Name this brand profile:",
+    data.brand.brandName || "Brand Profile"
+  );
+
+  if (!profileName?.trim()) {
+    return;
+  }
+
+  const profiles = readStorageArray(
+    APP_STORAGE_KEYS.brandProfiles
+  );
+
+  profiles.push({
+    id: createId(),
+    name: profileName.trim(),
+    brand: data.brand
+  });
+
+  localStorage.setItem(
+    APP_STORAGE_KEYS.brandProfiles,
+    JSON.stringify(profiles)
+  );
+
+  showToast("Brand profile saved.", "success");
+}
+
+function applySavedProfile(type) {
+  const storageKey =
+    type === "product"
+      ? APP_STORAGE_KEYS.productProfiles
+      : APP_STORAGE_KEYS.brandProfiles;
+
+  const profiles = readStorageArray(storageKey);
+
+  if (profiles.length === 0) {
+    showToast(`No saved ${type} profiles were found.`, "warning");
+    return;
+  }
+
+  const names = profiles
+    .map((profile, index) => `${index + 1}. ${profile.name}`)
+    .join("\n");
+
+  const choice = window.prompt(
+    `Choose a ${type} profile by number:\n\n${names}`
+  );
+
+  const index = Number.parseInt(choice, 10) - 1;
+  const selectedProfile = profiles[index];
+
+  if (!selectedProfile) {
+    showToast("No profile was applied.", "warning");
+    return;
+  }
+
+  if (type === "product") {
+    restoreProjectFields({
+      product: selectedProfile.product,
+      audience: selectedProfile.audience,
+      pricing: selectedProfile.pricing
+    });
+  } else {
+    restoreProjectFields({
+      brand: selectedProfile.brand
+    });
+  }
+
+  markResultsOutdated();
+  updateIngredientReview();
+  updateValidationSummary();
+  saveCurrentProject();
+  showToast(`${capitalize(type)} profile applied.`, "success");
+}
+
+
+/* =========================================================
+   20. GENERATED VISIBILITY AND UPDATE STATE
+   ========================================================= */
+
+function updateGeneratedVisibility() {
+  const hasResults =
+    Object.keys(appState.generatedOptions).length > 0;
+
+  const resultsSection = getElement("resultsSection");
+  const promptAssemblySection =
+    getElement("promptAssemblySection");
+
+  if (resultsSection) {
+    resultsSection.hidden = !hasResults;
+  }
+
+  if (promptAssemblySection) {
+    promptAssemblySection.hidden = !hasResults;
+  }
+}
+
+function markResultsOutdated() {
+  if (!appState.lastGeneratedSignature) {
+    return;
+  }
+
+  const currentSignature = createProjectSignature(
+    collectProjectData()
+  );
+
+  const updateNeeded =
+    currentSignature !== appState.lastGeneratedSignature;
+
+  const resultsSection = getElement("resultsSection");
+  const promptAssemblySection =
+    getElement("promptAssemblySection");
+
+  resultsSection?.classList.toggle(
+    "is-update-needed",
+    updateNeeded
+  );
+
+  promptAssemblySection?.classList.toggle(
+    "is-update-needed",
+    updateNeeded
+  );
+
+  const status =
+    getElement("generationStatus") ||
+    getElement("resultsStatus");
+
+  if (status) {
+    status.textContent = updateNeeded
+      ? "Your inputs changed. Generate again to update the results."
+      : "Your prompt options are ready.";
+  }
+}
+
+function setGeneratingState(isGenerating) {
+  appState.isGenerating = isGenerating;
+
+  const button = getElement("generateBtn");
+
+  if (!button) {
+    return;
+  }
+
+  button.disabled = isGenerating;
+  button.setAttribute(
+    "aria-busy",
+    isGenerating ? "true" : "false"
+  );
+
+  if (!button.dataset.originalLabel) {
+    button.dataset.originalLabel =
+      button.textContent.trim() || "Generate Prompt Options";
+  }
+
+  button.textContent = isGenerating
+    ? "Generating..."
+    : button.dataset.originalLabel;
+}
+
+
+/* =========================================================
+   21. TOASTS
+   ========================================================= */
+
+function showToast(message, type = "success") {
+  const toast =
+    getElement("appToast") ||
+    document.querySelector(".toast");
+
+  if (!toast) {
+    return;
+  }
+
+  toast.classList.remove(
+    "is-success",
+    "is-warning",
+    "is-error"
+  );
+
+  toast.classList.add(`is-${type}`);
+  toast.textContent = message;
+  toast.hidden = false;
+  toast.setAttribute("role", type === "error" ? "alert" : "status");
+
+  window.clearTimeout(showToast.timeoutId);
+
+  showToast.timeoutId = window.setTimeout(() => {
+    toast.hidden = true;
+  }, 3200);
+}
+
+
+/* =========================================================
+   22. UTILITIES
+   ========================================================= */
+
+function readStorageArray(key) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function createId() {
+  if (crypto?.randomUUID) {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random()
+    .toString(16)
+    .slice(2)}`;
+}
+
+function delay(milliseconds) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, milliseconds);
+  });
+}
+
+function capitalize(value) {
+  const text = String(value || "");
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}

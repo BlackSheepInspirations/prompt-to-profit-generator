@@ -1,0 +1,2273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Prompt to Profit helps creators build product, marketing, launch, image, and video prompts."
+  >
+
+  <title>Prompt to Profit Generator</title>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <a class="skip-link" href="#mainContent">
+    Skip to main content
+  </a>
+
+  <header class="site-header">
+    <div class="site-header__content">
+      <div>
+        <p class="eyebrow">AI Product and Launch Prompt Builder</p>
+
+        <h1>Prompt to Profit Generator</h1>
+
+        <p class="site-header__description">
+          Turn one product idea into coordinated, sales-focused prompts
+          for content, visuals, marketing, and product launches.
+        </p>
+      </div>
+
+      <div class="project-actions" aria-label="Project actions">
+        <button id="newProjectBtn" type="button">
+          New Project
+        </button>
+
+        <button id="loadProductProfileBtn" type="button">
+          Load Product Profile
+        </button>
+
+        <button id="loadBrandProfileBtn" type="button">
+          Load Brand Profile
+        </button>
+
+        <button id="saveProductProfileBtn" type="button">
+          Save Product Profile
+        </button>
+
+        <button id="saveBrandProfileBtn" type="button">
+          Save Brand Profile
+        </button>
+      </div>
+
+      <p
+        id="projectStatus"
+        class="status-message"
+        role="status"
+        aria-live="polite"
+      >
+        Start a new project or enter your product information below.
+      </p>
+    </div>
+  </header>
+
+  <main id="mainContent" class="main-content">
+    <form id="generatorForm" novalidate>
+      <!-- PRODUCT INFORMATION -->
+      <section
+        id="productSection"
+        class="form-section"
+        data-category="product"
+        aria-labelledby="productSectionTitle"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="section-number">Step 1</p>
+            <h2 id="productSectionTitle">Product Information</h2>
+          </div>
+
+          <button
+            type="button"
+            data-clear-category="product"
+            aria-label="Clear unlocked product information"
+          >
+            Clear Category
+          </button>
+        </div>
+
+        <p class="section-description">
+          Enter the core facts that should remain consistent across all
+          generated prompts.
+        </p>
+
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="productName">
+              Product name
+              <span aria-hidden="true">*</span>
+            </label>
+
+            <input
+              id="productName"
+              name="productName"
+              type="text"
+              data-field-key="productName"
+              data-category="product"
+              autocomplete="off"
+              required
+            >
+
+            <label class="lock-control">
+              <input
+                id="productNameLock"
+                type="checkbox"
+                data-lock-target="productName"
+              >
+              Lock this field
+            </label>
+          </div>
+
+          <div class="field-group">
+            <label for="productType">
+              Product type
+              <span aria-hidden="true">*</span>
+            </label>
+
+            <select
+              id="productType"
+              name="productType"
+              data-field-key="productType"
+              data-category="product"
+              required
+            >
+              <option value="">Choose a product type</option>
+              <option value="digital-product">Digital product</option>
+              <option value="physical-product">Physical product</option>
+              <option value="pod-product">
+                Print-on-demand product
+              </option>
+              <option value="course">Course</option>
+              <option value="membership">Membership</option>
+              <option value="lead-magnet">Lead magnet</option>
+              <option value="service">Service</option>
+              <option value="productized-service">
+                Productized service
+              </option>
+              <option value="bundle">Bundle</option>
+              <option value="image-asset">
+                Image or graphic asset
+              </option>
+              <option value="other">Other</option>
+            </select>
+
+            <label class="lock-control">
+              <input
+                id="productTypeLock"
+                type="checkbox"
+                data-lock-target="productType"
+              >
+              Lock this field
+            </label>
+          </div>
+
+          <div class="field-group field-group--full">
+            <label for="productDescription">
+              Product description
+              <span aria-hidden="true">*</span>
+            </label>
+
+            <textarea
+              id="productDescription"
+              name="productDescription"
+              rows="5"
+              data-field-key="productDescription"
+              data-category="product"
+              required
+              placeholder="Describe what the product is, what it includes, and how it helps the customer."
+            ></textarea>
+
+            <label class="lock-control">
+              <input
+                id="productDescriptionLock"
+                type="checkbox"
+                data-lock-target="productDescription"
+              >
+              Lock this field
+            </label>
+          </div>
+
+          <div class="field-group">
+            <label for="productFormat">
+              Product format
+            </label>
+
+            <select
+              id="productFormat"
+              name="productFormat"
+              data-field-key="productFormat"
+              data-category="product"
+              multiple
+            >
+              <option value="pdf">PDF</option>
+              <option value="template">Template</option>
+              <option value="workbook">Workbook</option>
+              <option value="planner">Planner</option>
+              <option value="journal">Journal</option>
+              <option value="ebook">E-book</option>
+              <option value="video">Video</option>
+              <option value="audio">Audio</option>
+              <option value="image">Image</option>
+              <option value="printable">Printable</option>
+              <option value="physical-item">Physical item</option>
+              <option value="service-delivery">
+                Service delivery
+              </option>
+              <option value="other">Other</option>
+            </select>
+
+            <label for="productFormatUsageMode">
+              How should this be used?
+            </label>
+
+            <select
+              id="productFormatUsageMode"
+              name="productFormatUsageMode"
+              data-usage-mode
+            >
+              <option value="included">
+                Use selected choices
+              </option>
+              <option value="choice-plus-custom">
+                Use choices plus custom details
+              </option>
+              <option value="custom-only">
+                Use only custom details
+              </option>
+              <option value="optional">
+                Use only if helpful
+              </option>
+              <option value="excluded">
+                Do not include
+              </option>
+            </select>
+
+            <label for="productFormatCustom">
+              Custom product format
+            </label>
+
+            <input
+              id="productFormatCustom"
+              name="productFormatCustom"
+              type="text"
+              data-field-key="productFormatCustom"
+              data-category="product"
+            >
+          </div>
+
+          <div class="field-group">
+            <label for="salesPlatform">
+              Sales platform or marketplace
+            </label>
+
+            <select
+              id="salesPlatform"
+              name="salesPlatform"
+              data-field-key="salesPlatform"
+              data-category="product"
+              multiple
+            >
+              <option value="etsy">Etsy</option>
+              <option value="shopify">Shopify</option>
+              <option value="amazon">Amazon</option>
+              <option value="gumroad">Gumroad</option>
+              <option value="stan-store">Stan Store</option>
+              <option value="payhip">Payhip</option>
+              <option value="website">Independent website</option>
+              <option value="social-commerce">
+                Social commerce
+              </option>
+              <option value="other">Other</option>
+            </select>
+
+            <label for="salesPlatformCustom">
+              Add another platform
+            </label>
+
+            <input
+              id="salesPlatformCustom"
+              name="salesPlatformCustom"
+              type="text"
+              data-field-key="salesPlatformCustom"
+              data-category="product"
+            >
+          </div>
+
+          <div class="field-group field-group--full">
+            <label for="productContents">
+              Product contents
+            </label>
+
+            <textarea
+              id="productContents"
+              name="productContents"
+              rows="4"
+              data-field-key="productContents"
+              data-category="product"
+              placeholder="List pages, files, modules, bonuses, designs, or included materials."
+            ></textarea>
+          </div>
+
+          <div class="field-group field-group--full">
+            <label for="productFeatures">
+              Product features
+            </label>
+
+            <textarea
+              id="productFeatures"
+              name="productFeatures"
+              rows="4"
+              data-field-key="productFeatures"
+              data-category="product"
+              placeholder="Enter one feature per line."
+            ></textarea>
+          </div>
+
+          <div class="field-group field-group--full">
+            <label for="productBenefits">
+              Product benefits
+            </label>
+
+            <textarea
+              id="productBenefits"
+              name="productBenefits"
+              rows="4"
+              data-field-key="productBenefits"
+              data-category="product"
+              placeholder="Enter one benefit per line."
+            ></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="marketingGoal">
+              Marketing goal
+              <span aria-hidden="true">*</span>
+            </label>
+
+            <select
+              id="marketingGoal"
+              name="marketingGoal"
+              data-field-key="marketingGoal"
+              data-category="product"
+              required
+            >
+              <option value="launch">Launch a new product</option>
+              <option value="listing">
+                Improve an existing listing
+              </option>
+              <option value="promotion">Promote a sale</option>
+              <option value="awareness">Build awareness</option>
+              <option value="lead-generation">
+                Generate leads
+              </option>
+              <option value="conversion">
+                Increase conversions
+              </option>
+              <option value="evergreen">
+                Create evergreen marketing
+              </option>
+              <option value="relaunch">
+                Relaunch or refresh
+              </option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label for="marketingGoalCustom">
+              Custom marketing goal
+            </label>
+
+            <input
+              id="marketingGoalCustom"
+              name="marketingGoalCustom"
+              type="text"
+              data-field-key="marketingGoalCustom"
+              data-category="product"
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- AUDIENCE -->
+      <section
+        id="audienceSection"
+        class="form-section"
+        data-category="audience"
+        aria-labelledby="audienceSectionTitle"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="section-number">Step 2</p>
+            <h2 id="audienceSectionTitle">
+              Audience and Positioning
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            data-clear-category="audience"
+          >
+            Clear Category
+          </button>
+        </div>
+
+        <div class="form-grid">
+          <div class="field-group field-group--full">
+            <label for="targetAudience">
+              Target audience
+              <span aria-hidden="true">*</span>
+            </label>
+
+            <textarea
+              id="targetAudience"
+              name="targetAudience"
+              rows="4"
+              data-field-key="targetAudience"
+              data-category="audience"
+              required
+              placeholder="Describe the people most likely to buy or use this product."
+            ></textarea>
+          </div>
+
+          <div class="field-group field-group--full">
+            <label for="buyerProblem">
+              Buyer problem
+            </label>
+
+            <textarea
+              id="buyerProblem"
+              name="buyerProblem"
+              rows="4"
+              data-field-key="buyerProblem"
+              data-category="audience"
+            ></textarea>
+          </div>
+
+          <div class="field-group field-group--full">
+            <label for="buyerOutcome">
+              Desired buyer outcome
+            </label>
+
+            <textarea
+              id="buyerOutcome"
+              name="buyerOutcome"
+              rows="4"
+              data-field-key="buyerOutcome"
+              data-category="audience"
+            ></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="buyerMotivation">
+              Buyer motivations
+            </label>
+
+            <select
+              id="buyerMotivation"
+              name="buyerMotivation"
+              data-field-key="buyerMotivation"
+              data-category="audience"
+              multiple
+            >
+              <option value="save-time">Save time</option>
+              <option value="make-money">Make money</option>
+              <option value="reduce-effort">Reduce effort</option>
+              <option value="confidence">Feel confident</option>
+              <option value="professionalism">
+                Look professional
+              </option>
+              <option value="learning">Learn a skill</option>
+              <option value="organization">
+                Stay organized
+              </option>
+              <option value="problem-solving">
+                Solve a specific problem
+              </option>
+              <option value="identity">Express identity</option>
+              <option value="convenience">
+                Enjoy convenience
+              </option>
+              <option value="custom">Custom</option>
+            </select>
+
+            <p class="field-note">
+              Select up to three.
+            </p>
+          </div>
+
+          <div class="field-group">
+            <label for="buyerMotivationCustom">
+              Custom buyer motivation
+            </label>
+
+            <textarea
+              id="buyerMotivationCustom"
+              name="buyerMotivationCustom"
+              rows="4"
+              data-field-key="buyerMotivationCustom"
+              data-category="audience"
+            ></textarea>
+          </div>
+
+          <div class="field-group field-group--full">
+            <label for="buyerObjections">
+              Buyer objections
+            </label>
+
+            <textarea
+              id="buyerObjections"
+              name="buyerObjections"
+              rows="4"
+              data-field-key="buyerObjections"
+              data-category="audience"
+              placeholder="Enter one objection per line."
+            ></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRICING -->
+      <section
+        id="pricingSection"
+        class="form-section"
+        data-category="pricing"
+        aria-labelledby="pricingSectionTitle"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="section-number">Step 3</p>
+            <h2 id="pricingSectionTitle">
+              Pricing and Offer
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            data-clear-category="pricing"
+          >
+            Clear Category
+          </button>
+        </div>
+
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="currentPrice">
+              Current price
+            </label>
+
+            <input
+              id="currentPrice"
+              name="currentPrice"
+              type="text"
+              data-field-key="currentPrice"
+              data-category="pricing"
+              placeholder="$27"
+            >
+          </div>
+
+          <div class="field-group">
+            <label for="intendedPrice">
+              Intended price or range
+            </label>
+
+            <input
+              id="intendedPrice"
+              name="intendedPrice"
+              type="text"
+              data-field-key="intendedPrice"
+              data-category="pricing"
+              placeholder="$25–$40"
+            >
+          </div>
+
+          <div class="field-group">
+            <label for="pricingTier">
+              Pricing tier
+            </label>
+
+            <select
+              id="pricingTier"
+              name="pricingTier"
+              data-field-key="pricingTier"
+              data-category="pricing"
+            >
+              <option value="none">Not specified</option>
+              <option value="entry">Entry-level</option>
+              <option value="affordable">Affordable</option>
+              <option value="mid-range">Mid-range</option>
+              <option value="premium">Premium</option>
+              <option value="luxury">Luxury</option>
+              <option value="bundle">Bundle pricing</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label for="launchPrice">
+              Launch price
+            </label>
+
+            <input
+              id="launchPrice"
+              name="launchPrice"
+              type="text"
+              data-field-key="launchPrice"
+              data-category="pricing"
+              placeholder="$17"
+            >
+          </div>
+
+          <div class="field-group">
+            <label for="offerType">
+              Offer type
+            </label>
+
+            <select
+              id="offerType"
+              name="offerType"
+              data-field-key="offerType"
+              data-category="pricing"
+              multiple
+            >
+              <option value="standard">Standard offer</option>
+              <option value="launch-offer">Launch offer</option>
+              <option value="limited-discount">
+                Limited-time discount
+              </option>
+              <option value="bundle">Bundle</option>
+              <option value="bonus">Bonus included</option>
+              <option value="early-bird">
+                Early-bird price
+              </option>
+              <option value="waitlist">Waitlist offer</option>
+              <option value="free">Free lead magnet</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label for="pricingUsage">
+              How should pricing be used?
+            </label>
+
+            <select
+              id="pricingUsage"
+              name="pricingUsage"
+              data-field-key="pricingUsage"
+              data-category="pricing"
+            >
+              <option value="exact-price">
+                Show exact price
+              </option>
+              <option value="value-only" selected>
+                Mention value without price
+              </option>
+              <option value="selected-only">
+                Include only in selected outputs
+              </option>
+              <option value="positioning-only">
+                Use for positioning but do not display
+              </option>
+              <option value="exclude">
+                Do not use pricing
+              </option>
+            </select>
+          </div>
+
+          <div class="field-group field-group--full">
+            <label for="pricingCustom">
+              Custom pricing and offer notes
+            </label>
+
+            <textarea
+              id="pricingCustom"
+              name="pricingCustom"
+              rows="4"
+              data-field-key="pricingCustom"
+              data-category="pricing"
+            ></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- BRAND -->
+      <section
+        id="brandSection"
+        class="form-section"
+        data-category="brand"
+        aria-labelledby="brandSectionTitle"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="section-number">Step 4</p>
+            <h2 id="brandSectionTitle">
+              Brand Direction
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            data-randomize-category="brand"
+          >
+            Randomize Unlocked
+          </button>
+
+          <button
+            type="button"
+            data-clear-category="brand"
+          >
+            Clear Category
+          </button>
+        </div>
+
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="brandTone">
+              Brand tone
+            </label>
+
+            <select
+              id="brandTone"
+              name="brandTone"
+              data-field-key="brandTone"
+              data-category="brand"
+              multiple
+            >
+              <option value="professional">Professional</option>
+              <option value="friendly">Friendly</option>
+              <option value="bold">Bold</option>
+              <option value="playful">Playful</option>
+              <option value="premium">Premium</option>
+              <option value="educational">Educational</option>
+              <option value="conversational">
+                Conversational
+              </option>
+              <option value="direct">Direct</option>
+              <option value="warm">Warm</option>
+              <option value="energetic">Energetic</option>
+              <option value="calm">Calm</option>
+              <option value="inspirational">
+                Inspirational
+              </option>
+              <option value="trend-aware">Trend-aware</option>
+              <option value="custom">Custom</option>
+            </select>
+
+            <p class="field-note">
+              Select up to three.
+            </p>
+
+            <label for="brandToneUsageMode">
+              How should this be used?
+            </label>
+
+            <select
+              id="brandToneUsageMode"
+              name="brandToneUsageMode"
+              data-usage-mode
+            >
+              <option value="included">
+                Use selected choices
+              </option>
+              <option value="choice-plus-custom">
+                Use choices plus custom details
+              </option>
+              <option value="custom-only">
+                Use only custom details
+              </option>
+              <option value="optional">
+                Use only if helpful
+              </option>
+              <option value="excluded">
+                Do not include
+              </option>
+            </select>
+
+            <label for="brandToneCustom">
+              Custom tone
+            </label>
+
+            <textarea
+              id="brandToneCustom"
+              name="brandToneCustom"
+              rows="3"
+              data-field-key="brandToneCustom"
+              data-category="brand"
+            ></textarea>
+
+            <label class="lock-control">
+              <input
+                id="brandToneLock"
+                type="checkbox"
+                data-lock-target="brandTone"
+              >
+              Lock this field
+            </label>
+          </div>
+
+          <div class="field-group">
+            <label for="visualStyle">
+              Visual style
+            </label>
+
+            <select
+              id="visualStyle"
+              name="visualStyle"
+              data-field-key="visualStyle"
+              data-category="brand"
+              multiple
+            >
+              <option value="minimal">Minimal</option>
+              <option value="editorial">Editorial</option>
+              <option value="luxury">Luxury</option>
+              <option value="playful">Playful</option>
+              <option value="organic">Organic</option>
+              <option value="bold-commercial">
+                Bold commercial
+              </option>
+              <option value="hand-drawn">Hand-drawn</option>
+              <option value="modern-digital">
+                Modern digital
+              </option>
+              <option value="clean-professional">
+                Clean professional
+              </option>
+              <option value="vintage">Vintage</option>
+              <option value="soft-feminine">
+                Soft feminine
+              </option>
+              <option value="high-energy">
+                High-energy
+              </option>
+              <option value="custom">Custom</option>
+            </select>
+
+            <p class="field-note">
+              Select up to three.
+            </p>
+
+            <label for="visualStyleUsageMode">
+              How should this be used?
+            </label>
+
+            <select
+              id="visualStyleUsageMode"
+              name="visualStyleUsageMode"
+              data-usage-mode
+            >
+              <option value="included">
+                Use selected choices
+              </option>
+              <option value="choice-plus-custom">
+                Use choices plus custom details
+              </option>
+              <option value="custom-only">
+                Use only custom details
+              </option>
+              <option value="optional">
+                Use only if helpful
+              </option>
+              <option value="excluded">
+                Do not include
+              </option>
+            </select>
+
+            <label for="visualStyleCustom">
+              Custom visual style
+            </label>
+
+            <textarea
+              id="visualStyleCustom"
+              name="visualStyleCustom"
+              rows="3"
+              data-field-key="visualStyleCustom"
+              data-category="brand"
+            ></textarea>
+
+            <label class="lock-control">
+              <input
+                id="visualStyleLock"
+                type="checkbox"
+                data-lock-target="visualStyle"
+              >
+              Lock this field
+            </label>
+          </div>
+
+          <div class="field-group">
+            <label for="colorDirection">
+              Color direction
+            </label>
+
+            <select
+              id="colorDirection"
+              name="colorDirection"
+              data-field-key="colorDirection"
+              data-category="brand"
+              multiple
+            >
+              <option value="brand-colors">Use brand colors</option>
+              <option value="neutral">Neutral</option>
+              <option value="warm">Warm</option>
+              <option value="cool">Cool</option>
+              <option value="pastel">Pastel</option>
+              <option value="earthy">Earthy</option>
+              <option value="bright">Bright</option>
+              <option value="monochrome">Monochrome</option>
+              <option value="high-contrast">
+                High contrast
+              </option>
+              <option value="custom">Custom</option>
+            </select>
+
+            <label for="colorDirectionCustom">
+              Custom color direction
+            </label>
+
+            <textarea
+              id="colorDirectionCustom"
+              name="colorDirectionCustom"
+              rows="3"
+              data-field-key="colorDirectionCustom"
+              data-category="brand"
+            ></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="typographyDirection">
+              Typography direction
+            </label>
+
+            <select
+              id="typographyDirection"
+              name="typographyDirection"
+              data-field-key="typographyDirection"
+              data-category="brand"
+              multiple
+            >
+              <option value="clean-legible">
+                Clean and legible
+              </option>
+              <option value="bold-modern">
+                Bold and modern
+              </option>
+              <option value="editorial-serif">
+                Editorial serif
+              </option>
+              <option value="minimal-sans">
+                Minimal sans serif
+              </option>
+              <option value="playful-rounded">
+                Playful rounded
+              </option>
+              <option value="handwritten-accent">
+                Handwritten accent
+              </option>
+              <option value="luxury-serif">
+                Luxury serif
+              </option>
+              <option value="custom">Custom</option>
+            </select>
+
+            <label for="typographyDirectionCustom">
+              Custom typography direction
+            </label>
+
+            <textarea
+              id="typographyDirectionCustom"
+              name="typographyDirectionCustom"
+              rows="3"
+              data-field-key="typographyDirectionCustom"
+              data-category="brand"
+            ></textarea>
+          </div>
+
+          <div class="field-group field-group--full">
+            <label for="customBrandInstructions">
+              Additional brand instructions
+            </label>
+
+            <textarea
+              id="customBrandInstructions"
+              name="customBrandInstructions"
+              rows="5"
+              data-field-key="customBrandInstructions"
+              data-category="brand"
+              placeholder="Add brand personality, emotional direction, layout preferences, or other details."
+            ></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="wordsToInclude">
+              Words or phrases to include
+            </label>
+
+            <textarea
+              id="wordsToInclude"
+              name="wordsToInclude"
+              rows="4"
+              data-field-key="wordsToInclude"
+              data-category="brand"
+            ></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="wordsToAvoid">
+              Words or phrases to avoid
+            </label>
+
+            <textarea
+              id="wordsToAvoid"
+              name="wordsToAvoid"
+              rows="4"
+              data-field-key="wordsToAvoid"
+              data-category="brand"
+            ></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- REFERENCE IMAGE -->
+      <section
+        id="referenceImageSection"
+        class="form-section"
+        data-category="referenceImage"
+        aria-labelledby="referenceImageSectionTitle"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="section-number">Step 5</p>
+            <h2 id="referenceImageSectionTitle">
+              Reference Image
+            </h2>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="referencePath">
+              How will you provide visual direction?
+            </label>
+
+            <select
+              id="referencePath"
+              name="referencePath"
+              data-field-key="referencePath"
+              data-category="referenceImage"
+            >
+              <option value="none">
+                Continue without an image
+              </option>
+              <option value="product-image">
+                Use my product image
+              </option>
+              <option value="inspiration">
+                Use my image as inspiration
+              </option>
+              <option value="description">
+                I will describe the direction
+              </option>
+            </select>
+          </div>
+
+          <div
+            id="referenceUploadGroup"
+            class="field-group"
+            hidden
+          >
+            <label for="referenceImageUpload">
+              Upload reference image
+            </label>
+
+            <input
+              id="referenceImageUpload"
+              name="referenceImageUpload"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              data-field-key="referenceImageUpload"
+              data-category="referenceImage"
+            >
+          </div>
+
+          <div
+            id="referencePurposeGroup"
+            class="field-group"
+            hidden
+          >
+            <label for="referenceImagePurpose">
+              Image purpose
+            </label>
+
+            <select
+              id="referenceImagePurpose"
+              name="referenceImagePurpose"
+              data-field-key="referenceImagePurpose"
+              data-category="referenceImage"
+            >
+              <option value="actual-product">
+                Actual product
+              </option>
+              <option value="style-reference">
+                Style reference
+              </option>
+              <option value="layout-reference">
+                Layout reference
+              </option>
+              <option value="color-reference">
+                Color reference
+              </option>
+              <option value="mockup-reference">
+                Mockup reference
+              </option>
+              <option value="competitor-reference">
+                Competitor example
+              </option>
+              <option value="inspiration">
+                General inspiration
+              </option>
+            </select>
+          </div>
+
+          <div
+            id="referenceInstructionsGroup"
+            class="field-group field-group--full"
+            hidden
+          >
+            <label for="referenceImageInstructions">
+              Reference-image instructions
+            </label>
+
+            <textarea
+              id="referenceImageInstructions"
+              name="referenceImageInstructions"
+              rows="5"
+              data-field-key="referenceImageInstructions"
+              data-category="referenceImage"
+              placeholder="Explain what to use, what not to copy, and which visual details matter."
+            ></textarea>
+          </div>
+
+          <div
+            id="referenceRightsGroup"
+            class="field-group field-group--full"
+            hidden
+          >
+            <label class="checkbox-line">
+              <input
+                id="referenceRightsConfirmation"
+                name="referenceRightsConfirmation"
+                type="checkbox"
+              >
+
+              I understand that protected logos, characters, artwork,
+              branded designs, and recognizable people may require
+              permission before commercial use.
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- GENERATOR LIBRARY -->
+      <section
+        id="generatorLibrary"
+        class="form-section"
+        data-category="generators"
+        aria-labelledby="generatorLibraryTitle"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="section-number">Step 6</p>
+            <h2 id="generatorLibraryTitle">
+              Select Up to Four Generators
+            </h2>
+          </div>
+
+          <p
+            id="selectedGeneratorCount"
+            class="selection-count"
+            aria-live="polite"
+          >
+            0 of 4 selected
+          </p>
+        </div>
+
+        <div class="field-group">
+          <label for="generatorCategoryFilter">
+            Filter generator categories
+          </label>
+
+          <select id="generatorCategoryFilter">
+            <option value="all">Show all</option>
+            <option value="sales-copy">
+              Product and sales copy
+            </option>
+            <option value="social">
+              Social and discovery
+            </option>
+            <option value="launch">
+              Launch content
+            </option>
+            <option value="design">
+              Image and design prompts
+            </option>
+            <option value="video">
+              Video and motion
+            </option>
+          </select>
+        </div>
+
+        <div class="generator-group" data-generator-category="sales-copy">
+          <h3>Product and Sales Copy</h3>
+
+          <div class="generator-grid">
+            <label
+              id="generatorCard-product-description"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="product-description"
+                data-generator-key="product-description"
+              >
+              <span>Product description</span>
+            </label>
+
+            <label
+              id="generatorCard-product-listing"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="product-listing"
+                data-generator-key="product-listing"
+              >
+              <span>Product listing</span>
+            </label>
+
+            <label
+              id="generatorCard-sales-page"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="sales-page"
+                data-generator-key="sales-page"
+              >
+              <span>Sales-page section</span>
+            </label>
+
+            <label
+              id="generatorCard-landing-page"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="landing-page"
+                data-generator-key="landing-page"
+              >
+              <span>Landing-page section</span>
+            </label>
+
+            <label
+              id="generatorCard-promotional-email"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="promotional-email"
+                data-generator-key="promotional-email"
+              >
+              <span>Promotional email</span>
+            </label>
+
+            <label
+              id="generatorCard-offer-summary"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="offer-summary"
+                data-generator-key="offer-summary"
+              >
+              <span>Offer summary</span>
+            </label>
+
+            <label
+              id="generatorCard-pricing-positioning"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="pricing-positioning"
+                data-generator-key="pricing-positioning"
+              >
+              <span>Pricing-positioning prompt</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="generator-group" data-generator-category="social">
+          <h3>Social and Discovery</h3>
+
+          <div class="generator-grid">
+            <label
+              id="generatorCard-social-post"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="social-post"
+                data-generator-key="social-post"
+              >
+              <span>Social media post</span>
+            </label>
+
+            <label
+              id="generatorCard-hooks-captions"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="hooks-captions"
+                data-generator-key="hooks-captions"
+              >
+              <span>Hooks and captions</span>
+            </label>
+
+            <label
+              id="generatorCard-tiktok"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="tiktok"
+                data-generator-key="tiktok"
+              >
+              <span>TikTok hook and caption</span>
+            </label>
+
+            <label
+              id="generatorCard-pinterest-pin"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="pinterest-pin"
+                data-generator-key="pinterest-pin"
+              >
+              <span>Pinterest pin</span>
+            </label>
+
+            <label
+              id="generatorCard-seo-copy"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="seo-copy"
+                data-generator-key="seo-copy"
+              >
+              <span>SEO title and description</span>
+            </label>
+
+            <label
+              id="generatorCard-tags-hashtags"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="tags-hashtags"
+                data-generator-key="tags-hashtags"
+              >
+              <span>Tags and hashtags</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="generator-group" data-generator-category="launch">
+          <h3>Launch Content</h3>
+
+          <div class="generator-grid">
+            <label
+              id="generatorCard-launch-carousel"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="launch-carousel"
+                data-generator-key="launch-carousel"
+              >
+              <span>Product-launch carousel</span>
+            </label>
+
+            <label
+              id="generatorCard-launch-campaign"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="launch-campaign"
+                data-generator-key="launch-campaign"
+              >
+              <span>Launch campaign concept</span>
+            </label>
+
+            <label
+              id="generatorCard-content-series"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="content-series"
+                data-generator-key="content-series"
+              >
+              <span>Promotional content series</span>
+            </label>
+
+            <label
+              id="generatorCard-launch-announcement"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="launch-announcement"
+                data-generator-key="launch-announcement"
+              >
+              <span>Launch announcement</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="generator-group" data-generator-category="design">
+          <h3>Image and Design Prompts</h3>
+
+          <div class="generator-grid">
+            <label
+              id="generatorCard-product-mockup"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="product-mockup"
+                data-generator-key="product-mockup"
+              >
+              <span>Product mockup</span>
+            </label>
+
+            <label
+              id="generatorCard-product-ad"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="product-ad"
+                data-generator-key="product-ad"
+              >
+              <span>Product advertisement graphic</span>
+            </label>
+
+            <label
+              id="generatorCard-promotional-flyer"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="promotional-flyer"
+                data-generator-key="promotional-flyer"
+              >
+              <span>Promotional flyer</span>
+            </label>
+
+            <label
+              id="generatorCard-lead-magnet-cover"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="lead-magnet-cover"
+                data-generator-key="lead-magnet-cover"
+              >
+              <span>Lead magnet cover</span>
+            </label>
+
+            <label
+              id="generatorCard-notebook-cover"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="notebook-cover"
+                data-generator-key="notebook-cover"
+              >
+              <span>Notebook or composition cover</span>
+            </label>
+
+            <label
+              id="generatorCard-infographic"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="infographic"
+                data-generator-key="infographic"
+              >
+              <span>Infographic</span>
+            </label>
+
+            <label
+              id="generatorCard-listing-image"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="listing-image"
+                data-generator-key="listing-image"
+              >
+              <span>Product listing image</span>
+            </label>
+
+            <label
+              id="generatorCard-lifestyle-image"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="lifestyle-image"
+                data-generator-key="lifestyle-image"
+              >
+              <span>Lifestyle image</span>
+            </label>
+
+            <label
+              id="generatorCard-hero-banner"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="hero-banner"
+                data-generator-key="hero-banner"
+              >
+              <span>Hero banner</span>
+            </label>
+
+            <label
+              id="generatorCard-creative-direction"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="creative-direction"
+                data-generator-key="creative-direction"
+              >
+              <span>Creative direction</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="generator-group" data-generator-category="video">
+          <h3>Video and Motion</h3>
+
+          <div class="generator-grid">
+            <label
+              id="generatorCard-video-motion"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="video-motion"
+                data-generator-key="video-motion"
+              >
+              <span>Video motion prompt</span>
+            </label>
+
+            <label
+              id="generatorCard-short-video-script"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="short-video-script"
+                data-generator-key="short-video-script"
+              >
+              <span>Short-form video script</span>
+            </label>
+
+            <label
+              id="generatorCard-product-video-ad"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="product-video-ad"
+                data-generator-key="product-video-ad"
+              >
+              <span>Product advertisement video</span>
+            </label>
+
+            <label
+              id="generatorCard-product-demo"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="product-demo"
+                data-generator-key="product-demo"
+              >
+              <span>Product demonstration</span>
+            </label>
+
+            <label
+              id="generatorCard-launch-teaser"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="launch-teaser"
+                data-generator-key="launch-teaser"
+              >
+              <span>Launch teaser</span>
+            </label>
+
+            <label
+              id="generatorCard-b-roll"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="b-roll"
+                data-generator-key="b-roll"
+              >
+              <span>B-roll sequence</span>
+            </label>
+
+            <label
+              id="generatorCard-cinematic-reveal"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="cinematic-reveal"
+                data-generator-key="cinematic-reveal"
+              >
+              <span>Cinematic reveal</span>
+            </label>
+
+            <label
+              id="generatorCard-voiceover-script"
+              class="generator-card"
+            >
+              <input
+                type="checkbox"
+                name="selectedGenerators"
+                value="voiceover-script"
+                data-generator-key="voiceover-script"
+              >
+              <span>Voiceover script</span>
+            </label>
+          </div>
+        </div>
+
+        <p
+          id="generatorLimitMessage"
+          class="validation-message"
+          role="status"
+          aria-live="polite"
+        >
+          Select at least one and no more than four generators.
+        </p>
+      </section>
+
+      <!-- GENERATOR CONFIGURATION -->
+      <section
+        id="generatorConfigSection"
+        class="form-section"
+        data-category="configuration"
+        aria-labelledby="generatorConfigTitle"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="section-number">Step 7</p>
+            <h2 id="generatorConfigTitle">
+              Generator Configuration
+            </h2>
+          </div>
+
+          <button
+            id="randomizeBtn"
+            type="button"
+          >
+            Randomize Unlocked Fields
+          </button>
+        </div>
+
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="optionCount">
+              Number of options per generator
+            </label>
+
+            <select
+              id="optionCount"
+              name="optionCount"
+              data-field-key="optionCount"
+              data-category="configuration"
+            >
+              <option value="1">1 option</option>
+              <option value="2">2 options</option>
+              <option value="3" selected>3 options</option>
+              <option value="4">4 options</option>
+              <option value="5">5 options</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label for="instructionPriority">
+              Custom instruction priority
+            </label>
+
+            <select
+              id="instructionPriority"
+              name="instructionPriority"
+              data-field-key="instructionPriority"
+              data-category="configuration"
+            >
+              <option value="primary">Primary</option>
+              <option value="secondary">Secondary</option>
+              <option value="optional">Optional</option>
+            </select>
+          </div>
+
+          <div class="field-group field-group--full">
+            <label for="additionalInstructions">
+              Additional instructions
+            </label>
+
+            <textarea
+              id="additionalInstructions"
+              name="additionalInstructions"
+              rows="5"
+              data-field-key="additionalInstructions"
+              data-category="configuration"
+              placeholder="Add information to include, replace, clarify, or emphasize."
+            ></textarea>
+          </div>
+
+          <div class="field-group field-group--full">
+            <label for="exactText">
+              Exact wording
+            </label>
+
+            <textarea
+              id="exactText"
+              name="exactText"
+              rows="4"
+              data-field-key="exactText"
+              data-category="configuration"
+              placeholder="Enter any wording that must appear exactly as written."
+            ></textarea>
+
+            <label class="checkbox-line">
+              <input
+                id="exactTextLock"
+                type="checkbox"
+                data-lock-target="exactText"
+              >
+              Preserve this wording exactly
+            </label>
+          </div>
+
+          <div class="field-group field-group--full">
+            <label for="globalExclusions">
+              Global exclusions
+            </label>
+
+            <textarea
+              id="globalExclusions"
+              name="globalExclusions"
+              rows="4"
+              data-field-key="globalExclusions"
+              data-category="configuration"
+              placeholder="List anything that must not appear in the prompts."
+            ></textarea>
+          </div>
+        </div>
+
+        <div
+          id="selectedGeneratorPanels"
+          class="generator-panels"
+          aria-live="polite"
+        >
+          <p class="empty-state">
+            Select generators above to open their individual
+            configuration panels.
+          </p>
+        </div>
+      </section>
+
+      <!-- PLATFORM AND DELIVERY -->
+      <section
+        id="deliverySection"
+        class="form-section"
+        data-category="delivery"
+        aria-labelledby="deliverySectionTitle"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="section-number">Step 8</p>
+            <h2 id="deliverySectionTitle">
+              Platform and Delivery
+            </h2>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="aiPlatform">
+              Target AI platform
+              <span aria-hidden="true">*</span>
+            </label>
+
+            <select
+              id="aiPlatform"
+              name="aiPlatform"
+              data-field-key="aiPlatform"
+              data-category="delivery"
+              required
+            >
+              <option value="agnostic">
+                AI-agnostic
+              </option>
+              <option value="chatgpt">ChatGPT</option>
+              <option value="gpt-image">GPT Image</option>
+              <option value="midjourney">Midjourney</option>
+              <option value="ideogram">Ideogram</option>
+              <option value="flux">Flux</option>
+              <option value="gemini">Gemini</option>
+              <option value="canva">Canva</option>
+              <option value="kittl">Kittl</option>
+              <option value="runway">Runway</option>
+              <option value="kling">Kling</option>
+              <option value="veo">Veo</option>
+              <option value="sora">Sora</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label for="aiPlatformCustom">
+              Other AI platform
+            </label>
+
+            <input
+              id="aiPlatformCustom"
+              name="aiPlatformCustom"
+              type="text"
+              data-field-key="aiPlatformCustom"
+              data-category="delivery"
+            >
+          </div>
+
+          <div class="field-group">
+            <label for="deliveryMode">
+              Prompt delivery mode
+              <span aria-hidden="true">*</span>
+            </label>
+
+            <select
+              id="deliveryMode"
+              name="deliveryMode"
+              data-field-key="deliveryMode"
+              data-category="delivery"
+              required
+            >
+              <option value="single">
+                One standalone prompt
+              </option>
+              <option value="separate" selected>
+                Separate prompts for selected items
+              </option>
+              <option value="combined">
+                One combined master prompt
+              </option>
+              <option value="both">
+                Separate and combined prompts
+              </option>
+              <option value="hybrid">
+                Hybrid selection
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div
+          id="combinationControls"
+          class="combination-controls"
+          hidden
+        >
+          <h3>Prompt Combination Choices</h3>
+
+          <p>
+            Choose whether each selected item should be combined,
+            kept separate, summarized, or excluded.
+          </p>
+
+          <div id="combinationItemList"></div>
+        </div>
+      </section>
+
+      <!-- INGREDIENT REVIEW -->
+      <section
+        id="ingredientReview"
+        class="form-section"
+        aria-labelledby="ingredientReviewTitle"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="section-number">Step 9</p>
+            <h2 id="ingredientReviewTitle">
+              Prompt Ingredient Review
+            </h2>
+          </div>
+
+          <button
+            id="refreshReviewBtn"
+            type="button"
+          >
+            Refresh Review
+          </button>
+        </div>
+
+        <div class="review-grid">
+          <article>
+            <h3>Included</h3>
+            <div id="includedSummary">
+              <p class="empty-state">Nothing reviewed yet.</p>
+            </div>
+          </article>
+
+          <article>
+            <h3>Optional</h3>
+            <div id="optionalSummary">
+              <p class="empty-state">Nothing reviewed yet.</p>
+            </div>
+          </article>
+
+          <article>
+            <h3>Excluded</h3>
+            <div id="excludedSummary">
+              <p class="empty-state">Nothing reviewed yet.</p>
+            </div>
+          </article>
+
+          <article>
+            <h3>Exact Text</h3>
+            <div id="exactTextSummary">
+              <p class="empty-state">No exact wording added.</p>
+            </div>
+          </article>
+
+          <article>
+            <h3>Custom Instructions</h3>
+            <div id="customSummary">
+              <p class="empty-state">
+                No custom instructions added.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- VALIDATION -->
+      <section
+        id="validationSection"
+        class="form-section"
+        aria-labelledby="validationSectionTitle"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="section-number">Step 10</p>
+            <h2 id="validationSectionTitle">
+              Review and Generate
+            </h2>
+          </div>
+        </div>
+
+        <div
+          id="validationSummary"
+          class="validation-summary"
+          role="alert"
+          aria-live="assertive"
+          tabindex="-1"
+        >
+          Complete the required fields, then generate your prompts.
+        </div>
+
+        <div class="action-row">
+          <button
+            id="generateBtn"
+            type="submit"
+          >
+            Generate Prompt Options
+          </button>
+
+          <button
+            id="clearAllBtn"
+            type="button"
+          >
+            Clear All
+          </button>
+        </div>
+      </section>
+    </form>
+
+    <!-- RESULTS -->
+    <section
+      id="resultsSection"
+      class="form-section"
+      aria-labelledby="resultsSectionTitle"
+      hidden
+    >
+      <div class="section-heading">
+        <div>
+          <p class="section-number">Results</p>
+          <h2 id="resultsSectionTitle">
+            Generated Prompt Options
+          </h2>
+        </div>
+      </div>
+
+      <p
+        id="outputUpdateNotice"
+        class="status-message"
+        role="status"
+        aria-live="polite"
+        hidden
+      >
+        Your inputs changed. Generate again to update the results.
+      </p>
+
+      <div id="generatorOptionsOutput">
+        <p class="empty-state">
+          Generated options will appear here.
+        </p>
+      </div>
+
+      <div
+        id="qualityResult"
+        class="quality-result"
+        role="status"
+        aria-live="polite"
+      >
+        Quality review has not run yet.
+      </div>
+    </section>
+
+    <!-- PROMPT ASSEMBLY -->
+    <section
+      id="promptAssemblySection"
+      class="form-section"
+      aria-labelledby="promptAssemblyTitle"
+      hidden
+    >
+      <div class="section-heading">
+        <div>
+          <p class="section-number">Final Step</p>
+          <h2 id="promptAssemblyTitle">
+            Prompt Assembly
+          </h2>
+        </div>
+      </div>
+
+      <article id="standalonePromptOutput" hidden>
+        <div class="output-heading">
+          <h3>Standalone Prompt</h3>
+
+          <button
+            id="copyStandaloneBtn"
+            type="button"
+            data-output-target="standalonePromptText"
+          >
+            Copy
+          </button>
+        </div>
+
+        <textarea
+          id="standalonePromptText"
+          rows="18"
+          readonly
+        ></textarea>
+      </article>
+
+      <article id="separatePromptsOutput" hidden>
+        <div class="output-heading">
+          <h3>Separate Prompts</h3>
+        </div>
+
+        <div id="separatePromptList">
+          <p class="empty-state">
+            Separate prompts will appear here.
+          </p>
+        </div>
+      </article>
+
+      <article id="combinedPromptOutput" hidden>
+        <div class="output-heading">
+          <h3>Combined Master Prompt</h3>
+
+          <button
+            id="copyCombinedBtn"
+            type="button"
+            data-output-target="combinedPromptText"
+          >
+            Copy
+          </button>
+        </div>
+
+        <textarea
+          id="combinedPromptText"
+          rows="24"
+          readonly
+        ></textarea>
+      </article>
+
+      <article id="hybridPromptOutput" hidden>
+        <div class="output-heading">
+          <h3>Hybrid Prompt Package</h3>
+
+          <button
+            id="copyHybridBtn"
+            type="button"
+            data-output-target="hybridPromptText"
+          >
+            Copy
+          </button>
+        </div>
+
+        <textarea
+          id="hybridPromptText"
+          rows="24"
+          readonly
+        ></textarea>
+      </article>
+
+      <article>
+        <div class="output-heading">
+          <h3>Final Prompt Package</h3>
+
+          <button
+            id="copyFinalPackageBtn"
+            type="button"
+            data-output-target="finalPromptPackage"
+          >
+            Copy Final Package
+          </button>
+
+          <button
+            id="saveFinalPromptBtn"
+            type="button"
+          >
+            Save Final Prompt
+          </button>
+        </div>
+
+        <textarea
+          id="finalPromptPackage"
+          rows="28"
+          readonly
+          aria-label="Final prompt package"
+        ></textarea>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Prompt to Profit Generator — Build clearer prompts and launch
+      products faster.
+    </p>
+  </footer>
+
+  <!-- TOAST -->
+  <div
+    id="appToast"
+    class="toast"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+    hidden
+  ></div>
+
+  <!-- CONFIRMATION MODAL -->
+  <div
+    id="confirmationModal"
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+    aria-describedby="modalMessage"
+    hidden
+  >
+    <div class="modal__content">
+      <h2 id="modalTitle">Please Confirm</h2>
+
+      <p id="modalMessage">
+        Are you sure you want to continue?
+      </p>
+
+      <div class="modal__actions">
+        <button id="modalConfirmBtn" type="button">
+          Confirm
+        </button>
+
+        <button id="modalCancelBtn" type="button">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
