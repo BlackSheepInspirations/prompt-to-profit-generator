@@ -15,6 +15,11 @@
 
   <title>Prompt to Profit Generator</title>
 
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link
+    href="https://api.fontshare.com/v2/css?f[]=general-sans@600,700,800&f[]=switzer@400,500,600,700&display=swap"
+    rel="stylesheet"
+  >
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -25,52 +30,89 @@
 
   <header class="site-header">
     <div class="site-header__content">
-      <div>
-        <p class="eyebrow">AI Product and Launch Prompt Builder</p>
+      <div class="marquee__intro">
+        <p class="eyebrow">AI Marketing Prompt Studio</p>
 
-        <h1>Prompt to Profit Generator</h1>
+        <h1>Turn what you sell into <span class="accent">paste-ready</span> AI prompts.</h1>
 
         <p class="site-header__description">
-          Turn one product idea into coordinated, sales-focused prompts
-          for content, visuals, marketing, and product launches.
+          Describe your product once, choose what you want to create, and get
+          professional, ready-to-run prompts for copy, social, images, and
+          video — tuned to your brand and your platform.
+        </p>
+
+        <div class="project-actions" aria-label="Project actions">
+          <button id="newProjectBtn" type="button">
+            New Project
+          </button>
+
+          <button id="loadProductProfileBtn" type="button">
+            Load Product Profile
+          </button>
+
+          <button id="loadBrandProfileBtn" type="button">
+            Load Brand Profile
+          </button>
+
+          <button id="saveProductProfileBtn" type="button">
+            Save Product Profile
+          </button>
+
+          <button id="saveBrandProfileBtn" type="button">
+            Save Brand Profile
+          </button>
+        </div>
+
+        <p
+          id="projectStatus"
+          class="status-message"
+          role="status"
+          aria-live="polite"
+        >
+          Start a new project or enter your product information below.
         </p>
       </div>
 
-      <div class="project-actions" aria-label="Project actions">
-        <button id="newProjectBtn" type="button">
-          New Project
-        </button>
+      <div class="marquee__media">
+        <div class="video-frame">
+          <video
+            id="howToVideo"
+            class="video-frame__player"
+            controls
+            preload="metadata"
+            playsinline
+            poster="assets/how-to-poster.jpg"
+          >
+            <source src="assets/how-to.mp4" type="video/mp4">
+          </video>
 
-        <button id="loadProductProfileBtn" type="button">
-          Load Product Profile
-        </button>
+          <div class="video-frame__placeholder" id="howToPlaceholder" hidden>
+            <span class="video-frame__play" aria-hidden="true">&#9654;</span>
+            <p class="video-frame__title">Video walkthrough coming soon</p>
+            <p class="video-frame__note">
+              Add your clip at <code>assets/how-to.mp4</code>
+            </p>
+          </div>
+        </div>
 
-        <button id="loadBrandProfileBtn" type="button">
-          Load Brand Profile
-        </button>
-
-        <button id="saveProductProfileBtn" type="button">
-          Save Product Profile
-        </button>
-
-        <button id="saveBrandProfileBtn" type="button">
-          Save Brand Profile
-        </button>
+        <p class="video-frame__caption">
+          Watch: how to turn your product into a prompt pack — in about 60 seconds.
+        </p>
       </div>
-
-      <p
-        id="projectStatus"
-        class="status-message"
-        role="status"
-        aria-live="polite"
-      >
-        Start a new project or enter your product information below.
-      </p>
     </div>
   </header>
 
   <main id="mainContent" class="main-content">
     <form id="generatorForm" novalidate>
+      <div class="phase-divider">
+        <p class="phase-divider__num">Phase 01</p>
+        <h2 class="phase-divider__title">Your product</h2>
+        <p class="phase-divider__desc">
+          Tell us what you're selling, who it's for, and how your brand
+          should sound. This is the foundation every prompt is built on.
+        </p>
+      </div>
+
       <!-- PRODUCT INFORMATION -->
       <section
         id="productSection"
@@ -1168,6 +1210,15 @@
         </div>
       </section>
 
+      <div class="phase-divider">
+        <p class="phase-divider__num">Phase 02</p>
+        <h2 class="phase-divider__title">What to make</h2>
+        <p class="phase-divider__desc">
+          Pick up to four things to create — copy, social, images, video —
+          then fine-tune each one to taste.
+        </p>
+      </div>
+
       <!-- GENERATOR LIBRARY -->
       <section
         id="generatorLibrary"
@@ -1838,6 +1889,15 @@
           </p>
         </div>
       </section>
+
+      <div class="phase-divider">
+        <p class="phase-divider__num">Phase 03</p>
+        <h2 class="phase-divider__title">Get your pack</h2>
+        <p class="phase-divider__desc">
+          Choose the AI platform and format you want, review everything,
+          then generate your ready-to-use prompts.
+        </p>
+      </div>
 
       <!-- PLATFORM AND DELIVERY -->
       <section

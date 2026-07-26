@@ -1342,6 +1342,212 @@ function initializeApplication() {
   updateIngredientReview();
   updateValidationSummary();
   updateGeneratedVisibility();
+  enhanceSelectsAsPills();
+  initHeroVideo();
+}
+
+
+/* =========================================================
+   PILL-SELECT ENHANCEMENT
+   Turns single-choice <select> controls into tap-to-choose
+   pill groups. The native <select> stays in the DOM as the
+   value holder, so all existing read/write/validate/restore/
+   randomize logic keeps working through it unchanged.
+   ========================================================= */
+
+const pillSelectRegistry = [];
+
+function enhanceSelectsAsPills() {
+  const denylist = new Set(["generatorCategoryFilter"]);
+
+  document
+    .querySelectorAll("#generatorForm select")
+    .forEach((select) => {
+      if (denylist.has(select.id)) {
+        return;
+      }
+
+      setupPillSelect(select);
+    });
+}
+
+function setupPillSelect(select) {
+  if (select.dataset.pillsReady === "true") {
+    return;
+  }
+
+  select.dataset.pillsReady = "true";
+
+  const isMulti = select.multiple;
+  const maxChoices = isMulti ? getPillMaxChoices(select) : 0;
+
+  const group = document.createElement("div");
+  group.className = isMulti ? "pill-select pill-select--multi" : "pill-select";
+  group.setAttribute("role", "group");
+
+  const label = select.id
+    ? document.querySelector(`label[for="${CSS.escape(select.id)}"]`)
+    : null;
+
+  if (label) {
+    group.setAttribute("aria-label", label.textContent.trim());
+  }
+
+  Array.from(select.options)
+    .filter((option) => option.value !== "")
+    .forEach((option) => {
+      const pill = document.createElement("button");
+      pill.type = "button";
+      pill.className = "pill";
+      pill.textContent = option.textContent.trim();
+      pill.dataset.value = option.value;
+
+      pill.addEventListener("click", () => {
+        if (isMulti) {
+          const selecting = !option.selected;
+
+          if (
+            selecting &&
+            maxChoices > 0 &&
+            countSelectedOptions(select) >= maxChoices
+          ) {
+            nudge(pill);
+            showToast(
+              `Choose up to ${maxChoices} for ${
+                group.getAttribute("aria-label") || "this option"
+              }.`,
+              "warning"
+            );
+            return;
+          }
+
+          option.selected = selecting;
+        } else {
+          select.value = option.value;
+        }
+
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        syncPillGroup(select, group);
+      });
+
+      group.appendChild(pill);
+    });
+
+  // Keep the native select for its value, but take it out of the tab order
+  // and the accessibility tree — the pills are now the control.
+  select.classList.add("pill-native-hidden");
+  select.setAttribute("tabindex", "-1");
+  select.setAttribute("aria-hidden", "true");
+  select.insertAdjacentElement("afterend", group);
+
+  select.addEventListener("change", () => syncPillGroup(select, group));
+  syncPillGroup(select, group);
+
+  pillSelectRegistry.push({ select, group });
+}
+
+function syncPillGroup(select, group) {
+  const isMulti = select.multiple;
+
+  group.querySelectorAll(".pill").forEach((pill) => {
+    let pressed;
+
+    if (isMulti) {
+      const option = Array.from(select.options).find(
+        (candidate) => candidate.value === pill.dataset.value
+      );
+      pressed = Boolean(option && option.selected);
+    } else {
+      pressed = pill.dataset.value === select.value;
+    }
+
+    pill.setAttribute("aria-pressed", String(pressed));
+  });
+}
+
+function countSelectedOptions(select) {
+  return Array.from(select.options).filter((option) => option.selected).length;
+}
+
+// Reads a "select up to three / up to 3" hint near a multi-select to cap it.
+function getPillMaxChoices(select) {
+  const scope = select.closest(".field-group") || select.parentElement;
+  const text = scope ? scope.textContent : "";
+  const match = /up to (\w+)/i.exec(text);
+
+  if (!match) {
+    return 0;
+  }
+
+  const words = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 };
+  const numeric = Number.parseInt(match[1], 10);
+
+  return Number.isNaN(numeric)
+    ? words[match[1].toLowerCase()] || 0
+    : numeric;
+}
+
+function nudge(element) {
+  if (typeof element.animate !== "function") {
+    return;
+  }
+
+  element.animate(
+    [
+      { transform: "translateX(0)" },
+      { transform: "translateX(-4px)" },
+      { transform: "translateX(4px)" },
+      { transform: "translateX(0)" }
+    ],
+    { duration: 180 }
+  );
+}
+
+// Re-sync every pill group from its select. Call after any code path that
+// changes select values without a user click (restore, clear, load profile).
+function syncAllPillSelects() {
+  pillSelectRegistry.forEach(({ select, group }) => {
+    if (group.isConnected) {
+      syncPillGroup(select, group);
+    }
+  });
+}
+
+// Shows a tidy placeholder in the hero video frame until a real
+// assets/how-to.mp4 is added, then reveals the player automatically.
+function initHeroVideo() {
+  const video = getElement("howToVideo");
+  const placeholder = getElement("howToPlaceholder");
+
+  if (!video || !placeholder) {
+    return;
+  }
+
+  const showPlaceholder = () => {
+    video.hidden = true;
+    placeholder.hidden = false;
+  };
+
+  const showVideo = () => {
+    placeholder.hidden = true;
+    video.hidden = false;
+  };
+
+  video.addEventListener("loadeddata", showVideo);
+  video.addEventListener("error", showPlaceholder, true);
+
+  const source = video.querySelector("source");
+  if (source) {
+    source.addEventListener("error", showPlaceholder);
+  }
+
+  // Fallback for browsers that don't surface a <source> error: if nothing
+  // has loaded shortly after init, assume the file isn't there yet.
+  window.setTimeout(() => {
+    if (video.readyState === 0 && !video.videoWidth) {
+      showPlaceholder();
+    }
+  }, 1200);
 }
 
 
@@ -2186,6 +2392,7 @@ function clearCategory(category) {
   markResultsOutdated();
   updateIngredientReview();
   updateValidationSummary();
+  syncAllPillSelects();
   saveCurrentProject();
   closeModal();
   showToast("Category cleared.", "success");
@@ -2225,6 +2432,7 @@ function clearAllData() {
   updateSelectionLimit();
   updateIngredientReview();
   updateValidationSummary();
+  syncAllPillSelects();
   updateGeneratedVisibility();
   closeModal();
   showToast("All information was cleared.", "success");
@@ -2435,6 +2643,12 @@ function readSelectLabel(id) {
 
   if (!element || element.tagName !== "SELECT") {
     return readValue(id);
+  }
+
+  if (element.multiple) {
+    return Array.from(element.selectedOptions)
+      .map((option) => option.textContent.trim())
+      .join(", ");
   }
 
   if (!element.value) {
@@ -3636,6 +3850,7 @@ function restoreCurrentProject(showFeedback = false) {
     updateSelectionLimit();
     updateIngredientReview();
     updateValidationSummary();
+    syncAllPillSelects();
 
     if (Object.keys(appState.generatedOptions).length > 0) {
       renderGeneratedOptions();
@@ -3814,6 +4029,7 @@ function applySavedProfile(type) {
   markResultsOutdated();
   updateIngredientReview();
   updateValidationSummary();
+  syncAllPillSelects();
   saveCurrentProject();
   showToast(`${capitalize(type)} profile applied.`, "success");
 }
