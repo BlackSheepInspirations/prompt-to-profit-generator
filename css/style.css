@@ -718,6 +718,83 @@ summary:focus-visible,
   color: var(--color-text-muted);
 }
 
+/* Collapsible rail panels: selections, vault, recently generated */
+.rail-panel {
+  margin-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+.rail-panel__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  list-style: none;
+  padding: 12px 2px 8px;
+  font-weight: 650;
+  font-size: 0.92rem;
+}
+.rail-panel__summary::-webkit-details-marker { display: none; }
+
+.rail-panel__count {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.rail-panel__chev {
+  flex: none;
+  color: var(--color-primary);
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+.rail-panel[open] .rail-panel__chev { transform: rotate(45deg); }
+
+.rail-panel__body { padding: 2px 0 6px; }
+
+.rail-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.rail-item-row:last-of-type { border-bottom: 0; }
+
+.rail-item-main { flex: 1; min-width: 0; }
+.rail-item-name { font-size: 0.86rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rail-item-date { font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-muted); }
+
+.rail-mini-btn {
+  min-height: 0;
+  flex: none;
+  padding: 5px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-primary);
+}
+.rail-mini-btn:hover {
+  border-color: var(--color-gold);
+  background: color-mix(in srgb, var(--color-gold) 12%, var(--color-surface));
+  color: var(--color-text);
+}
+.rail-mini-btn--x { padding: 5px 9px; color: var(--color-error); }
+
+.rail-clear { margin-top: 10px; width: 100%; }
+
+.rail-empty {
+  margin: 4px 0;
+  font-size: 0.84rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
 @media (max-width: 980px) {
   .build-layout {
     grid-template-columns: 1fr;

@@ -2239,6 +2239,30 @@
             role="status"
             aria-live="polite"
           ></p>
+
+          <details class="rail-panel">
+            <summary class="rail-panel__summary">
+              <span>Your selections</span>
+              <span class="rail-panel__chev" aria-hidden="true">+</span>
+            </summary>
+            <div id="railSelections" class="rail-panel__body ingredient-review"></div>
+          </details>
+
+          <details class="rail-panel">
+            <summary class="rail-panel__summary">
+              <span>Your Vault <span id="railVaultCount" class="rail-panel__count">(0)</span></span>
+              <span class="rail-panel__chev" aria-hidden="true">+</span>
+            </summary>
+            <div id="railVault" class="rail-panel__body"></div>
+          </details>
+
+          <details class="rail-panel">
+            <summary class="rail-panel__summary">
+              <span>Recently Generated <span id="railRecentCount" class="rail-panel__count">(0)</span></span>
+              <span class="rail-panel__chev" aria-hidden="true">+</span>
+            </summary>
+            <div id="railRecent" class="rail-panel__body"></div>
+          </details>
         </div>
       </aside>
     </div>
@@ -2389,7 +2413,7 @@
             id="saveFinalPromptBtn"
             type="button"
           >
-            Save Final Prompt
+            Save to Vault
           </button>
 
           <button

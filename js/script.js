@@ -21,7 +21,8 @@ const APP_STORAGE_KEYS = {
   project: "promptToProfit.currentProject",
   productProfiles: "promptToProfit.productProfiles",
   brandProfiles: "promptToProfit.brandProfiles",
-  savedPackages: "promptToProfit.savedPackages"
+  savedPackages: "promptToProfit.savedPackages",
+  recentGenerations: "promptToProfit.recentGenerations"
 };
 
 const MAX_SELECTED_GENERATORS = 4;
@@ -1405,6 +1406,8 @@ function initializeApplication() {
   initJourney();
   initHeroVideo();
   initBackToTop();
+  renderVault();
+  renderRecent();
   window.scrollTo(0, 0);
 }
 
@@ -1927,6 +1930,22 @@ function handleDocumentClick(event) {
 
     case "save-package":
       saveFinalPackage();
+      break;
+
+    case "copy-stored":
+      copyStoredItem(button.dataset.store, button.dataset.storeId);
+      break;
+
+    case "delete-stored":
+      deleteVaultItem(button.dataset.storeId);
+      break;
+
+    case "clear-vault":
+      clearVault();
+      break;
+
+    case "clear-recent":
+      clearRecent();
       break;
 
     case "save-project":
@@ -2945,6 +2964,12 @@ function updateBuildRail() {
         ? "Everything's ready — generate your pack."
         : `${done} of ${items.length} essentials added`;
   }
+
+  const railSelections = getElement("railSelections");
+
+  if (railSelections) {
+    railSelections.innerHTML = selectionsSummaryHtml(data);
+  }
 }
 
 function markFieldError(fieldId) {
@@ -3017,86 +3042,236 @@ function focusFirstValidationError(errors) {
    12. INGREDIENT REVIEW
    ========================================================= */
 
-function updateIngredientReview() {
-  const container = getElement("ingredientReview");
-
-  if (!container) {
-    return;
-  }
-
-  const data = collectProjectData();
-
+// Shared "what you've selected" summary, used by the ingredient review and
+// the live brief in the sticky rail.
+function selectionsSummaryHtml(data) {
   const groups = [
     [
       "Product",
-      [data.product.name, data.display.productType, data.product.description]
+      [
+        ["Name", data.product.name],
+        ["Type", data.display.productType],
+        ["Description", data.product.description],
+        ["Features", data.product.features],
+        ["Benefits", data.product.benefits]
+      ]
     ],
     [
       "Audience",
       [
-        data.audience.targetAudience,
-        data.display.marketingGoal,
-        data.display.buyerMotivation
+        ["Audience", data.audience.targetAudience],
+        ["Problem", data.audience.customerProblem],
+        ["Outcome", data.audience.desiredOutcome],
+        ["Goal", data.display.marketingGoal],
+        ["Motivation", data.display.buyerMotivation]
       ]
     ],
     [
       "Pricing",
       [
-        formatPrice(data.pricing.currentPrice),
-        data.display.pricingTier,
-        data.display.offerType,
-        data.display.pricingUsage
+        ["Price", formatPrice(data.pricing.currentPrice)],
+        ["Tier", data.display.pricingTier],
+        ["Offer", data.display.offerType],
+        ["Pricing use", data.display.pricingUsage]
       ]
     ],
     [
       "Brand",
       [
-        data.display.brandTone,
-        data.display.visualStyle,
-        data.brand.brandKeywords
+        ["Tone", data.display.brandTone],
+        ["Visual", data.display.visualStyle],
+        ["Color", data.display.colorDirection],
+        ["Type", data.display.typographyDirection],
+        ["Keywords", data.brand.brandKeywords],
+        ["Avoid", data.brand.wordsToAvoid]
       ]
     ],
     [
-      "Generators",
-      data.selectedGenerators.map(
-        (key) => GENERATOR_DEFINITIONS[key]?.label || key
-      )
+      "Creating",
+      data.selectedGenerators.map((key) => [
+        "",
+        GENERATOR_DEFINITIONS[key]?.label || key
+      ])
     ],
     [
       "Delivery",
       [
-        data.display.aiPlatform,
-        data.display.deliveryMode,
-        `${data.delivery.optionCount} option${
-          data.delivery.optionCount === 1 ? "" : "s"
-        }`
+        ["Platform", data.display.aiPlatform],
+        ["Format", data.display.deliveryMode],
+        ["Options", `${data.delivery.optionCount}`]
       ]
     ]
   ];
 
   const blocks = groups
-    .map(([title, values]) => {
-      const items = values.filter(Boolean);
+    .map(([title, pairs]) => {
+      const items = pairs.filter(
+        ([, value]) => value && String(value).trim()
+      );
 
       if (items.length === 0) {
         return "";
       }
 
-      return `
-        <div class="review-block">
-          <h4>${escapeHtml(title)}</h4>
-          <ul>${items
-            .map((value) => `<li>${escapeHtml(value)}</li>`)
-            .join("")}</ul>
-        </div>
-      `;
+      return `<div class="review-block"><h4>${escapeHtml(title)}</h4><ul>${items
+        .map(
+          ([label, value]) =>
+            `<li>${
+              label ? `<b>${escapeHtml(label)}:</b> ` : ""
+            }${escapeHtml(String(value))}</li>`
+        )
+        .join("")}</ul></div>`;
     })
     .filter(Boolean)
     .join("");
 
-  container.innerHTML =
+  return (
     blocks ||
-    '<p class="empty-state">Fill in your details to preview them here.</p>';
+    '<p class="empty-state">Fill in your details to see them here.</p>'
+  );
+}
+
+function updateIngredientReview() {
+  const container = getElement("ingredientReview");
+
+  if (container) {
+    container.innerHTML = selectionsSummaryHtml(collectProjectData());
+  }
+}
+
+
+/* =========================================================
+   12b. VAULT + RECENTLY GENERATED (sticky rail)
+   ========================================================= */
+
+function renderVault() {
+  const container = getElement("railVault");
+  const count = getElement("railVaultCount");
+
+  if (!container) {
+    return;
+  }
+
+  const items = readStorageArray(APP_STORAGE_KEYS.savedPackages);
+
+  if (count) {
+    count.textContent = `(${items.length})`;
+  }
+
+  container.innerHTML = items.length
+    ? items.map((item) => renderStoredRow(item, "vault")).join("") +
+      '<button type="button" class="rail-mini-btn rail-clear" data-action="clear-vault">Clear vault</button>'
+    : '<p class="rail-empty">Empty &mdash; use &ldquo;Save to Vault&rdquo; after you generate.</p>';
+}
+
+function renderRecent() {
+  const container = getElement("railRecent");
+  const count = getElement("railRecentCount");
+
+  if (!container) {
+    return;
+  }
+
+  const items = readStorageArray(APP_STORAGE_KEYS.recentGenerations);
+
+  if (count) {
+    count.textContent = `(${items.length})`;
+  }
+
+  container.innerHTML = items.length
+    ? items.map((item) => renderStoredRow(item, "recent")).join("") +
+      '<button type="button" class="rail-mini-btn rail-clear" data-action="clear-recent">Clear list</button>'
+    : '<p class="rail-empty">Nothing generated yet.</p>';
+}
+
+function renderStoredRow(item, store) {
+  const date = new Date(item.savedAt);
+  const when = Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString();
+
+  return `
+    <div class="rail-item-row">
+      <div class="rail-item-main">
+        <div class="rail-item-name">${escapeHtml(item.productName || "Untitled")}</div>
+        <div class="rail-item-date">${escapeHtml(when)}</div>
+      </div>
+      <button type="button" class="rail-mini-btn" data-action="copy-stored" data-store="${store}" data-store-id="${escapeHtml(item.id)}">Copy</button>
+      ${
+        store === "vault"
+          ? `<button type="button" class="rail-mini-btn rail-mini-btn--x" data-action="delete-stored" data-store-id="${escapeHtml(item.id)}" aria-label="Remove from vault">&times;</button>`
+          : ""
+      }
+    </div>
+  `;
+}
+
+function getStoredItem(store, id) {
+  const key =
+    store === "vault"
+      ? APP_STORAGE_KEYS.savedPackages
+      : APP_STORAGE_KEYS.recentGenerations;
+
+  return readStorageArray(key).find((item) => item.id === id);
+}
+
+async function copyStoredItem(store, id) {
+  const item = getStoredItem(store, id);
+
+  if (!item || !item.content) {
+    showToast("There is nothing to copy.", "warning");
+    return;
+  }
+
+  const copied = await copyTextToClipboard(item.content);
+  showToast(
+    copied ? "Copied to your clipboard." : "Couldn't copy automatically.",
+    copied ? "success" : "warning"
+  );
+}
+
+function deleteVaultItem(id) {
+  const items = readStorageArray(APP_STORAGE_KEYS.savedPackages).filter(
+    (item) => item.id !== id
+  );
+
+  localStorage.setItem(
+    APP_STORAGE_KEYS.savedPackages,
+    JSON.stringify(items)
+  );
+
+  renderVault();
+  showToast("Removed from your vault.", "success");
+}
+
+function clearVault() {
+  localStorage.removeItem(APP_STORAGE_KEYS.savedPackages);
+  renderVault();
+  showToast("Vault cleared.", "success");
+}
+
+function clearRecent() {
+  localStorage.removeItem(APP_STORAGE_KEYS.recentGenerations);
+  renderRecent();
+  showToast("Recent list cleared.", "success");
+}
+
+function addRecentGeneration() {
+  const content = buildFullExport();
+
+  const items = readStorageArray(APP_STORAGE_KEYS.recentGenerations);
+
+  items.unshift({
+    id: createId(),
+    productName: readValue("productName") || "Untitled Product",
+    savedAt: new Date().toISOString(),
+    content
+  });
+
+  localStorage.setItem(
+    APP_STORAGE_KEYS.recentGenerations,
+    JSON.stringify(items.slice(0, 10))
+  );
+
+  renderRecent();
 }
 
 function formatPrice(value) {
@@ -3165,6 +3340,7 @@ async function generatePromptOptions() {
   updateGeneratedVisibility();
   setGeneratingState(false);
   saveCurrentProject();
+  addRecentGeneration();
 
   const resultsSection = getElement("resultsSection");
 
@@ -4706,7 +4882,8 @@ function saveFinalPackage() {
     JSON.stringify(savedPackages.slice(0, 25))
   );
 
-  showToast("Prompt package saved on this device.", "success");
+  renderVault();
+  showToast("Saved to your vault.", "success");
 }
 
 // Assembles the final package plus every premium module into one document.
