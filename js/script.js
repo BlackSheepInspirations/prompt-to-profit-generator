@@ -2223,6 +2223,37 @@ function applyPreset(key) {
   }
 }
 
+// Highlights the creators most worth picking for the chosen product type.
+const RECOMMENDED_BY_TYPE = {
+  "digital-product": ["product-listing", "seo-copy", "tags-hashtags", "pinterest-pin", "social-post", "geo-optimization"],
+  "pod-product": ["product-listing", "product-mockup", "pinterest-pin", "social-post", "tags-hashtags"],
+  course: ["sales-page", "promotional-email", "social-post", "launch-carousel", "hooks-captions"],
+  membership: ["sales-page", "promotional-email", "social-post", "launch-carousel"],
+  "lead-magnet": ["lead-magnet-cover", "sales-page", "social-post", "promotional-email"],
+  "physical-product": ["product-description", "product-ad", "product-mockup", "lifestyle-image", "social-post", "geo-optimization"],
+  service: ["sales-page", "hooks-captions", "social-post", "promotional-email", "creative-direction"],
+  "productized-service": ["sales-page", "hooks-captions", "social-post", "promotional-email"],
+  bundle: ["product-listing", "sales-page", "social-post", "launch-carousel"],
+  "image-asset": ["product-mockup", "listing-image", "pinterest-pin", "tags-hashtags", "social-post"]
+};
+
+function updateRecommendedGenerators() {
+  const type = readValue("productType");
+  const recommended = new Set(RECOMMENDED_BY_TYPE[type] || []);
+
+  getGeneratorCheckboxes().forEach((checkbox) => {
+    const card = checkbox.closest(".generator-card");
+
+    if (!card) {
+      return;
+    }
+
+    const isRecommended = recommended.has(resolveGeneratorKey(checkbox));
+    card.classList.toggle("is-recommended", isRecommended);
+    card.title = isRecommended ? "Recommended for your product type" : "";
+  });
+}
+
 
 /* =========================================================
    7. GENERATOR CONFIGURATION PANELS
@@ -3105,6 +3136,7 @@ function clearFieldErrors() {
 
 function updateValidationSummary() {
   updateBuildRail();
+  updateRecommendedGenerators();
 
   const summary = getElement("validationSummary");
 
@@ -5176,20 +5208,28 @@ function printLaunchKit() {
   }
 
   const title = readValue("productName") || "Launch Kit";
+  const when = new Date().toLocaleDateString();
   const doc = printWindow.document;
 
   doc.write(
     "<!doctype html><html><head><meta charset='utf-8'><title>" +
       escapeHtml(`Prompt to Profit — ${title}`) +
       "</title><style>" +
-      "body{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;line-height:1.6;color:#12201f;max-width:820px;margin:0 auto;padding:36px;}" +
-      "h1{font-family:system-ui,-apple-system,sans-serif;font-size:22px;color:#0b5e59;margin:0 0 4px;}" +
-      ".sub{font-family:system-ui,sans-serif;color:#566360;margin:0 0 24px;font-size:13px;}" +
-      "pre{white-space:pre-wrap;word-wrap:break-word;margin:0;}" +
+      "@page{margin:28px;}" +
+      "*{box-sizing:border-box;}" +
+      "body{margin:0;color:#12201f;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;}" +
+      ".brandbar{background:linear-gradient(135deg,#0e3b38,#0b5e59 60%,#0a6e67);color:#eaf6f3;padding:26px 40px;}" +
+      ".wm{font-size:24px;font-weight:800;letter-spacing:-.02em;}" +
+      ".wm b{color:#e6b955;}" +
+      ".meta{margin-top:6px;color:#bfe0db;font-size:13px;}" +
+      ".content{padding:26px 40px;}" +
+      "pre{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;margin:0;}" +
+      ".foot{padding:14px 40px 30px;color:#8a9b97;font-size:11px;}" +
       "</style></head><body>" +
-      "<h1>Prompt to Profit — Launch Kit</h1>" +
-      `<p class='sub'>${escapeHtml(title)}</p>` +
-      `<pre>${escapeHtml(buildFullExport())}</pre>` +
+      "<div class='brandbar'><div class='wm'>Prompt to <b>Profit</b></div>" +
+      `<div class='meta'>Launch Kit &nbsp;&middot;&nbsp; ${escapeHtml(title)} &nbsp;&middot;&nbsp; ${escapeHtml(when)}</div></div>` +
+      `<div class='content'><pre>${escapeHtml(buildFullExport())}</pre></div>` +
+      "<div class='foot'>Generated with Prompt to Profit</div>" +
       "</body></html>"
   );
 

@@ -595,6 +595,13 @@ summary:focus-visible,
   color: var(--color-text);
 }
 
+.quickstart__sep {
+  width: 1px;
+  height: 24px;
+  background: var(--color-border-strong);
+  margin: 0 2px;
+}
+
 .quickstart__sample {
   background: var(--color-primary) !important;
   border-color: var(--color-primary) !important;
@@ -1359,6 +1366,7 @@ button:active {
 }
 
 .generator-card {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1395,6 +1403,25 @@ button:active {
 .generator-card:has(input:disabled) {
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+.generator-card.is-recommended {
+  border-color: color-mix(in srgb, var(--color-gold) 55%, var(--color-border));
+}
+
+.generator-card.is-recommended::after {
+  content: "\2605 Pick";
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-gold-ink);
+  background: var(--color-gold);
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
 }
 
 .selection-count {
