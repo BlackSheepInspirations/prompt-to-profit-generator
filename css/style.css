@@ -232,20 +232,12 @@ summary:focus-visible,
 .wordmark {
   display: inline-flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 1.2rem;
+  font-size: clamp(1.5rem, 2.8vw, 2rem);
   letter-spacing: -0.02em;
   color: #ffffff;
-}
-
-.wordmark__mark {
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  background: linear-gradient(140deg, var(--color-primary-bright), #eaf6f3);
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
 }
 
 .wordmark__tag {
@@ -353,9 +345,10 @@ summary:focus-visible,
   transition: background 0.14s ease, border-color 0.14s ease, transform 0.14s ease;
 }
 
-.project-actions button:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.5);
+.project-actions button:not(#newProjectBtn):hover {
+  background: rgba(230, 185, 85, 0.18);
+  border-color: var(--color-gold);
+  color: #f2d789;
   transform: translateY(-1px);
 }
 
@@ -984,8 +977,9 @@ textarea[readonly] {
 }
 
 .pill:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  border-color: var(--color-gold);
+  background: color-mix(in srgb, var(--color-gold) 14%, var(--color-surface));
+  color: var(--color-text);
 }
 
 .pill[aria-pressed="true"] {
@@ -1557,9 +1551,9 @@ button:active {
 }
 
 .premium-tab:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: var(--color-surface);
+  border-color: var(--color-gold);
+  background: color-mix(in srgb, var(--color-gold) 12%, var(--color-surface));
+  color: var(--color-text);
 }
 
 .premium-tab.is-active,
