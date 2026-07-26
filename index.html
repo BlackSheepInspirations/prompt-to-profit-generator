@@ -29,9 +29,17 @@
   </a>
 
   <header class="site-header">
+    <div class="site-header__bar">
+      <span class="wordmark">
+        <span class="wordmark__mark" aria-hidden="true"></span>
+        Prompt to Profit
+        <span class="wordmark__tag">Studio</span>
+      </span>
+    </div>
+
     <div class="site-header__content">
       <div class="marquee__intro">
-        <p class="eyebrow">AI Marketing Prompt Studio</p>
+        <p class="eyebrow">From product to launch-ready marketing</p>
 
         <h1>Turn what you sell into <span class="accent">paste-ready</span> AI prompts.</h1>
 
@@ -41,36 +49,6 @@
           video — tuned to your brand and your platform.
         </p>
 
-        <div class="project-actions" aria-label="Project actions">
-          <button id="newProjectBtn" type="button">
-            New Project
-          </button>
-
-          <button id="loadProductProfileBtn" type="button">
-            Load Product Profile
-          </button>
-
-          <button id="loadBrandProfileBtn" type="button">
-            Load Brand Profile
-          </button>
-
-          <button id="saveProductProfileBtn" type="button">
-            Save Product Profile
-          </button>
-
-          <button id="saveBrandProfileBtn" type="button">
-            Save Brand Profile
-          </button>
-        </div>
-
-        <p
-          id="projectStatus"
-          class="status-message"
-          role="status"
-          aria-live="polite"
-        >
-          Start a new project or enter your product information below.
-        </p>
       </div>
 
       <div class="marquee__media">
@@ -99,6 +77,26 @@
           Watch: how to turn your product into a prompt pack — in about 60 seconds.
         </p>
       </div>
+    </div>
+
+    <div class="site-header__actions">
+      <div class="project-actions" aria-label="Project actions">
+        <button id="newProjectBtn" type="button">New Project</button>
+        <span class="pa-sep" aria-hidden="true"></span>
+        <button id="loadProductProfileBtn" type="button">Load Product</button>
+        <button id="loadBrandProfileBtn" type="button">Load Brand</button>
+        <button id="saveProductProfileBtn" type="button">Save Product</button>
+        <button id="saveBrandProfileBtn" type="button">Save Brand</button>
+      </div>
+
+      <p
+        id="projectStatus"
+        class="status-message"
+        role="status"
+        aria-live="polite"
+      >
+        Start a new project or enter your product info below.
+      </p>
     </div>
   </header>
 

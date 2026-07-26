@@ -221,6 +221,45 @@ summary:focus-visible,
   pointer-events: none;
 }
 
+.site-header__bar {
+  position: relative;
+  z-index: 1;
+  width: min(100%, var(--content-width));
+  margin: 0 auto;
+  padding-bottom: clamp(24px, 4vw, 40px);
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.wordmark__mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: linear-gradient(140deg, var(--color-primary-bright), #eaf6f3);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.wordmark__tag {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #86e7d6;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+}
+
 .site-header__content {
   position: relative;
   z-index: 1;
@@ -230,6 +269,26 @@ summary:focus-visible,
   grid-template-columns: 1.1fr 0.9fr;
   gap: clamp(28px, 4vw, 56px);
   align-items: center;
+}
+
+/* Project actions — one clean row across the bottom of the marquee */
+.site-header__actions {
+  position: relative;
+  z-index: 1;
+  width: min(100%, var(--content-width));
+  margin: clamp(26px, 4vw, 44px) auto 0;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.pa-sep {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .marquee__intro { min-width: 0; }
@@ -276,9 +335,10 @@ summary:focus-visible,
 
 .project-actions {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 28px;
+  margin: 0;
 }
 
 .project-actions button {
@@ -310,12 +370,18 @@ summary:focus-visible,
 
 .site-header .status-message {
   display: inline-block;
-  margin: 18px 0 0;
+  margin: 0 0 0 auto;
   padding: 8px 15px;
   border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.1);
   color: #eaf6f3;
   font-size: 0.86rem;
+}
+
+@media (max-width: 680px) {
+  .site-header__actions .status-message {
+    margin: 4px 0 0;
+  }
 }
 
 /* ---------- Video-instruction slot ---------- */
