@@ -3701,6 +3701,7 @@ function clearOutputElements() {
   renderSeparatePromptList([]);
 
   [
+    "premiumAdPackageText",
     "premiumSunoText",
     "premiumVideoText",
     "premiumVoiceText",
@@ -3733,6 +3734,7 @@ function clearOutputElements() {
 
 function generatePremiumOutputs(data) {
   appState.premiumOutputs = {
+    adpackage: buildFullAdPackage(data),
     suno: buildSunoPrompt(data),
     video: buildVideoScriptPrompt(data),
     voice: buildVoiceoverScript(data),
@@ -3746,6 +3748,7 @@ function generatePremiumOutputs(data) {
 
 function renderPremiumOutputs(outputs) {
   const targets = {
+    adpackage: "premiumAdPackageText",
     suno: "premiumSunoText",
     video: "premiumVideoText",
     voice: "premiumVoiceText",
@@ -4281,6 +4284,72 @@ function animationStyleFromVisual(visual, tone) {
   };
 }
 
+// Stitches the visual script, voiceover, background music, and captions into
+// one coordinated, ready-to-hand-off ad brief.
+function buildFullAdPackage(data) {
+  const d = premiumData(data);
+  const scenes = videoScenes(d);
+  const style = sunoStyleFromTone(d.toneFirst);
+
+  const concept = `${capitalize(d.audience)} struggle with ${
+    d.problem ? lowerText(d.problem) : "the usual options"
+  } — ${d.name} gives them ${
+    d.outcome ? lowerText(d.outcome) : "a better result"
+  }.`;
+
+  const lines = [
+    "FULL AD PACKAGE",
+    `Product: ${d.name} (${d.type})  |  Audience: ${d.audience}  |  Tone: ${d.tone}`,
+    "Format: ~35-second vertical 9:16 ad  |  TikTok / Reels / Shorts",
+    "",
+    "CONCEPT:",
+    concept,
+    "",
+    "==================================================",
+    "SCENE-BY-SCENE (visual + voice together)",
+    "==================================================",
+    ""
+  ];
+
+  scenes.forEach((scene) => {
+    lines.push(`[${scene.time}]  ${scene.label.toUpperCase()}`);
+    if (scene.onscreen) {
+      lines.push(`  On-screen: ${scene.onscreen}`);
+    }
+    lines.push(`  Voiceover: "${scene.vo}"`);
+    lines.push(`  Shot: ${scene.shot}`, "");
+  });
+
+  lines.push(
+    "==================================================",
+    "MUSIC — instrumental background bed",
+    "==================================================",
+    `Style: ${style.genre} instrumental, ${style.tempo}, ${style.instr}, no vocals, kept low under the voice, loopable.`,
+    "Arc: soft intro -> steady low bed -> gentle lift on the CTA -> clean end.",
+    "In Suno: turn 'Instrumental' ON and paste the Style line above.",
+    "",
+    "==================================================",
+    "CAPTION & HASHTAGS",
+    "==================================================",
+    `Caption: ${capitalize(
+      d.outcome || "The " + d.type + " " + d.audience + " actually needs"
+    )} — meet ${d.name}.${d.price ? " From " + d.price + "." : ""}`,
+    `Hashtags: ${premiumHashtags(d)}`,
+    "",
+    "==================================================",
+    "PRODUCTION CHECKLIST",
+    "==================================================",
+    "[ ] Film or generate the shots in order (see scenes above).",
+    "[ ] Record the voiceover, or generate it with a voice AI (ElevenLabs / Play.ht).",
+    "[ ] Generate the instrumental track in Suno (Instrumental ON).",
+    "[ ] Layer it: video + voiceover on top + music low underneath.",
+    "[ ] Add the on-screen text and a clear CTA card at the end.",
+    "[ ] Export 9:16 and post with the caption + hashtags."
+  );
+
+  return lines.join("\n");
+}
+
 function buildPhotoAnimationPrompt(data) {
   const d = premiumData(data);
   const s = animationStyleFromVisual(d.visual, d.toneFirst);
@@ -4543,6 +4612,7 @@ function buildFullExport() {
   const premium = appState.premiumOutputs || {};
 
   [
+    ["FULL AD PACKAGE", premium.adpackage],
     ["MUSIC PROMPTS (SUNO)", premium.suno],
     ["VIDEO SCRIPT", premium.video],
     ["VOICEOVER SCRIPT", premium.voice],

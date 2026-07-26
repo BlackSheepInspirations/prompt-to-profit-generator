@@ -2285,9 +2285,18 @@
         <button
           type="button"
           class="premium-tab is-active"
-          data-premium-tab="suno"
+          data-premium-tab="adpackage"
           role="tab"
           aria-selected="true"
+        >
+          Full Ad Package
+        </button>
+        <button
+          type="button"
+          class="premium-tab"
+          data-premium-tab="suno"
+          role="tab"
+          aria-selected="false"
         >
           Suno Music
         </button>
@@ -2339,7 +2348,28 @@
       </div>
 
       <div class="premium-panels">
-        <div class="premium-panel is-active" data-premium-panel="suno">
+        <div class="premium-panel is-active" data-premium-panel="adpackage">
+          <div class="output-heading">
+            <h3>Full Ad Package</h3>
+            <button type="button" data-output-target="premiumAdPackageText">
+              Copy
+            </button>
+          </div>
+          <p class="field-note">
+            The whole ad in one brief — concept, scene-by-scene visuals with the
+            voiceover, a background-music direction, caption, hashtags, and a
+            production checklist. Hand it to an editor or follow it yourself.
+          </p>
+          <textarea
+            id="premiumAdPackageText"
+            class="premium-output"
+            rows="26"
+            readonly
+            aria-label="Full ad package brief"
+          ></textarea>
+        </div>
+
+        <div class="premium-panel" data-premium-panel="suno" hidden>
           <div class="output-heading">
             <h3>Suno AI Music Prompt</h3>
             <button type="button" data-output-target="premiumSunoText">
