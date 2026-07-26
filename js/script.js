@@ -1323,7 +1323,8 @@ const appState = {
   lastGeneratedSignature: "",
   modalAction: null,
   activeAccordion: null,
-  isGenerating: false
+  isGenerating: false,
+  premiumOutputs: {}
 };
 
 
@@ -1751,6 +1752,11 @@ function handleDocumentClick(event) {
   // rather than through a data-action name.
   if (button.dataset.outputTarget) {
     copyOutput(button.dataset.outputTarget);
+    return;
+  }
+
+  if (button.dataset.premiumTab) {
+    handlePremiumTab(button);
     return;
   }
 
@@ -3032,6 +3038,7 @@ async function generatePromptOptions() {
 
   renderGeneratedOptions();
   assembleAllOutputs(data);
+  generatePremiumOutputs(data);
   renderQualityResult(data);
   updateGeneratedVisibility();
   setGeneratingState(false);
@@ -3674,6 +3681,11 @@ function clearOutputElements() {
 
   renderSeparatePromptList([]);
 
+  ["premiumSunoText", "premiumVideoText", "premiumMarketingText", "premiumGptText"].forEach(
+    (id) => setOutputValue(id, "")
+  );
+  appState.premiumOutputs = {};
+
   const optionContainer = getElement("generatorOptionsOutput");
 
   if (optionContainer) {
@@ -3685,6 +3697,425 @@ function clearOutputElements() {
   if (qualityResult) {
     qualityResult.innerHTML = "";
   }
+}
+
+
+/* =========================================================
+   15b. PREMIUM OUTPUT MODULES
+   Suno music, video script, marketing campaign, custom GPT.
+   Each builds a complete, copy-ready deliverable from the
+   same project inputs.
+   ========================================================= */
+
+function generatePremiumOutputs(data) {
+  appState.premiumOutputs = {
+    suno: buildSunoPrompt(data),
+    video: buildVideoScriptPrompt(data),
+    marketing: buildMarketingPrompt(data),
+    gpt: buildCustomGptConfig(data)
+  };
+
+  renderPremiumOutputs(appState.premiumOutputs);
+}
+
+function renderPremiumOutputs(outputs) {
+  const targets = {
+    suno: "premiumSunoText",
+    video: "premiumVideoText",
+    marketing: "premiumMarketingText",
+    gpt: "premiumGptText"
+  };
+
+  Object.entries(targets).forEach(([key, id]) => {
+    setOutputValue(id, (outputs && outputs[key]) || "");
+  });
+}
+
+function handlePremiumTab(button) {
+  const key = button.dataset.premiumTab;
+
+  document.querySelectorAll(".premium-tab").forEach((tab) => {
+    const active = tab === button;
+    tab.classList.toggle("is-active", active);
+    tab.setAttribute("aria-selected", String(active));
+  });
+
+  document.querySelectorAll("[data-premium-panel]").forEach((panel) => {
+    const active = panel.dataset.premiumPanel === key;
+    panel.hidden = !active;
+    panel.classList.toggle("is-active", active);
+  });
+}
+
+// Normalizes project data into safe, readable fields for the builders,
+// with sensible fallbacks so an output is never empty or broken.
+function premiumData(data) {
+  return {
+    name: data.product.name || "your product",
+    type: data.display.productType || data.product.type || "product",
+    description: data.product.description || "",
+    features: data.product.features || "",
+    benefits: data.product.benefits || "",
+    audience: data.audience.targetAudience || "your ideal customer",
+    problem: data.audience.customerProblem || "",
+    outcome: data.audience.desiredOutcome || "",
+    goal: data.display.marketingGoal || "grow sales",
+    motivation: data.display.buyerMotivation || "",
+    price: data.pricing.currentPrice ? formatPrice(data.pricing.currentPrice) : "",
+    tier: data.display.pricingTier || "",
+    offer: data.display.offerType || "",
+    pricingUsage: data.display.pricingUsage || "",
+    brand: data.brand.brandName || data.product.name || "the brand",
+    tone: data.display.brandTone || "professional",
+    toneFirst: (data.display.brandTone || "professional").split(",")[0].trim(),
+    visual: data.display.visualStyle || "clean and modern",
+    keywords: data.brand.brandKeywords || "",
+    avoid: data.brand.wordsToAvoid || "",
+    platform: data.display.aiPlatform || "any AI platform"
+  };
+}
+
+function lowerText(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function lowerFirst(value) {
+  const text = String(value || "").trim();
+  return text.charAt(0).toLowerCase() + text.slice(1);
+}
+
+function premiumFirstClause(value) {
+  return String(value || "").split(/[.,;\n]/)[0].trim();
+}
+
+function sunoStyleFromTone(tone) {
+  const t = lowerText(tone);
+
+  if (t.includes("bold") || t.includes("energetic")) {
+    return {
+      genre: "high-energy pop anthem",
+      tempo: "128 BPM",
+      instr: "driving drums, big synth stabs, punchy bass",
+      vocal: "powerful, confident lead vocal"
+    };
+  }
+
+  if (t.includes("premium") || t.includes("luxur") || t.includes("calm")) {
+    return {
+      genre: "cinematic downtempo pop",
+      tempo: "90 BPM",
+      instr: "lush strings, deep sub bass, soft piano",
+      vocal: "smooth, soulful lead vocal"
+    };
+  }
+
+  if (t.includes("play")) {
+    return {
+      genre: "bouncy indie pop",
+      tempo: "120 BPM",
+      instr: "ukulele, hand claps, bright synth",
+      vocal: "cheerful, upbeat vocal"
+    };
+  }
+
+  if (t.includes("friend") || t.includes("warm") || t.includes("convers")) {
+    return {
+      genre: "warm acoustic pop",
+      tempo: "104 BPM",
+      instr: "acoustic guitar, light percussion, claps",
+      vocal: "warm, inviting vocal"
+    };
+  }
+
+  if (t.includes("educat")) {
+    return {
+      genre: "clean modern pop",
+      tempo: "108 BPM",
+      instr: "electric piano, soft beat, subtle synth",
+      vocal: "clear, friendly vocal"
+    };
+  }
+
+  return {
+    genre: "polished commercial pop",
+    tempo: "110 BPM",
+    instr: "electric piano, warm synth pads, steady beat",
+    vocal: "clear, confident lead vocal"
+  };
+}
+
+function premiumHashtags(d) {
+  const source = [d.type, d.audience, d.keywords, d.goal].join(" ");
+  const words = source
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]/g, " ")
+    .split(/\s+/)
+    .filter((word) => word.length > 3);
+
+  const unique = [...new Set(words)].slice(0, 6).map((word) => `#${word}`);
+  const branded = `#${d.name.toLowerCase().replace(/[^a-z0-9]/g, "")}`;
+
+  return [branded, ...unique].slice(0, 7).join(" ");
+}
+
+function buildSunoPrompt(data) {
+  const d = premiumData(data);
+  const style = sunoStyleFromTone(d.toneFirst);
+  const outcome = d.outcome || "getting the result they wanted";
+
+  return [
+    "SUNO AI — MUSIC PROMPT",
+    `For: ${d.name} (${d.type})`,
+    "",
+    'HOW TO USE: In Suno, paste STYLE into "Style of Music", TITLE into the title field, and the LYRICS block into the lyrics field. Keep "Instrumental" off.',
+    "",
+    "----------------------------------------",
+    "STYLE:",
+    `${style.genre}, ${style.tempo}, ${style.instr}, ${style.vocal}, radio-ready commercial production, catchy and memorable`,
+    "",
+    "TITLE:",
+    `${d.name} (Made For You)`,
+    "",
+    "LYRICS:",
+    "[Intro]",
+    `Yeah... ${d.name}... here we go`,
+    "",
+    "[Verse 1]",
+    `${capitalize(d.audience)}, I see you clear`,
+    "Carrying the weight, know it all too well",
+    "Then something shifted, a whole new view",
+    `${d.name} came through, made it feel brand new`,
+    "",
+    "[Pre-Chorus]",
+    "No more waiting, no more doubt",
+    "This right here is what it's all about",
+    "",
+    "[Chorus]",
+    `${d.name}, lighting up the way`,
+    `${capitalize(outcome)}, starting today`,
+    "Feel it rising, feel it true",
+    `${d.name}, made for you`,
+    "",
+    "[Verse 2]",
+    d.benefits
+      ? capitalize(premiumFirstClause(d.benefits))
+      : "Everything you need, right in your hands",
+    `Built for ${lowerText(d.audience)}, meeting the demand`,
+    d.keywords
+      ? `${capitalize(premiumFirstClause(d.keywords))}, nothing in the way`
+      : "Simple and clear, nothing in the way",
+    "A better tomorrow, starting from today",
+    "",
+    "[Chorus]",
+    `${d.name}, lighting up the way`,
+    `${capitalize(outcome)}, starting today`,
+    "Feel it rising, feel it true",
+    `${d.name}, made for you`,
+    "",
+    "[Bridge]",
+    "When you're ready to grow (ready to grow)",
+    `${d.name}'s the way to go (way to go)`,
+    "",
+    "[Outro]",
+    `${d.name}... made for you`,
+    `${d.brand}... breaking through`
+  ].join("\n");
+}
+
+function buildVideoScriptPrompt(data) {
+  const d = premiumData(data);
+  const cta = d.offer ? `Grab the ${lowerText(d.offer)} now` : `Get ${d.name} today`;
+
+  return [
+    "SHORT-FORM VIDEO SCRIPT",
+    `Product: ${d.name} (${d.type})  |  Audience: ${d.audience}  |  Tone: ${d.tone}`,
+    "Length: ~35 seconds  |  Format: vertical 9:16 (TikTok / Reels / Shorts)",
+    "",
+    "HOW TO USE: Film or generate each scene in order. [On-screen] = text overlay, [VO] = what you say, [Shot] = camera direction.",
+    "",
+    "HOOK — 0:00-0:03",
+    `[On-screen] ${d.problem ? capitalize(premiumFirstClause(d.problem)) + "?" : "Struggling with your " + lowerText(d.type) + "?"}`,
+    `[VO] If you're ${lowerText(d.audience)}, stop scrolling — this changes everything.`,
+    "[Shot] Fast punch-in on face or product with a bold text overlay.",
+    "",
+    "PROBLEM — 0:03-0:09",
+    `[VO] ${d.problem ? "You know the feeling: " + lowerText(d.problem) + "." : "Most options overpromise and underdeliver."}`,
+    "[Shot] Quick b-roll of the frustration / the 'before'.",
+    "",
+    "SOLUTION — 0:09-0:20",
+    `[On-screen] Meet ${d.name}`,
+    `[VO] ${d.name} is a ${lowerText(d.type)} that ${d.outcome ? lowerText(d.outcome) : "gets you real results, fast"}. ${d.benefits ? capitalize(premiumFirstClause(d.benefits)) + "." : ""}`.trim(),
+    "[Shot] Clean hero shots of the product in use.",
+    "",
+    "PROOF — 0:20-0:29",
+    `[VO] ${d.keywords ? "It's " + lowerText(d.keywords) + "." : "It's simple, and it just works."} Made for ${lowerText(d.audience)}.`,
+    "[Shot] Fast feature montage / results / testimonial-style clip.",
+    "",
+    "CALL TO ACTION — 0:29-0:35",
+    `[On-screen] ${cta}`,
+    `[VO] ${cta}. Link in bio.`,
+    "[Shot] Product with a button overlay and a confident smile.",
+    "",
+    "SHOT LIST:",
+    "1. Hook close-up (0-3s)",
+    "2. Problem b-roll (3-9s)",
+    "3. Product reveal (9-14s)",
+    "4. In-use demo (14-20s)",
+    "5. Feature montage (20-29s)",
+    "6. CTA card (29-35s)",
+    "",
+    "CAPTION:",
+    `${capitalize(d.outcome || "The " + d.type + " " + d.audience + " actually needs")} — meet ${d.name}. ${d.price ? "From " + d.price + "." : ""}`.trim(),
+    "",
+    "HASHTAGS:",
+    premiumHashtags(d)
+  ].join("\n");
+}
+
+function buildMarketingPrompt(data) {
+  const d = premiumData(data);
+
+  const brief = [
+    `- Product: ${d.name} (${d.type})`,
+    d.description ? `- What it is: ${d.description}` : "",
+    `- Target audience: ${d.audience}`,
+    d.problem ? `- Problem it solves: ${d.problem}` : "",
+    d.outcome ? `- Desired outcome: ${d.outcome}` : "",
+    d.benefits ? `- Key benefits: ${d.benefits}` : "",
+    `- Marketing goal: ${d.goal}`,
+    d.offer ? `- Offer type: ${d.offer}` : "",
+    d.price ? `- Price: ${d.price}` : "",
+    `- Brand tone: ${d.tone}`,
+    d.keywords ? `- Brand keywords: ${d.keywords}` : "",
+    d.avoid ? `- Words to avoid: ${d.avoid}` : ""
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const priceRule = d.pricingUsage ? ` Pricing rule: ${d.pricingUsage}.` : "";
+
+  return [
+    "MARKETING CAMPAIGN PROMPT",
+    "",
+    `HOW TO USE: Paste this whole block into ${d.platform}. It will produce a complete, launch-ready campaign.`,
+    "",
+    `You are a senior direct-response marketer. Using the brief below, write a complete, launch-ready campaign for "${d.name}". Match the ${d.tone} tone exactly${d.avoid ? ", and never use these words: " + d.avoid : ""}.${priceRule}`,
+    "",
+    "BRIEF:",
+    brief,
+    "",
+    "PRODUCE ALL OF THE FOLLOWING, fully written and ready to publish:",
+    "",
+    "1) FIVE HEADLINE OPTIONS — punchy, benefit-led, under 10 words each.",
+    "2) LAUNCH EMAIL — subject line, preview text, a 150-220 word body, and one clear call to action.",
+    "3) THREE SOCIAL POSTS — one educational, one story-led, one promotional. Each with a hook, body, CTA, and 5 hashtags.",
+    "4) ONE PAID AD — primary text (max 125 words), headline (max 40 characters), and description (max 30 words).",
+    "5) THREE SUBJECT-LINE VARIATIONS for A/B testing (curiosity, benefit, urgency).",
+    "6) A 2-LINE SMS / DM BLAST with a {link} placeholder.",
+    "",
+    `RULES: Speak directly to ${d.audience}. Lead with the transformation (${d.outcome || "the result they want"}), not the features. Be specific and human — no clichés, no hype, no false claims. End every asset with one clear action.`
+  ].join("\n");
+}
+
+function buildCustomGptConfig(data) {
+  const d = premiumData(data);
+  const gptName = `${d.name} Assistant`;
+
+  return [
+    "CUSTOM GPT CONFIGURATION",
+    'Build it in ChatGPT: Explore GPTs > Create. Paste each block into the matching field.',
+    "",
+    "==================================================",
+    "NAME",
+    "==================================================",
+    gptName,
+    "",
+    "==================================================",
+    "DESCRIPTION (short, shown under the name)",
+    "==================================================",
+    `Your on-demand expert for ${d.name} — helping ${d.audience} ${
+      d.outcome ? "achieve " + lowerText(d.outcome) : "get results"
+    } with a ${lowerText(d.type)}.`,
+    "",
+    "==================================================",
+    'INSTRUCTIONS (paste into the "Instructions" field)',
+    "==================================================",
+    "ROLE",
+    `You are ${gptName}, a specialized assistant for ${d.name}.`,
+    `${d.name} is a ${lowerText(d.type)}${
+      d.description ? " — " + lowerFirst(premiumFirstClause(d.description)) : ""
+    }. You help ${d.audience}.`,
+    "",
+    "GOALS & RESPONSIBILITIES",
+    `- Help users understand and get the most from ${d.name}.`,
+    `- Move every user toward this outcome: ${d.outcome || "a successful result"}.`,
+    `- Solve this core problem: ${d.problem || "the user's main challenge"}.`,
+    `- Support the wider goal of ${d.goal}.`,
+    "",
+    "TONE & PERSONALITY",
+    `- Voice: ${d.tone}.`,
+    "- Sound like a knowledgeable, friendly expert — clear, encouraging, never condescending.",
+    d.keywords ? `- Reflect these brand qualities: ${d.keywords}.` : null,
+    d.avoid ? `- Never use these words or phrases: ${d.avoid}.` : null,
+    "",
+    "BEHAVIOR & RESPONSE GUIDELINES",
+    "- Ask one clarifying question when a request is ambiguous.",
+    "- Give complete, step-by-step, immediately usable answers.",
+    "- Use short paragraphs, headers, and bullets for readability.",
+    `- Tailor examples to ${d.audience}.`,
+    "- End with a helpful next step or an offer to go deeper.",
+    "",
+    "RULES & LIMITATIONS",
+    `- Stay on topic: ${d.name} and closely related help for ${d.audience}.`,
+    "- Never invent facts, prices, or features. If unsure, say so and ask.",
+    "- Do not give legal, medical, or financial advice.",
+    "- Make no guarantees or unverifiable claims.",
+    `- Hold the ${d.tone} tone even when correcting or declining.`,
+    "",
+    "BEST PRACTICES FOR USING THIS GPT",
+    "- Tell it who you are and what you're trying to achieve.",
+    "- Share context (your audience, your goal) for tailored answers.",
+    "- Ask for formats you can use directly (scripts, checklists, copy).",
+    "",
+    "==================================================",
+    "SUGGESTED KNOWLEDGE FILES TO UPLOAD",
+    "==================================================",
+    `- Product overview / one-pager for ${d.name} (features, benefits, use cases).`,
+    "- FAQ document (common questions with approved answers).",
+    `- Brand voice guide (tone: ${d.tone}${d.avoid ? "; avoid: " + d.avoid : ""}).`,
+    `- Pricing & offers sheet${d.price ? " (current price: " + d.price + ")" : ""}.`,
+    "- Example outputs / templates you want it to match.",
+    `- Customer personas for ${d.audience}.`,
+    "",
+    "==================================================",
+    "CONVERSATION STARTERS",
+    "==================================================",
+    `1. How can ${d.name} help me ${d.outcome ? lowerText(d.outcome) : "get started"}?`,
+    `2. Give me a quick-start plan for ${lowerText(d.type)} success.`,
+    `3. Help me solve: ${d.problem || "my biggest challenge"}.`,
+    `4. Write me something I can use today for ${d.name}.`,
+    "",
+    "==================================================",
+    "SUGGESTED WELCOME MESSAGE",
+    "==================================================",
+    `Hi! I'm your ${d.name} assistant. Tell me what you're working on and I'll help you ${
+      d.outcome ? "reach " + lowerText(d.outcome) : "get results"
+    }, step by step. Where would you like to start?`,
+    "",
+    "==================================================",
+    "TESTING CHECKLIST (run before you publish)",
+    "==================================================",
+    `[ ] Stays on topic and in the ${d.tone} tone.`,
+    "[ ] Asks a clarifying question when input is vague.",
+    "[ ] Produces complete, usable answers (not outlines).",
+    "[ ] Never invents prices, features, or guarantees.",
+    "[ ] Handles an off-topic request gracefully.",
+    "[ ] Each conversation starter returns a strong, on-brand answer.",
+    `[ ] The welcome message sounds like ${d.brand}.`,
+    d.avoid ? `[ ] Avoids all restricted words (${d.avoid}).` : null
+  ]
+    .filter((line) => line !== null)
+    .join("\n");
 }
 
 
@@ -3851,6 +4282,7 @@ function saveCurrentProject() {
       data: collectProjectData(),
       generatedOptions: appState.generatedOptions,
       selectedOptions: appState.selectedOptions,
+      premiumOutputs: appState.premiumOutputs,
       lastGeneratedSignature: appState.lastGeneratedSignature
     };
 
@@ -3892,6 +4324,7 @@ function restoreCurrentProject(showFeedback = false) {
 
     appState.generatedOptions = project.generatedOptions || {};
     appState.selectedOptions = project.selectedOptions || {};
+    appState.premiumOutputs = project.premiumOutputs || {};
     appState.lastGeneratedSignature =
       project.lastGeneratedSignature || "";
 
@@ -3907,6 +4340,7 @@ function restoreCurrentProject(showFeedback = false) {
       renderGeneratedOptions();
       assembleAllOutputs(collectProjectData());
       renderQualityResult(collectProjectData());
+      renderPremiumOutputs(appState.premiumOutputs);
     }
 
     updateGeneratedVisibility();
@@ -4097,6 +4531,7 @@ function updateGeneratedVisibility() {
   const resultsSection = getElement("resultsSection");
   const promptAssemblySection =
     getElement("promptAssemblySection");
+  const premiumSection = getElement("premiumSection");
 
   if (resultsSection) {
     resultsSection.hidden = !hasResults;
@@ -4104,6 +4539,10 @@ function updateGeneratedVisibility() {
 
   if (promptAssemblySection) {
     promptAssemblySection.hidden = !hasResults;
+  }
+
+  if (premiumSection) {
+    premiumSection.hidden = !hasResults;
   }
 }
 

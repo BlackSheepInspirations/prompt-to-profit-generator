@@ -2254,6 +2254,146 @@
         ></textarea>
       </article>
     </section>
+
+    <!-- PREMIUM OUTPUT MODULES -->
+    <section
+      id="premiumSection"
+      class="form-section premium-section"
+      aria-labelledby="premiumTitle"
+      hidden
+    >
+      <div class="section-heading">
+        <div>
+          <p class="section-number">Bonus modules</p>
+          <h2 id="premiumTitle">Premium Output Modules</h2>
+        </div>
+      </div>
+
+      <p class="section-description">
+        Four extra, ready-to-use deliverables built from the same inputs.
+        Pick a tab, then copy — each one is complete and paste-ready.
+      </p>
+
+      <div class="premium-tabs" role="tablist" aria-label="Premium output modules">
+        <button
+          type="button"
+          class="premium-tab is-active"
+          data-premium-tab="suno"
+          role="tab"
+          aria-selected="true"
+        >
+          Suno Music
+        </button>
+        <button
+          type="button"
+          class="premium-tab"
+          data-premium-tab="video"
+          role="tab"
+          aria-selected="false"
+        >
+          Video Script
+        </button>
+        <button
+          type="button"
+          class="premium-tab"
+          data-premium-tab="marketing"
+          role="tab"
+          aria-selected="false"
+        >
+          Marketing Campaign
+        </button>
+        <button
+          type="button"
+          class="premium-tab"
+          data-premium-tab="gpt"
+          role="tab"
+          aria-selected="false"
+        >
+          Custom GPT Builder
+        </button>
+      </div>
+
+      <div class="premium-panels">
+        <div class="premium-panel is-active" data-premium-panel="suno">
+          <div class="output-heading">
+            <h3>Suno AI Music Prompt</h3>
+            <button type="button" data-output-target="premiumSunoText">
+              Copy
+            </button>
+          </div>
+          <p class="field-note">
+            A complete style prompt plus full, structured lyrics — paste into Suno.
+          </p>
+          <textarea
+            id="premiumSunoText"
+            class="premium-output"
+            rows="20"
+            readonly
+            aria-label="Suno AI music prompt"
+          ></textarea>
+        </div>
+
+        <div class="premium-panel" data-premium-panel="video" hidden>
+          <div class="output-heading">
+            <h3>Video Script Prompt</h3>
+            <button type="button" data-output-target="premiumVideoText">
+              Copy
+            </button>
+          </div>
+          <p class="field-note">
+            A full short-form script: hook, scenes, voiceover, on-screen text,
+            shot list, caption, and hashtags.
+          </p>
+          <textarea
+            id="premiumVideoText"
+            class="premium-output"
+            rows="20"
+            readonly
+            aria-label="Video script prompt"
+          ></textarea>
+        </div>
+
+        <div class="premium-panel" data-premium-panel="marketing" hidden>
+          <div class="output-heading">
+            <h3>Marketing Campaign Prompt</h3>
+            <button type="button" data-output-target="premiumMarketingText">
+              Copy
+            </button>
+          </div>
+          <p class="field-note">
+            A complete multi-channel campaign prompt — email, social, ad, and
+            subject lines — ready to run in any AI.
+          </p>
+          <textarea
+            id="premiumMarketingText"
+            class="premium-output"
+            rows="20"
+            readonly
+            aria-label="Marketing campaign prompt"
+          ></textarea>
+        </div>
+
+        <div class="premium-panel" data-premium-panel="gpt" hidden>
+          <div class="output-heading">
+            <h3>Custom GPT Builder</h3>
+            <button type="button" data-output-target="premiumGptText">
+              Copy
+            </button>
+          </div>
+          <p class="field-note">
+            A complete Custom GPT configuration — instructions, knowledge files,
+            starters, welcome message, rules, and a testing checklist.
+          </p>
+          <textarea
+            id="premiumGptText"
+            class="premium-output"
+            rows="24"
+            readonly
+            aria-label="Custom GPT builder configuration"
+          ></textarea>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">

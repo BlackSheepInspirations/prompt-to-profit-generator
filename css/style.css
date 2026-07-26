@@ -1247,6 +1247,76 @@ button:active {
 
 
 /* =========================================================
+   14b. PREMIUM OUTPUT MODULES
+   ========================================================= */
+
+.premium-section {
+  border-top: 3px solid var(--color-gold);
+  box-shadow: var(--shadow-medium);
+}
+
+.premium-section .section-number {
+  color: var(--color-primary);
+}
+
+.premium-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.premium-tab {
+  min-height: 40px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  border-radius: var(--radius-pill);
+  padding: 9px 18px;
+  font-weight: 600;
+}
+
+.premium-tab:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-surface);
+}
+
+.premium-tab.is-active,
+.premium-tab.is-active:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--on-accent);
+}
+
+.premium-panel .field-note {
+  margin: 0 0 12px;
+}
+
+.premium-output {
+  min-height: 360px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.65;
+  background: var(--color-surface-soft);
+}
+
+@media (max-width: 720px) {
+  .premium-tabs {
+    gap: 6px;
+  }
+
+  .premium-tab {
+    flex: 1 1 calc(50% - 6px);
+    padding: 9px 10px;
+    text-align: center;
+  }
+}
+
+
+/* =========================================================
    15. TOAST
    ========================================================= */
 
