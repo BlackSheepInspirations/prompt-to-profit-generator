@@ -1345,7 +1345,31 @@ function initializeApplication() {
   updateGeneratedVisibility();
   enhanceSelectsAsPills();
   initPremiumTabs();
+  initJourney();
   initHeroVideo();
+}
+
+// Start-here journey: tap a trail stop to reveal it, flip a card for the payoff.
+function initJourney() {
+  document.querySelectorAll("[data-jstop]").forEach((stop) => {
+    stop.addEventListener("click", () => {
+      const isOpen = stop.getAttribute("aria-expanded") === "true";
+      stop.setAttribute("aria-expanded", String(!isOpen));
+
+      const body = document.getElementById(stop.getAttribute("aria-controls"));
+      if (body) {
+        body.style.maxHeight = isOpen ? "0px" : `${body.scrollHeight + 24}px`;
+      }
+    });
+  });
+
+  document.querySelectorAll("[data-jflip]").forEach((card) => {
+    card.setAttribute("aria-pressed", "false");
+    card.addEventListener("click", () => {
+      const flipped = card.classList.toggle("is-flipped");
+      card.setAttribute("aria-pressed", String(flipped));
+    });
+  });
 }
 
 // Links each premium tab to its panel for screen readers.
