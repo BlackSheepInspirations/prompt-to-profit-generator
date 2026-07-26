@@ -3700,7 +3700,7 @@ function clearOutputElements() {
 
   renderSeparatePromptList([]);
 
-  ["premiumSunoText", "premiumVideoText", "premiumMarketingText", "premiumGptText"].forEach(
+  ["premiumSunoText", "premiumVideoText", "premiumMarketingText", "premiumGptText", "premiumAnimateText"].forEach(
     (id) => setOutputValue(id, "")
   );
   appState.premiumOutputs = {};
@@ -3731,7 +3731,8 @@ function generatePremiumOutputs(data) {
     suno: buildSunoPrompt(data),
     video: buildVideoScriptPrompt(data),
     marketing: buildMarketingPrompt(data),
-    gpt: buildCustomGptConfig(data)
+    gpt: buildCustomGptConfig(data),
+    animate: buildPhotoAnimationPrompt(data)
   };
 
   renderPremiumOutputs(appState.premiumOutputs);
@@ -3742,7 +3743,8 @@ function renderPremiumOutputs(outputs) {
     suno: "premiumSunoText",
     video: "premiumVideoText",
     marketing: "premiumMarketingText",
-    gpt: "premiumGptText"
+    gpt: "premiumGptText",
+    animate: "premiumAnimateText"
   };
 
   Object.entries(targets).forEach(([key, id]) => {
@@ -4137,6 +4139,83 @@ function buildCustomGptConfig(data) {
     .join("\n");
 }
 
+function animationStyleFromVisual(visual, tone) {
+  const v = lowerText(`${visual} ${tone}`);
+
+  if (v.includes("luxur") || v.includes("premium")) {
+    return {
+      camera: "slow cinematic orbit",
+      motion: "a soft light sweep across the surface and a gentle depth-of-field shift",
+      loop: "elegant and premium"
+    };
+  }
+
+  if (v.includes("bold") || v.includes("energetic") || v.includes("commercial")) {
+    return {
+      camera: "punchy dolly-in",
+      motion: "a quick light flare and crisp moving reflections",
+      loop: "high-energy"
+    };
+  }
+
+  if (v.includes("play")) {
+    return {
+      camera: "bouncy zoom",
+      motion: "playful sparkles and a light color shimmer",
+      loop: "fun and upbeat"
+    };
+  }
+
+  if (v.includes("organic") || v.includes("natural") || v.includes("soft")) {
+    return {
+      camera: "slow drifting push-in",
+      motion: "gentle natural light drift and subtle ambient movement",
+      loop: "calm and natural"
+    };
+  }
+
+  return {
+    camera: "slow push-in",
+    motion: "subtle parallax and a soft light drift",
+    loop: "clean and premium"
+  };
+}
+
+function buildPhotoAnimationPrompt(data) {
+  const d = premiumData(data);
+  const s = animationStyleFromVisual(d.visual, d.toneFirst);
+
+  return [
+    "PHOTO -> ANIMATION & VIDEO",
+    `For: ${d.name} (${d.type})  |  Visual style: ${d.visual}  |  Tone: ${d.tone}`,
+    "",
+    "HOW TO USE: Open an image-to-video tool (Runway Gen-3, Kling, Luma Dream Machine, Pika, or Sora). Upload your product photo, then paste the matching prompt below.",
+    "",
+    "----------------------------------------",
+    "1) ANIMATION PROMPT (subtle cinemagraph, 3-4s loop):",
+    `Animate this photo of ${d.name}. Keep the product razor-sharp, centered, and unchanged. Add ${s.motion}, with a ${s.camera}. Photoreal, ${d.visual} aesthetic, seamless 3-4 second loop. Do not add text or logos and do not distort the product. Keep it ${s.loop}.`,
+    "",
+    "2) SHORT HERO-VIDEO PROMPT (5-8s):",
+    `Create a 6-second cinematic product video from this image of ${d.name}. Camera: ${s.camera}. Motion: ${s.motion}. Mood: ${d.tone}. Lighting: soft, directional, commercial. End on a clean, well-lit hero frame. Vertical 9:16, high detail, ${d.visual} style. No warping, no added text.`,
+    "",
+    "----------------------------------------",
+    "CAMERA & MOTION OPTIONS (swap in to taste):",
+    "- Slow push-in — builds focus on the product.",
+    "- Slow orbit — shows form and a premium feel.",
+    "- Parallax drift — adds depth without moving the product.",
+    "- Macro pull-back — reveal from a detail out to the full product.",
+    "",
+    "RECOMMENDED SETTINGS:",
+    "- Tools: Runway Gen-3, Kling 1.5, Luma Dream Machine, Pika, Sora",
+    "- Aspect ratio: 9:16 for Reels / TikTok / Shorts (1:1 for feed)",
+    "- Duration: 3-8 seconds",
+    "- Motion strength: low to medium (keeps the product clean)",
+    d.keywords ? `- Keep the mood aligned with: ${d.keywords}.` : null
+  ]
+    .filter((line) => line !== null)
+    .join("\n");
+}
+
 
 /* =========================================================
    16. QUALITY REVIEW
@@ -4241,31 +4320,81 @@ async function copyOutput(targetId) {
     return;
   }
 
-  try {
-    await navigator.clipboard.writeText(text);
+  const copied = await copyTextToClipboard(text);
+
+  if (copied) {
     showToast("Copied to your clipboard.", "success");
-  } catch {
-    fallbackCopy(text);
+  } else {
+    showToast(
+      `Couldn't copy automatically — the text is selected, press ${
+        isAppleDevice() ? "Cmd" : "Ctrl"
+      }+C.`,
+      "warning"
+    );
   }
 }
 
-function fallbackCopy(text) {
-  const temporaryTextarea = document.createElement("textarea");
-  temporaryTextarea.value = text;
-  temporaryTextarea.setAttribute("readonly", "");
-  temporaryTextarea.style.position = "fixed";
-  temporaryTextarea.style.opacity = "0";
-  document.body.appendChild(temporaryTextarea);
-  temporaryTextarea.select();
+// Copies text reliably across contexts: the async Clipboard API where it's
+// allowed (HTTPS), falling back to a focused, selected textarea + execCommand
+// for local file:// use. Returns true only when the copy actually happened.
+async function copyTextToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Permission/context blocked it — fall through to the manual method.
+    }
+  }
+
+  return legacyCopy(text);
+}
+
+function legacyCopy(text) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.top = "0";
+  textarea.style.left = "0";
+  textarea.style.width = "1px";
+  textarea.style.height = "1px";
+  textarea.style.padding = "0";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+
+  const selection = document.getSelection();
+  const savedRange =
+    selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+  textarea.focus();
+  textarea.select();
+
+  if (typeof textarea.setSelectionRange === "function") {
+    textarea.setSelectionRange(0, text.length);
+  }
+
+  let copied = false;
 
   try {
-    document.execCommand("copy");
-    showToast("Copied to your clipboard.", "success");
+    copied = document.execCommand("copy");
   } catch {
-    showToast("The content could not be copied.", "error");
-  } finally {
-    temporaryTextarea.remove();
+    copied = false;
   }
+
+  textarea.remove();
+
+  if (savedRange && selection) {
+    selection.removeAllRanges();
+    selection.addRange(savedRange);
+  }
+
+  return copied;
+}
+
+function isAppleDevice() {
+  const platform = navigator.platform || navigator.userAgent || "";
+  return /mac|iphone|ipad|ipod/i.test(platform);
 }
 
 function saveFinalPackage() {
@@ -4317,7 +4446,8 @@ function buildFullExport() {
     ["SUNO AI MUSIC PROMPT", premium.suno],
     ["VIDEO SCRIPT PROMPT", premium.video],
     ["MARKETING CAMPAIGN PROMPT", premium.marketing],
-    ["CUSTOM GPT BUILDER", premium.gpt]
+    ["CUSTOM GPT BUILDER", premium.gpt],
+    ["PHOTO ANIMATION & VIDEO", premium.animate]
   ].forEach(([title, content]) => {
     if (content) {
       parts.push(

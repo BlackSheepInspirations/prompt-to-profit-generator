@@ -2318,6 +2318,15 @@
         >
           Custom GPT Builder
         </button>
+        <button
+          type="button"
+          class="premium-tab"
+          data-premium-tab="animate"
+          role="tab"
+          aria-selected="false"
+        >
+          Photo Animation
+        </button>
       </div>
 
       <div class="premium-panels">
@@ -2397,6 +2406,27 @@
             rows="24"
             readonly
             aria-label="Custom GPT builder configuration"
+          ></textarea>
+        </div>
+
+        <div class="premium-panel" data-premium-panel="animate" hidden>
+          <div class="output-heading">
+            <h3>Photo → Animation &amp; Video</h3>
+            <button type="button" data-output-target="premiumAnimateText">
+              Copy
+            </button>
+          </div>
+          <p class="field-note">
+            Bring a product photo to life. Paste into an image-to-video tool
+            (Runway, Kling, Luma, Pika, or Sora) with your image — an animation
+            (cinemagraph) prompt plus a short hero-video prompt.
+          </p>
+          <textarea
+            id="premiumAnimateText"
+            class="premium-output"
+            rows="22"
+            readonly
+            aria-label="Photo animation and video prompt"
           ></textarea>
         </div>
       </div>
