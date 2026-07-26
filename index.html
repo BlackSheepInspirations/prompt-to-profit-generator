@@ -1072,21 +1072,20 @@
       </section>
 
       <!-- REFERENCE IMAGE -->
-      <section
+      <details
         id="referenceImageSection"
-        class="form-section"
+        class="form-section form-section--advanced"
         data-category="referenceImage"
-        aria-labelledby="referenceImageSectionTitle"
       >
-        <div class="section-heading">
-          <div>
-            <p class="section-number">Step 5</p>
-            <h2 id="referenceImageSectionTitle">
-              Reference Image
-            </h2>
-          </div>
-        </div>
+        <summary class="advanced-summary">
+          <span class="advanced-summary__label">
+            <span class="section-number">Optional · Advanced</span>
+            <span class="advanced-summary__title">Reference Image</span>
+          </span>
+          <span class="advanced-summary__chev" aria-hidden="true">+</span>
+        </summary>
 
+        <div class="advanced-body">
         <div class="form-grid">
           <div class="field-group">
             <label for="referencePath">
@@ -1209,7 +1208,8 @@
             </label>
           </div>
         </div>
-      </section>
+        </div>
+      </details>
 
       <div class="phase-divider">
         <p class="phase-divider__num">Phase 02</p>
@@ -2012,66 +2012,25 @@
       </section>
 
       <!-- INGREDIENT REVIEW -->
-      <section
-        id="ingredientReview"
-        class="form-section"
-        aria-labelledby="ingredientReviewTitle"
+      <details
+        id="ingredientReviewSection"
+        class="form-section form-section--advanced"
       >
-        <div class="section-heading">
-          <div>
-            <p class="section-number">Step 9</p>
-            <h2 id="ingredientReviewTitle">
-              Prompt Ingredient Review
-            </h2>
-          </div>
+        <summary class="advanced-summary">
+          <span class="advanced-summary__label">
+            <span class="section-number">Optional · Advanced</span>
+            <span class="advanced-summary__title">Prompt Ingredient Review</span>
+          </span>
+          <span class="advanced-summary__chev" aria-hidden="true">+</span>
+        </summary>
 
-          <button
-            id="refreshReviewBtn"
-            type="button"
-          >
-            Refresh Review
-          </button>
+        <div class="advanced-body">
+          <p class="section-description">
+            A quick recap of everything you've entered, grouped by area.
+          </p>
+          <div id="ingredientReview" class="ingredient-review"></div>
         </div>
-
-        <div class="review-grid">
-          <article>
-            <h3>Included</h3>
-            <div id="includedSummary">
-              <p class="empty-state">Nothing reviewed yet.</p>
-            </div>
-          </article>
-
-          <article>
-            <h3>Optional</h3>
-            <div id="optionalSummary">
-              <p class="empty-state">Nothing reviewed yet.</p>
-            </div>
-          </article>
-
-          <article>
-            <h3>Excluded</h3>
-            <div id="excludedSummary">
-              <p class="empty-state">Nothing reviewed yet.</p>
-            </div>
-          </article>
-
-          <article>
-            <h3>Exact Text</h3>
-            <div id="exactTextSummary">
-              <p class="empty-state">No exact wording added.</p>
-            </div>
-          </article>
-
-          <article>
-            <h3>Custom Instructions</h3>
-            <div id="customSummary">
-              <p class="empty-state">
-                No custom instructions added.
-              </p>
-            </div>
-          </article>
-        </div>
-      </section>
+      </details>
 
       <!-- VALIDATION -->
       <section

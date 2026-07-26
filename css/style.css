@@ -558,6 +558,99 @@ a:focus-visible {
   box-shadow: var(--shadow-small);
 }
 
+/* ---------- Collapsible "Advanced" sections ---------- */
+.form-section--advanced {
+  padding: 0;
+  overflow: hidden;
+}
+
+.advanced-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 28px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.advanced-summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced-summary__label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.advanced-summary__title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.advanced-summary__chev {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-primary);
+  font-size: 1.3rem;
+  line-height: 1;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.advanced-summary:hover .advanced-summary__chev {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+}
+
+.form-section--advanced[open] .advanced-summary {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.form-section--advanced[open] .advanced-summary__chev {
+  transform: rotate(45deg);
+}
+
+.advanced-body {
+  padding: 24px 28px 28px;
+}
+
+.advanced-body > .section-description {
+  margin-top: 0;
+}
+
+/* Ingredient review body (populated by JS) */
+.ingredient-review {
+  display: grid;
+  gap: 16px;
+}
+
+.review-block h4 {
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.review-block ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--color-text-muted);
+}
+
+.review-block li {
+  margin: 4px 0;
+}
+
 .section-heading {
   display: flex;
   flex-wrap: wrap;
