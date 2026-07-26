@@ -4187,14 +4187,20 @@ function renderQualityResult(data) {
   }
 
   container.innerHTML = `
-    <h3>Quality Result: ${escapeHtml(status)} (${score}%)</h3>
-    <ul>
+    <div class="quality-head">
+      <h3>Prompt quality: ${escapeHtml(status)}</h3>
+      <span class="quality-score">${score}%</span>
+    </div>
+    <div class="quality-bar"><span style="width: ${score}%"></span></div>
+    <ul class="quality-list">
       ${checks
         .map(
           (check) => `
-            <li>
-              ${check.passed ? "Complete" : "Update needed"}:
-              ${escapeHtml(check.label)}
+            <li class="${check.passed ? "is-pass" : "is-todo"}">
+              <span class="quality-mark" aria-hidden="true">${
+                check.passed ? "✓" : "!"
+              }</span>
+              <span>${escapeHtml(check.label)}</span>
             </li>
           `
         )
