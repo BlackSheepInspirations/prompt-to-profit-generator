@@ -335,6 +335,58 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
+  "geo-optimization": {
+    label: "GEO / AI Search",
+    category: "Discovery",
+    goal: "Optimize the product so AI answer engines recommend and cite it",
+    fields: [
+      {
+        key: "engine",
+        label: "AI Answer Engine",
+        type: "select",
+        options: [
+          "ChatGPT / GPT search",
+          "Perplexity",
+          "Google AI Overviews",
+          "Gemini",
+          "All AI answer engines"
+        ],
+        defaultValue: "All AI answer engines"
+      },
+      {
+        key: "asset",
+        label: "Content to Optimize",
+        type: "select",
+        options: [
+          "Product page",
+          "Marketplace listing",
+          "FAQ / Q&A block",
+          "Comparison / best-of content",
+          "About / brand page"
+        ],
+        defaultValue: "Product page"
+      },
+      {
+        key: "format",
+        label: "Output Format",
+        type: "select",
+        options: [
+          "Answer-ready copy",
+          "FAQ Q&A pairs",
+          "Citation-friendly fact sheet",
+          "Structured-data notes"
+        ],
+        defaultValue: "Answer-ready copy"
+      },
+      {
+        key: "queries",
+        label: "Buyer Questions to Win",
+        type: "text",
+        defaultValue: "The questions buyers ask an AI before choosing"
+      }
+    ]
+  },
+
   "product-mockup": {
     label: "Product Mockups",
     category: "Visual Creation",
@@ -3334,6 +3386,8 @@ function buildOutputRequirements(generatorKey, data, variation) {
     "launch-announcement"
   ]);
 
+  const geoGenerators = new Set(["geo-optimization"]);
+
   const requirements = [
     "Output requirements:",
     `- Use the ${variation.toLowerCase()} direction consistently.`,
@@ -3360,6 +3414,16 @@ function buildOutputRequirements(generatorKey, data, variation) {
     requirements.push(
       "- Build a clear sequence from awareness to interest to action.",
       "- Avoid repeating the same message in every asset."
+    );
+  }
+
+  if (geoGenerators.has(generatorKey)) {
+    requirements.push(
+      "- Write so AI answer engines (ChatGPT, Perplexity, Gemini, Google AI Overviews) can quote it directly.",
+      "- Lead with a clear, factual one-line answer, then the supporting specifics.",
+      "- Include concrete attributes: what it is, who it's for, price range, key benefits, and how it compares.",
+      "- Add the natural-language questions buyers ask an AI, each with a concise, citable answer.",
+      "- Avoid hype and unverifiable claims — answer engines skip fluff and reward specificity."
     );
   }
 
