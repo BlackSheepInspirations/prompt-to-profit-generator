@@ -118,7 +118,7 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
-  "social-posts": {
+  "social-post": {
     label: "Social Posts",
     category: "Social Content",
     goal: "Create platform-ready promotional social posts",
@@ -230,7 +230,7 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
-  pinterest: {
+  "pinterest-pin": {
     label: "Pinterest",
     category: "Social Content",
     goal: "Create a Pinterest pin concept, title, and description",
@@ -263,7 +263,7 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
-  seo: {
+  "seo-copy": {
     label: "SEO",
     category: "Discovery",
     goal: "Create search-focused SEO copy",
@@ -296,7 +296,7 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
-  tags: {
+  "tags-hashtags": {
     label: "Tags",
     category: "Discovery",
     goal: "Create relevant marketplace and social discovery tags",
@@ -330,7 +330,7 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
-  "product-mockups": {
+  "product-mockup": {
     label: "Product Mockups",
     category: "Visual Creation",
     goal: "Create a professional product mockup image prompt",
@@ -376,7 +376,7 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
-  ads: {
+  "product-ad": {
     label: "Advertisement Graphics",
     category: "Visual Creation",
     goal: "Create a conversion-focused advertisement graphic prompt",
@@ -415,7 +415,7 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
-  flyers: {
+  "promotional-flyer": {
     label: "Flyers",
     category: "Visual Creation",
     goal: "Create a professional promotional flyer prompt",
@@ -449,7 +449,7 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
-  "lead-magnet-covers": {
+  "lead-magnet-cover": {
     label: "Lead Magnet Covers",
     category: "Visual Creation",
     goal: "Create a high-value lead magnet cover prompt",
@@ -488,7 +488,7 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
-  "notebook-covers": {
+  "notebook-cover": {
     label: "Notebook Covers",
     category: "Visual Creation",
     goal: "Create a print-ready notebook cover prompt",
@@ -522,7 +522,7 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
-  infographics: {
+  "infographic": {
     label: "Infographics",
     category: "Visual Creation",
     goal: "Create a clear, educational infographic prompt",
@@ -663,7 +663,7 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
-  "video-scripts": {
+  "short-video-script": {
     label: "Short-Form Video Scripts",
     category: "Video",
     goal: "Create a complete short-form video script",
@@ -698,7 +698,7 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
-  voiceover: {
+  "voiceover-script": {
     label: "Voiceover Scripts",
     category: "Video",
     goal: "Create a natural promotional voiceover script",
@@ -811,7 +811,7 @@ const GENERATOR_DEFINITIONS = {
     ]
   },
 
-  carousel: {
+  "launch-carousel": {
     label: "Carousel Launch",
     category: "Launch",
     goal: "Create a slide-by-slide product launch carousel",
@@ -954,79 +954,362 @@ const GENERATOR_DEFINITIONS = {
         defaultValue: "Slow push-in"
       }
     ]
+  },
+
+  "landing-page": {
+    label: "Landing Page",
+    category: "Sales Copy",
+    goal: "Create a focused, conversion-ready landing page",
+    fields: [
+      {
+        key: "pageType",
+        label: "Landing Page Type",
+        type: "select",
+        options: [
+          "Product landing page",
+          "Lead capture page",
+          "Waitlist page",
+          "Webinar registration page",
+          "Coming soon page"
+        ],
+        defaultValue: "Product landing page"
+      },
+      {
+        key: "sections",
+        label: "Page Sections",
+        type: "select",
+        options: [
+          "Hero, benefits, and action",
+          "Hero, proof, offer, and action",
+          "Long-form with questions answered",
+          "Minimal single-offer page"
+        ],
+        defaultValue: "Hero, proof, offer, and action"
+      },
+      {
+        key: "cta",
+        label: "Primary Action",
+        type: "text",
+        defaultValue: "Drive visitors to one clear action"
+      }
+    ]
+  },
+
+  "promotional-email": {
+    label: "Promotional Email",
+    category: "Sales Copy",
+    goal: "Write a persuasive promotional email",
+    fields: [
+      {
+        key: "emailType",
+        label: "Email Type",
+        type: "select",
+        options: [
+          "Sales announcement",
+          "Limited-time offer",
+          "Product launch",
+          "Restock alert",
+          "Last-chance reminder"
+        ],
+        defaultValue: "Limited-time offer"
+      },
+      {
+        key: "length",
+        label: "Email Length",
+        type: "select",
+        options: ["Short", "Medium", "Detailed"],
+        defaultValue: "Medium"
+      },
+      {
+        key: "cta",
+        label: "Call to Action",
+        type: "text",
+        defaultValue: "Encourage the reader to buy now"
+      }
+    ]
+  },
+
+  "offer-summary": {
+    label: "Offer Summary",
+    category: "Sales Copy",
+    goal: "Summarize the offer clearly and persuasively",
+    fields: [
+      {
+        key: "format",
+        label: "Summary Format",
+        type: "select",
+        options: [
+          "Bullet summary",
+          "Short paragraph",
+          "Headline and bullets",
+          "Comparison layout"
+        ],
+        defaultValue: "Headline and bullets"
+      },
+      {
+        key: "emphasis",
+        label: "What to Emphasize",
+        type: "select",
+        options: [
+          "Value and savings",
+          "Transformation",
+          "Bonuses and extras",
+          "Urgency and scarcity"
+        ],
+        defaultValue: "Value and savings"
+      },
+      {
+        key: "cta",
+        label: "Next Step",
+        type: "text",
+        defaultValue: "Make the next step obvious"
+      }
+    ]
+  },
+
+  "pricing-positioning": {
+    label: "Pricing Positioning",
+    category: "Sales Copy",
+    goal: "Position the price so it feels worth it",
+    fields: [
+      {
+        key: "strategy",
+        label: "Positioning Strategy",
+        type: "select",
+        options: [
+          "Value stacking",
+          "Cost-per-use framing",
+          "Comparison anchoring",
+          "Bonus justification",
+          "Payment framing"
+        ],
+        defaultValue: "Value stacking"
+      },
+      {
+        key: "tone",
+        label: "Positioning Tone",
+        type: "select",
+        options: [
+          "Confident",
+          "Reassuring",
+          "Premium",
+          "Straightforward"
+        ],
+        defaultValue: "Confident"
+      },
+      {
+        key: "priceHandling",
+        label: "Price Handling",
+        type: "text",
+        defaultValue: "Present the price as a clear investment"
+      }
+    ]
+  },
+
+  "content-series": {
+    label: "Content Series",
+    category: "Launch",
+    goal: "Plan a multi-post promotional content series",
+    fields: [
+      {
+        key: "postCount",
+        label: "Number of Posts",
+        type: "select",
+        options: ["3 posts", "5 posts", "7 posts", "10 posts"],
+        defaultValue: "5 posts"
+      },
+      {
+        key: "seriesStyle",
+        label: "Series Style",
+        type: "select",
+        options: [
+          "Educational series",
+          "Story-driven series",
+          "Behind-the-scenes series",
+          "Countdown series"
+        ],
+        defaultValue: "Educational series"
+      },
+      {
+        key: "channel",
+        label: "Primary Channel",
+        type: "select",
+        options: [
+          "Instagram",
+          "TikTok",
+          "Email",
+          "Pinterest",
+          "Multi-channel"
+        ],
+        defaultValue: "Multi-channel"
+      }
+    ]
+  },
+
+  "listing-image": {
+    label: "Listing Image",
+    category: "Visual Creation",
+    goal: "Create a marketplace listing image prompt",
+    fields: [
+      {
+        key: "imageType",
+        label: "Image Type",
+        type: "select",
+        options: [
+          "Main listing image",
+          "Feature callout image",
+          "Size or scale image",
+          "What's included image",
+          "How-to image"
+        ],
+        defaultValue: "Main listing image"
+      },
+      {
+        key: "background",
+        label: "Background",
+        type: "select",
+        options: [
+          "Clean white",
+          "Soft neutral",
+          "Lifestyle scene",
+          "Branded color",
+          "Subtle gradient"
+        ],
+        defaultValue: "Clean white"
+      },
+      {
+        key: "textOverlay",
+        label: "Text Overlay",
+        type: "select",
+        options: [
+          "No text",
+          "Minimal label",
+          "Feature callouts",
+          "Full information"
+        ],
+        defaultValue: "Minimal label"
+      }
+    ]
+  },
+
+  "lifestyle-image": {
+    label: "Lifestyle Image",
+    category: "Visual Creation",
+    goal: "Create a lifestyle product image prompt",
+    fields: [
+      {
+        key: "scene",
+        label: "Scene",
+        type: "select",
+        options: [
+          "Home interior",
+          "Workspace",
+          "Outdoor",
+          "In-use close-up",
+          "Styled flat lay"
+        ],
+        defaultValue: "Home interior"
+      },
+      {
+        key: "mood",
+        label: "Mood",
+        type: "select",
+        options: [
+          "Warm and inviting",
+          "Bright and fresh",
+          "Calm and premium",
+          "Energetic and vibrant"
+        ],
+        defaultValue: "Warm and inviting"
+      },
+      {
+        key: "subject",
+        label: "Subject Focus",
+        type: "select",
+        options: [
+          "Product only",
+          "Product in hands",
+          "Product with props",
+          "Product in context"
+        ],
+        defaultValue: "Product with props"
+      }
+    ]
+  },
+
+  "product-video-ad": {
+    label: "Product Video Ad",
+    category: "Video",
+    goal: "Create a short product advertisement video prompt",
+    fields: [
+      {
+        key: "duration",
+        label: "Ad Length",
+        type: "select",
+        options: ["15 seconds", "30 seconds", "45 seconds", "60 seconds"],
+        defaultValue: "30 seconds"
+      },
+      {
+        key: "adAngle",
+        label: "Ad Angle",
+        type: "select",
+        options: [
+          "Problem and solution",
+          "Feature showcase",
+          "Testimonial style",
+          "Fast promo cuts"
+        ],
+        defaultValue: "Problem and solution"
+      },
+      {
+        key: "format",
+        label: "Production Format",
+        type: "select",
+        options: [
+          "Faceless",
+          "Talking head",
+          "Product demonstration",
+          "Text-led"
+        ],
+        defaultValue: "Faceless"
+      }
+    ]
+  },
+
+  "launch-teaser": {
+    label: "Launch Teaser",
+    category: "Video",
+    goal: "Create a suspense-building launch teaser prompt",
+    fields: [
+      {
+        key: "duration",
+        label: "Teaser Length",
+        type: "select",
+        options: ["5 seconds", "10 seconds", "15 seconds", "30 seconds"],
+        defaultValue: "10 seconds"
+      },
+      {
+        key: "teaserStyle",
+        label: "Teaser Style",
+        type: "select",
+        options: [
+          "Mysterious reveal",
+          "Countdown",
+          "Sneak peek",
+          "Coming soon"
+        ],
+        defaultValue: "Sneak peek"
+      },
+      {
+        key: "aspectRatio",
+        label: "Aspect Ratio",
+        type: "select",
+        options: ["9:16", "1:1", "16:9", "4:5"],
+        defaultValue: "9:16"
+      }
+    ]
   }
 };
-
-const RANDOM_OPTIONS = {
-  productType: [
-    "Digital download",
-    "Physical product",
-    "Print-on-demand product",
-    "Service",
-    "Course",
-    "Template",
-    "Workbook",
-    "Membership"
-  ],
-  marketingGoal: [
-    "Launch a new product",
-    "Increase direct sales",
-    "Build product awareness",
-    "Grow an email list",
-    "Re-engage past buyers"
-  ],
-  buyerMotivation: [
-    "Save time",
-    "Make money",
-    "Feel organized",
-    "Solve a frustrating problem",
-    "Express personal identity",
-    "Create a professional result"
-  ],
-  pricingTier: ["Budget", "Mid-range", "Premium", "Luxury"],
-  offerType: [
-    "Single product",
-    "Bundle",
-    "Limited-time offer",
-    "Introductory offer",
-    "Evergreen offer"
-  ],
-  pricingUsage: [
-    "Mention the exact price",
-    "Emphasize value without stating the price",
-    "Compare value to the cost",
-    "Do not mention pricing"
-  ],
-  brandTone: [
-    "Warm and encouraging",
-    "Bold and direct",
-    "Professional and polished",
-    "Playful and energetic",
-    "Calm and premium",
-    "Educational and practical"
-  ],
-  visualStyle: [
-    "Clean modern",
-    "Bold editorial",
-    "Soft feminine",
-    "Minimal luxury",
-    "Colorful playful",
-    "Natural lifestyle",
-    "High-contrast commercial"
-  ],
-  aiPlatform: [
-    "ChatGPT",
-    "Claude",
-    "Gemini",
-    "Midjourney",
-    "DALL-E",
-    "Adobe Firefly",
-    "Canva",
-    "Kittl",
-    "Any AI platform"
-  ]
-};
-
 
 /* =========================================================
    2. APPLICATION STATE
@@ -1073,7 +1356,7 @@ function getElement(id) {
 function getGeneratorCheckboxes() {
   const explicitCheckboxes = Array.from(
     document.querySelectorAll(
-      'input[type="checkbox"][data-generator], input[type="checkbox"][data-generator-id]'
+      'input[type="checkbox"][data-generator], input[type="checkbox"][data-generator-id], input[type="checkbox"][data-generator-key]'
     )
   );
 
@@ -1101,6 +1384,7 @@ function normalizeGeneratorCheckboxes() {
 
 function resolveGeneratorKey(checkbox) {
   const explicitKey =
+    checkbox.dataset.generatorKey ||
     checkbox.dataset.generator ||
     checkbox.dataset.generatorId ||
     checkbox.value ||
@@ -1257,6 +1541,23 @@ function handleDocumentClick(event) {
     return;
   }
 
+  // Buttons that declare their target/category directly on the element,
+  // rather than through a data-action name.
+  if (button.dataset.outputTarget) {
+    copyOutput(button.dataset.outputTarget);
+    return;
+  }
+
+  if (button.dataset.clearCategory) {
+    requestClearCategory(button.dataset.clearCategory);
+    return;
+  }
+
+  if (button.dataset.randomizeCategory) {
+    randomizeCategory(button.dataset.randomizeCategory);
+    return;
+  }
+
   const action = button.dataset.action || "";
 
   switch (action) {
@@ -1339,20 +1640,20 @@ function handleKnownButtonIds(button) {
   const actionMap = {
     generateBtn: generatePromptOptions,
     clearAllBtn: requestClearAll,
+    newProjectBtn: requestClearAll,
     randomizeBtn: randomizeAllUnlockedFields,
     randomizeAllBtn: randomizeAllUnlockedFields,
+    refreshReviewBtn: updateIngredientReview,
     saveProjectBtn: saveProjectWithFeedback,
     loadProjectBtn: () => restoreCurrentProject(true),
     saveProductProfileBtn: saveProductProfile,
     applyProductProfileBtn: () => applySavedProfile("product"),
+    loadProductProfileBtn: () => applySavedProfile("product"),
     saveBrandProfileBtn: saveBrandProfile,
     applyBrandProfileBtn: () => applySavedProfile("brand"),
-    copyStandaloneBtn: () => copyOutput("standalonePromptOutput"),
-    copySeparateBtn: () => copyOutput("separatePromptsOutput"),
-    copyCombinedBtn: () => copyOutput("combinedPromptOutput"),
-    copyHybridBtn: () => copyOutput("hybridPromptOutput"),
-    copyFinalPackageBtn: () => copyOutput("finalPromptPackage"),
+    loadBrandProfileBtn: () => applySavedProfile("brand"),
     savePackageBtn: saveFinalPackage,
+    saveFinalPromptBtn: saveFinalPackage,
     modalConfirmBtn: confirmModalAction,
     modalCancelBtn: closeModal
   };
@@ -1715,8 +2016,8 @@ function randomizeCategory(categoryName) {
     category.querySelectorAll("input, select, textarea")
   ).filter(isRandomizableField);
 
-  randomizeFields(fields);
-  completeRandomization();
+  const changedCount = randomizeFields(fields);
+  completeRandomization(changedCount);
 }
 
 function randomizeAllUnlockedFields() {
@@ -1726,8 +2027,8 @@ function randomizeAllUnlockedFields() {
     )
   ).filter(isRandomizableField);
 
-  randomizeFields(fields);
-  completeRandomization();
+  const changedCount = randomizeFields(fields);
+  completeRandomization(changedCount);
 }
 
 function isRandomizableField(field) {
@@ -1742,30 +2043,42 @@ function isRandomizableField(field) {
     return false;
   }
 
-  return Boolean(
-    RANDOM_OPTIONS[field.id] ||
-    field.matches("[data-random-options]") ||
+  // Randomize only touches creative "flavor" choices: the per-generator
+  // option dropdowns and any field that explicitly opts in with
+  // data-random-options. Core product, audience, pricing, and brand inputs
+  // are intentionally excluded, so Randomize can never blank a required field
+  // or change the facts the user actually entered about their product.
+  if (field.matches("[data-random-options]")) {
+    return true;
+  }
+
+  return (
+    field.tagName === "SELECT" &&
     field.matches("[data-generator-setting]")
   );
 }
 
 function randomizeFields(fields) {
+  let changedCount = 0;
+
   fields.forEach((field) => {
     const explicitOptions = parseRandomOptions(field);
-    const globalOptions = RANDOM_OPTIONS[field.id] || [];
-    const options =
-      explicitOptions.length > 0 ? explicitOptions : globalOptions;
 
-    if (options.length > 0) {
-      field.value = randomItem(options);
+    if (explicitOptions.length > 0) {
+      field.value = randomItem(explicitOptions);
       field.dispatchEvent(new Event("change", { bubbles: true }));
+      changedCount += 1;
       return;
     }
 
     if (field.matches("[data-generator-setting]")) {
-      randomizeGeneratorSettingField(field);
+      if (randomizeGeneratorSettingField(field)) {
+        changedCount += 1;
+      }
     }
   });
+
+  return changedCount;
 }
 
 function parseRandomOptions(field) {
@@ -1795,16 +2108,32 @@ function randomizeGeneratorSettingField(field) {
     if (options.length > 0) {
       field.value = randomItem(options).value;
       updateGeneratorSetting(field);
+      return true;
     }
   }
+
+  return false;
 }
 
-function completeRandomization() {
+function completeRandomization(changedCount = 0) {
   markResultsOutdated();
   updateIngredientReview();
   updateValidationSummary();
   saveCurrentProject();
-  showToast("Unlocked fields were randomized.", "success");
+
+  if (changedCount > 0) {
+    showToast(
+      `Randomized ${changedCount} creative option${
+        changedCount === 1 ? "" : "s"
+      }.`,
+      "success"
+    );
+  } else {
+    showToast(
+      "Select a generator first — randomize only changes the creative options inside generator panels.",
+      "warning"
+    );
+  }
 }
 
 function randomItem(items) {
@@ -2010,8 +2339,8 @@ function collectProjectData() {
 
     audience: {
       targetAudience: readValue("targetAudience"),
-      customerProblem: readValue("customerProblem"),
-      desiredOutcome: readValue("desiredOutcome"),
+      customerProblem: readValue("buyerProblem"),
+      desiredOutcome: readValue("buyerOutcome"),
       marketingGoal: readValue("marketingGoal"),
       buyerMotivation: readValue("buyerMotivation")
     },
@@ -2021,31 +2350,54 @@ function collectProjectData() {
       pricingTier: readValue("pricingTier"),
       offerType: readValue("offerType"),
       pricingUsage: readValue("pricingUsage"),
-      offerDetails: readValue("offerDetails")
+      offerDetails: readValue("pricingCustom")
     },
 
     brand: {
       brandName: readValue("brandName"),
       brandTone: readValue("brandTone"),
       visualStyle: readValue("visualStyle"),
-      primaryColor: readValue("primaryColor"),
-      secondaryColor: readValue("secondaryColor"),
-      brandKeywords: readValue("brandKeywords"),
+      colorDirection: readValue("colorDirection"),
+      typographyDirection: readValue("typographyDirection"),
+      brandKeywords: readValue("wordsToInclude"),
       wordsToAvoid: readValue("wordsToAvoid")
     },
 
     reference: {
-      usage: readValue("referenceImageUsage"),
-      notes: readValue("referenceImageNotes"),
+      usage: readValue("referenceImagePurpose"),
+      notes: readValue("referenceImageInstructions"),
       fileName: getElement("referenceImageUpload")?.files?.[0]?.name || ""
     },
 
     delivery: {
-      aiPlatform: readValue("aiPlatform") || "Any AI platform",
-      deliveryMode: readValue("deliveryMode") || "Separate prompts",
+      aiPlatform: readValue("aiPlatform"),
+      deliveryMode: readValue("deliveryMode") || "separate",
       optionCount: clampNumber(readValue("optionCount"), 1, 5, 3),
       exactText: readValue("exactText"),
       globalInstructions: readValue("globalInstructions")
+    },
+
+    // Readable labels for select values, resolved once here and used when
+    // building prompts and the ingredient review so output never shows raw
+    // slugs like "digital-product". Raw values above stay intact for saving,
+    // restoring, and validation.
+    display: {
+      productType: readSelectLabel("productType"),
+      marketingGoal: readSelectLabel("marketingGoal"),
+      buyerMotivation: readSelectLabel("buyerMotivation"),
+      pricingTier:
+        readValue("pricingTier") === "none"
+          ? ""
+          : readSelectLabel("pricingTier"),
+      offerType: readSelectLabel("offerType"),
+      pricingUsage: readSelectLabel("pricingUsage"),
+      brandTone: readSelectLabel("brandTone"),
+      visualStyle: readSelectLabel("visualStyle"),
+      colorDirection: readSelectLabel("colorDirection"),
+      typographyDirection: readSelectLabel("typographyDirection"),
+      referencePurpose: readSelectLabel("referenceImagePurpose"),
+      aiPlatform: readSelectLabel("aiPlatform") || "Any AI platform",
+      deliveryMode: readSelectLabel("deliveryMode")
     },
 
     selectedGenerators: [...appState.selectedGenerators],
@@ -2072,6 +2424,25 @@ function readValue(id) {
   }
 
   return String(element.value || "").trim();
+}
+
+// Returns the human-readable label of a select's chosen option (e.g.
+// "Digital product" instead of the raw value "digital-product"), so generated
+// prompts read naturally. Returns "" when the select is on an empty/placeholder
+// value, which keeps required-field validation working.
+function readSelectLabel(id) {
+  const element = getElement(id);
+
+  if (!element || element.tagName !== "SELECT") {
+    return readValue(id);
+  }
+
+  if (!element.value) {
+    return "";
+  }
+
+  const option = element.options[element.selectedIndex];
+  return option ? option.textContent.trim() : "";
 }
 
 function writeValue(id, value) {
@@ -2254,86 +2625,85 @@ function focusFirstValidationError(errors) {
    ========================================================= */
 
 function updateIngredientReview() {
-  const data = collectProjectData();
+  const container = getElement("ingredientReview");
 
-  updateReviewElement(
-    "productReview",
-    [
-      data.product.name,
-      data.product.type,
-      data.product.description
-    ],
-    "Add product information to preview it here."
-  );
-
-  updateReviewElement(
-    "audienceReview",
-    [
-      data.audience.targetAudience,
-      data.audience.marketingGoal,
-      data.audience.buyerMotivation
-    ],
-    "Add audience and positioning information."
-  );
-
-  updateReviewElement(
-    "pricingReview",
-    [
-      formatPrice(data.pricing.currentPrice),
-      data.pricing.pricingTier,
-      data.pricing.offerType,
-      data.pricing.pricingUsage
-    ],
-    "Add pricing or offer information."
-  );
-
-  updateReviewElement(
-    "brandReview",
-    [
-      data.brand.brandName,
-      data.brand.brandTone,
-      data.brand.visualStyle,
-      data.brand.brandKeywords
-    ],
-    "Add brand direction."
-  );
-
-  updateReviewElement(
-    "generatorReview",
-    data.selectedGenerators.map(
-      (key) => GENERATOR_DEFINITIONS[key]?.label || key
-    ),
-    "Select up to four generators."
-  );
-
-  updateReviewElement(
-    "deliveryReview",
-    [
-      data.delivery.aiPlatform,
-      data.delivery.deliveryMode,
-      `${data.delivery.optionCount} option${
-        data.delivery.optionCount === 1 ? "" : "s"
-      }`
-    ],
-    "Choose the platform and delivery format."
-  );
-}
-
-function updateReviewElement(id, values, emptyMessage) {
-  const element = getElement(id);
-
-  if (!element) {
+  if (!container) {
     return;
   }
 
-  const usableValues = values.filter(Boolean);
+  const data = collectProjectData();
 
-  element.innerHTML =
-    usableValues.length > 0
-      ? `<ul>${usableValues
-          .map((value) => `<li>${escapeHtml(value)}</li>`)
-          .join("")}</ul>`
-      : `<p class="empty-state">${escapeHtml(emptyMessage)}</p>`;
+  const groups = [
+    [
+      "Product",
+      [data.product.name, data.display.productType, data.product.description]
+    ],
+    [
+      "Audience",
+      [
+        data.audience.targetAudience,
+        data.display.marketingGoal,
+        data.display.buyerMotivation
+      ]
+    ],
+    [
+      "Pricing",
+      [
+        formatPrice(data.pricing.currentPrice),
+        data.display.pricingTier,
+        data.display.offerType,
+        data.display.pricingUsage
+      ]
+    ],
+    [
+      "Brand",
+      [
+        data.display.brandTone,
+        data.display.visualStyle,
+        data.brand.brandKeywords
+      ]
+    ],
+    [
+      "Generators",
+      data.selectedGenerators.map(
+        (key) => GENERATOR_DEFINITIONS[key]?.label || key
+      )
+    ],
+    [
+      "Delivery",
+      [
+        data.display.aiPlatform,
+        data.display.deliveryMode,
+        `${data.delivery.optionCount} option${
+          data.delivery.optionCount === 1 ? "" : "s"
+        }`
+      ]
+    ]
+  ];
+
+  const blocks = groups
+    .map(([title, values]) => {
+      const items = values.filter(Boolean);
+
+      if (items.length === 0) {
+        return "";
+      }
+
+      return `
+        <div class="review-block">
+          <h4>${escapeHtml(title)}</h4>
+          <ul>${items
+            .map((value) => `<li>${escapeHtml(value)}</li>`)
+            .join("")}</ul>
+        </div>
+      `;
+    })
+    .filter(Boolean)
+    .join("");
+
+  container.innerHTML =
+    blocks ||
+    '<p class="empty-state">Fill in your details to preview them here.</p>';
 }
 
 function formatPrice(value) {
@@ -2429,12 +2799,15 @@ function buildPrompt(generatorKey, data, variationIndex) {
     generatorKey,
     settings
   );
-  const referenceInstructions = buildReferenceInstructions(data.reference);
+  const referenceInstructions = buildReferenceInstructions(
+    data.reference,
+    data.display.referencePurpose
+  );
   const exactTextInstructions = buildExactTextInstructions(
     data.delivery.exactText
   );
   const platformInstructions = buildPlatformInstructions(
-    data.delivery.aiPlatform
+    data.display.aiPlatform
   );
   const outputRequirements = buildOutputRequirements(
     generatorKey,
@@ -2471,7 +2844,7 @@ function buildPrompt(generatorKey, data, variationIndex) {
 function buildSharedIngredients(data) {
   const lines = [
     `Product name: ${data.product.name}`,
-    `Product type: ${data.product.type}`,
+    `Product type: ${data.display.productType || data.product.type}`,
     `Product description: ${data.product.description}`,
     data.product.features
       ? `Key features: ${data.product.features}`
@@ -2489,23 +2862,23 @@ function buildSharedIngredients(data) {
     data.audience.desiredOutcome
       ? `Desired outcome: ${data.audience.desiredOutcome}`
       : "",
-    data.audience.marketingGoal
-      ? `Marketing goal: ${data.audience.marketingGoal}`
+    data.display.marketingGoal
+      ? `Marketing goal: ${data.display.marketingGoal}`
       : "",
-    data.audience.buyerMotivation
-      ? `Buyer motivation: ${data.audience.buyerMotivation}`
+    data.display.buyerMotivation
+      ? `Buyer motivation: ${data.display.buyerMotivation}`
       : "",
     data.pricing.currentPrice
       ? `Current price: ${formatPrice(data.pricing.currentPrice)}`
       : "",
-    data.pricing.pricingTier
-      ? `Pricing position: ${data.pricing.pricingTier}`
+    data.display.pricingTier
+      ? `Pricing position: ${data.display.pricingTier}`
       : "",
-    data.pricing.offerType
-      ? `Offer type: ${data.pricing.offerType}`
+    data.display.offerType
+      ? `Offer type: ${data.display.offerType}`
       : "",
-    data.pricing.pricingUsage
-      ? `Pricing instruction: ${data.pricing.pricingUsage}`
+    data.display.pricingUsage
+      ? `Pricing instruction: ${data.display.pricingUsage}`
       : "",
     data.pricing.offerDetails
       ? `Offer details: ${data.pricing.offerDetails}`
@@ -2513,13 +2886,13 @@ function buildSharedIngredients(data) {
     data.brand.brandName
       ? `Brand name: ${data.brand.brandName}`
       : "",
-    `Brand tone: ${data.brand.brandTone}`,
-    `Visual style: ${data.brand.visualStyle}`,
-    data.brand.primaryColor
-      ? `Primary brand color: ${data.brand.primaryColor}`
+    `Brand tone: ${data.display.brandTone || data.brand.brandTone}`,
+    `Visual style: ${data.display.visualStyle || data.brand.visualStyle}`,
+    data.display.colorDirection
+      ? `Color direction: ${data.display.colorDirection}`
       : "",
-    data.brand.secondaryColor
-      ? `Secondary brand color: ${data.brand.secondaryColor}`
+    data.display.typographyDirection
+      ? `Typography direction: ${data.display.typographyDirection}`
       : "",
     data.brand.brandKeywords
       ? `Brand keywords: ${data.brand.brandKeywords}`
@@ -2548,8 +2921,10 @@ function buildGeneratorInstructions(generatorKey, settings) {
   return fieldLines.join("\n");
 }
 
-function buildReferenceInstructions(reference) {
-  if (!reference.fileName && !reference.notes && !reference.usage) {
+function buildReferenceInstructions(reference, purposeLabel) {
+  const usage = purposeLabel || reference.usage;
+
+  if (!reference.fileName && !reference.notes && !usage) {
     return "Reference image: No reference image was provided. Create an original direction without imitating protected work.";
   }
 
@@ -2558,8 +2933,8 @@ function buildReferenceInstructions(reference) {
     reference.fileName
       ? `- Uploaded file: ${reference.fileName}`
       : "",
-    reference.usage
-      ? `- Approved use: ${reference.usage}`
+    usage
+      ? `- Approved use: ${usage}`
       : "",
     reference.notes
       ? `- Observations to use: ${reference.notes}`
@@ -2585,12 +2960,14 @@ function buildPlatformInstructions(platform) {
 
 function buildOutputRequirements(generatorKey, data, variation) {
   const visualGenerators = new Set([
-    "product-mockups",
-    "ads",
-    "flyers",
-    "lead-magnet-covers",
-    "notebook-covers",
-    "infographics",
+    "product-mockup",
+    "product-ad",
+    "promotional-flyer",
+    "lead-magnet-cover",
+    "notebook-cover",
+    "infographic",
+    "listing-image",
+    "lifestyle-image",
     "hero-banner",
     "video-motion",
     "cinematic-reveal"
@@ -2599,16 +2976,19 @@ function buildOutputRequirements(generatorKey, data, variation) {
   const videoGenerators = new Set([
     "tiktok",
     "video-motion",
-    "video-scripts",
-    "voiceover",
+    "short-video-script",
+    "voiceover-script",
+    "product-video-ad",
     "product-demo",
+    "launch-teaser",
     "b-roll",
     "cinematic-reveal"
   ]);
 
   const launchGenerators = new Set([
     "launch-campaign",
-    "carousel",
+    "launch-carousel",
+    "content-series",
     "launch-announcement"
   ]);
 
@@ -2641,9 +3021,9 @@ function buildOutputRequirements(generatorKey, data, variation) {
     );
   }
 
-  if (data.pricing.pricingUsage) {
+  if (data.display.pricingUsage) {
     requirements.push(
-      `- Follow this pricing rule exactly: ${data.pricing.pricingUsage}.`
+      `- Follow this pricing rule exactly: ${data.display.pricingUsage}.`
     );
   }
 
@@ -2853,23 +3233,76 @@ function assembleAllOutputs(data) {
   const combinedOutput = buildCombinedPrompt(data, selectedPrompts);
   const hybridOutput = buildHybridPrompt(data, selectedPrompts);
 
-  setOutputValue("standalonePromptOutput", standaloneOutput);
-  setOutputValue("separatePromptsOutput", separateOutput);
-  setOutputValue("combinedPromptOutput", combinedOutput);
-  setOutputValue("hybridPromptOutput", hybridOutput);
+  // Write each format into its own textarea/list and reveal the ones that
+  // have content. (The visible textarea IDs end in "Text"; the "...Output"
+  // IDs are the surrounding <article> wrappers.)
+  setOutputText("standalonePromptOutput", "standalonePromptText", standaloneOutput);
+  setOutputText("combinedPromptOutput", "combinedPromptText", combinedOutput);
+  setOutputText("hybridPromptOutput", "hybridPromptText", hybridOutput);
+  renderSeparatePromptList(selectedPrompts);
 
-  const mode = normalizeKey(data.delivery.deliveryMode);
-  let finalPackage = separateOutput;
-
-  if (mode.includes("standalone")) {
-    finalPackage = standaloneOutput;
-  } else if (mode.includes("combined")) {
-    finalPackage = combinedOutput;
-  } else if (mode.includes("hybrid")) {
-    finalPackage = hybridOutput;
-  }
+  const modeValue = normalizeKey(data.delivery.deliveryMode);
+  const finalByMode = {
+    single: standaloneOutput,
+    separate: separateOutput,
+    combined: combinedOutput,
+    both: combinedOutput,
+    hybrid: hybridOutput
+  };
+  const finalPackage = finalByMode[modeValue] || separateOutput;
 
   setOutputValue("finalPromptPackage", finalPackage);
+}
+
+// Fills an output textarea and shows its wrapper article only when it has
+// content, so empty format boxes stay hidden.
+function setOutputText(articleId, textareaId, value) {
+  setOutputValue(textareaId, value);
+
+  const article = getElement(articleId);
+
+  if (article) {
+    article.hidden = !value;
+  }
+}
+
+function renderSeparatePromptList(selectedPrompts) {
+  const article = getElement("separatePromptsOutput");
+  const list = getElement("separatePromptList");
+
+  if (!list) {
+    return;
+  }
+
+  if (selectedPrompts.length === 0) {
+    list.innerHTML =
+      '<p class="empty-state">Separate prompts will appear here.</p>';
+
+    if (article) {
+      article.hidden = true;
+    }
+
+    return;
+  }
+
+  list.innerHTML = selectedPrompts
+    .map((item, index) => {
+      const textId = `separatePromptText-${index}`;
+      return `
+        <div class="output-card">
+          <div class="output-heading">
+            <h3>Prompt ${index + 1}: ${escapeHtml(item.label)}</h3>
+            <button type="button" data-output-target="${textId}">Copy</button>
+          </div>
+          <textarea id="${textId}" rows="16" readonly>${escapeHtml(item.prompt)}</textarea>
+        </div>
+      `;
+    })
+    .join("");
+
+  if (article) {
+    article.hidden = false;
+  }
 }
 
 function buildCombinedPrompt(data, selectedPrompts) {
@@ -2910,10 +3343,10 @@ function buildHybridPrompt(data, selectedPrompts) {
     `PROJECT OVERVIEW`,
     `Product: ${data.product.name}`,
     `Audience: ${data.audience.targetAudience}`,
-    `Goal: ${data.audience.marketingGoal || "Create commercially useful assets"}`,
-    `Brand tone: ${data.brand.brandTone}`,
-    `Visual style: ${data.brand.visualStyle}`,
-    `Platform: ${data.delivery.aiPlatform}`
+    `Goal: ${data.display.marketingGoal || "Create commercially useful assets"}`,
+    `Brand tone: ${data.display.brandTone || data.brand.brandTone}`,
+    `Visual style: ${data.display.visualStyle || data.brand.visualStyle}`,
+    `Platform: ${data.display.aiPlatform}`
   ].join("\n");
 
   const separatePrompts = selectedPrompts
@@ -2961,13 +3394,20 @@ function getOutputValue(id) {
 }
 
 function clearOutputElements() {
-  [
-    "standalonePromptOutput",
-    "separatePromptsOutput",
-    "combinedPromptOutput",
-    "hybridPromptOutput",
-    "finalPromptPackage"
-  ].forEach((id) => setOutputValue(id, ""));
+  ["standalonePromptText", "combinedPromptText", "hybridPromptText", "finalPromptPackage"].forEach(
+    (id) => setOutputValue(id, "")
+  );
+
+  ["standalonePromptOutput", "separatePromptsOutput", "combinedPromptOutput", "hybridPromptOutput"].forEach(
+    (id) => {
+      const article = getElement(id);
+      if (article) {
+        article.hidden = true;
+      }
+    }
+  );
+
+  renderSeparatePromptList([]);
 
   const optionContainer = getElement("generatorOptionsOutput");
 
@@ -3225,8 +3665,8 @@ function restoreProjectFields(data) {
     productFormat: data.product?.format,
 
     targetAudience: data.audience?.targetAudience,
-    customerProblem: data.audience?.customerProblem,
-    desiredOutcome: data.audience?.desiredOutcome,
+    buyerProblem: data.audience?.customerProblem,
+    buyerOutcome: data.audience?.desiredOutcome,
     marketingGoal: data.audience?.marketingGoal,
     buyerMotivation: data.audience?.buyerMotivation,
 
@@ -3234,18 +3674,17 @@ function restoreProjectFields(data) {
     pricingTier: data.pricing?.pricingTier,
     offerType: data.pricing?.offerType,
     pricingUsage: data.pricing?.pricingUsage,
-    offerDetails: data.pricing?.offerDetails,
+    pricingCustom: data.pricing?.offerDetails,
 
-    brandName: data.brand?.brandName,
     brandTone: data.brand?.brandTone,
     visualStyle: data.brand?.visualStyle,
-    primaryColor: data.brand?.primaryColor,
-    secondaryColor: data.brand?.secondaryColor,
-    brandKeywords: data.brand?.brandKeywords,
+    colorDirection: data.brand?.colorDirection,
+    typographyDirection: data.brand?.typographyDirection,
+    wordsToInclude: data.brand?.brandKeywords,
     wordsToAvoid: data.brand?.wordsToAvoid,
 
-    referenceImageUsage: data.reference?.usage,
-    referenceImageNotes: data.reference?.notes,
+    referenceImagePurpose: data.reference?.usage,
+    referenceImageInstructions: data.reference?.notes,
 
     aiPlatform: data.delivery?.aiPlatform,
     deliveryMode: data.delivery?.deliveryMode,
