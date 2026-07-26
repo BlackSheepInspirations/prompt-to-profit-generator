@@ -177,9 +177,22 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
-a:focus-visible {
-  outline: 3px solid rgba(10, 168, 155, 0.3);
+a:focus-visible,
+summary:focus-visible,
+.pill:focus-visible {
+  outline: 3px solid rgba(10, 168, 155, 0.4);
   outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 

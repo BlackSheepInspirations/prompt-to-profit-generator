@@ -1344,7 +1344,25 @@ function initializeApplication() {
   updateValidationSummary();
   updateGeneratedVisibility();
   enhanceSelectsAsPills();
+  initPremiumTabs();
   initHeroVideo();
+}
+
+// Links each premium tab to its panel for screen readers.
+function initPremiumTabs() {
+  document.querySelectorAll(".premium-tab").forEach((tab) => {
+    const key = tab.dataset.premiumTab;
+    const panel = document.querySelector(`[data-premium-panel="${key}"]`);
+
+    if (!panel) {
+      return;
+    }
+
+    panel.id = panel.id || `premiumPanel-${key}`;
+    panel.setAttribute("role", "tabpanel");
+    panel.setAttribute("tabindex", "0");
+    tab.setAttribute("aria-controls", panel.id);
+  });
 }
 
 
@@ -1867,6 +1885,7 @@ function handleKnownButtonIds(button) {
     loadBrandProfileBtn: () => applySavedProfile("brand"),
     savePackageBtn: saveFinalPackage,
     saveFinalPromptBtn: saveFinalPackage,
+    downloadAllBtn: downloadAllOutputs,
     modalConfirmBtn: confirmModalAction,
     modalCancelBtn: closeModal
   };
@@ -4265,7 +4284,7 @@ function saveFinalPackage() {
     id: createId(),
     productName: readValue("productName") || "Untitled Product",
     deliveryMode: readValue("deliveryMode"),
-    content: packageText,
+    content: buildFullExport(),
     savedAt: new Date().toISOString()
   });
 
@@ -4275,6 +4294,70 @@ function saveFinalPackage() {
   );
 
   showToast("Prompt package saved on this device.", "success");
+}
+
+// Assembles the final package plus every premium module into one document.
+function buildFullExport() {
+  const productName = readValue("productName") || "Untitled Product";
+
+  const parts = [
+    "PROMPT TO PROFIT — FULL EXPORT",
+    `Product: ${productName}`,
+    `Generated: ${new Date().toLocaleString()}`,
+    "",
+    "========================================",
+    "FINAL PROMPT PACKAGE",
+    "========================================",
+    getOutputValue("finalPromptPackage") || "(none)"
+  ];
+
+  const premium = appState.premiumOutputs || {};
+
+  [
+    ["SUNO AI MUSIC PROMPT", premium.suno],
+    ["VIDEO SCRIPT PROMPT", premium.video],
+    ["MARKETING CAMPAIGN PROMPT", premium.marketing],
+    ["CUSTOM GPT BUILDER", premium.gpt]
+  ].forEach(([title, content]) => {
+    if (content) {
+      parts.push(
+        "",
+        "========================================",
+        title,
+        "========================================",
+        content
+      );
+    }
+  });
+
+  return parts.join("\n");
+}
+
+function downloadAllOutputs() {
+  if (!getOutputValue("finalPromptPackage").trim()) {
+    showToast("Generate your prompts before downloading.", "warning");
+    return;
+  }
+
+  const blob = new Blob([buildFullExport()], {
+    type: "text/plain;charset=utf-8"
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  const safeName = (readValue("productName") || "prompt-pack")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  link.href = url;
+  link.download = `${safeName || "prompt-pack"}-prompts.txt`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+
+  showToast("Downloaded your full prompt pack.", "success");
 }
 
 
