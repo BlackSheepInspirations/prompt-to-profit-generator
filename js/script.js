@@ -1884,6 +1884,11 @@ function handleDocumentClick(event) {
     return;
   }
 
+  if (button.dataset.preset) {
+    applyPreset(button.dataset.preset);
+    return;
+  }
+
   if (button.dataset.clearCategory) {
     requestClearCategory(button.dataset.clearCategory);
     return;
@@ -2008,6 +2013,7 @@ function handleKnownButtonIds(button) {
     savePackageBtn: saveFinalPackage,
     saveFinalPromptBtn: saveFinalPackage,
     downloadAllBtn: downloadAllOutputs,
+    printKitBtn: printLaunchKit,
     modalConfirmBtn: confirmModalAction,
     modalCancelBtn: closeModal
   };
@@ -2122,6 +2128,98 @@ function updateSelectionLimit() {
         : count === MAX_SELECTED_GENERATORS
           ? "Maximum selection reached."
           : `You may select ${MAX_SELECTED_GENERATORS - count} more.`;
+  }
+}
+
+
+/* =========================================================
+   6b. STARTER PRESETS + SAMPLE
+   ========================================================= */
+
+const PRESETS = {
+  etsy: {
+    fields: { productType: "digital-product", marketingGoal: "listing", pricingTier: "affordable" },
+    multiFields: { salesPlatform: ["etsy"] },
+    generators: ["product-listing", "seo-copy", "tags-hashtags", "pinterest-pin"]
+  },
+  course: {
+    fields: { productType: "course", marketingGoal: "launch", pricingTier: "premium" },
+    generators: ["sales-page", "promotional-email", "social-post", "launch-carousel"]
+  },
+  shopify: {
+    fields: { productType: "physical-product", marketingGoal: "conversion", pricingTier: "mid-range" },
+    generators: ["product-description", "product-ad", "social-post", "geo-optimization"]
+  },
+  service: {
+    fields: { productType: "service", marketingGoal: "lead-generation", pricingTier: "premium" },
+    generators: ["sales-page", "hooks-captions", "social-post", "promotional-email"]
+  },
+  sample: {
+    fields: {
+      productName: "Focus Planner",
+      productType: "digital-product",
+      productDescription:
+        "A minimalist daily planner PDF that helps busy solopreneurs pick their top 3 priorities, time-block the day, and actually finish what matters.",
+      targetAudience: "Busy solopreneurs and small-business owners who feel scattered",
+      buyerProblem: "They feel overwhelmed and end each day unsure what they actually got done",
+      buyerOutcome: "Calm, focused days where the important work finally gets finished",
+      marketingGoal: "launch",
+      pricingTier: "affordable",
+      currentPrice: "19"
+    },
+    multiFields: { brandTone: ["professional", "calm"], visualStyle: ["minimal"] },
+    generators: ["product-listing", "social-post", "product-mockup", "launch-announcement"],
+    generate: true
+  }
+};
+
+function applyPreset(key) {
+  const preset = PRESETS[key];
+
+  if (!preset) {
+    return;
+  }
+
+  Object.entries(preset.fields || {}).forEach(([id, value]) => {
+    if (value != null) {
+      writeValue(id, value);
+    }
+  });
+
+  Object.entries(preset.multiFields || {}).forEach(([id, values]) => {
+    const select = getElement(id);
+    if (select) {
+      Array.from(select.options).forEach((option) => {
+        option.selected = values.includes(option.value);
+      });
+    }
+  });
+
+  const wanted = (preset.generators || []).slice(0, MAX_SELECTED_GENERATORS);
+  getGeneratorCheckboxes().forEach((checkbox) => {
+    checkbox.checked = wanted.includes(resolveGeneratorKey(checkbox));
+  });
+
+  synchronizeSelectedGenerators();
+  renderGeneratorPanels();
+  updateSelectionLimit();
+  syncAllPillSelects();
+  updateIngredientReview();
+  updateValidationSummary();
+  markResultsOutdated();
+  saveCurrentProject();
+
+  if (preset.generate) {
+    showToast("Sample loaded — generating your kit...", "success");
+    generatePromptOptions();
+    return;
+  }
+
+  showToast("Preset applied — add your details, then generate.", "success");
+
+  const section = getElement("productSection");
+  if (section) {
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 }
 
@@ -2816,6 +2914,21 @@ function writeValue(id, value) {
 
   if (element.type === "checkbox") {
     element.checked = Boolean(value);
+    return;
+  }
+
+  // Multi-selects hold a comma-joined value; setting .value directly would
+  // collapse the selection, so re-select each option instead.
+  if (element.tagName === "SELECT" && element.multiple) {
+    const wanted = String(value)
+      .split(",")
+      .map((part) => part.trim())
+      .filter(Boolean);
+
+    Array.from(element.options).forEach((option) => {
+      option.selected = wanted.includes(option.value);
+    });
+
     return;
   }
 
@@ -3993,6 +4106,8 @@ function clearOutputElements() {
 
   [
     "premiumAdPackageText",
+    "premiumLaunchPlanText",
+    "premiumCalendarText",
     "premiumSunoText",
     "premiumVideoText",
     "premiumVoiceText",
@@ -4026,6 +4141,8 @@ function clearOutputElements() {
 function generatePremiumOutputs(data) {
   appState.premiumOutputs = {
     adpackage: buildFullAdPackage(data),
+    launchplan: buildLaunchPlan(data),
+    calendar: build30DayCalendar(data),
     suno: buildSunoPrompt(data),
     video: buildVideoScriptPrompt(data),
     voice: buildVoiceoverScript(data),
@@ -4040,6 +4157,8 @@ function generatePremiumOutputs(data) {
 function renderPremiumOutputs(outputs) {
   const targets = {
     adpackage: "premiumAdPackageText",
+    launchplan: "premiumLaunchPlanText",
+    calendar: "premiumCalendarText",
     suno: "premiumSunoText",
     video: "premiumVideoText",
     voice: "premiumVoiceText",
@@ -4641,6 +4760,92 @@ function buildFullAdPackage(data) {
   return lines.join("\n");
 }
 
+function buildLaunchPlan(data) {
+  const d = premiumData(data);
+  const picks = data.selectedGenerators.map(
+    (key) => GENERATOR_DEFINITIONS[key]?.label || key
+  );
+  const has = (word) => picks.some((p) => p.toLowerCase().includes(word));
+  const kit = picks.length ? picks.join(", ") : "your generated assets";
+
+  return [
+    `7-DAY LAUNCH PLAN — ${d.name}`,
+    `Goal: ${d.goal}  |  Audience: ${d.audience}  |  Platform: ${d.platform}`,
+    `Your kit for this launch: ${kit}`,
+    "",
+    "HOW TO USE: Follow it day by day — each day says what to post and which piece of your kit to use. Shift the dates to fit your schedule.",
+    "",
+    "-- PRE-LAUNCH --",
+    "Day -3  Tease it: post a \"something's coming\" hook and open a waitlist. (Use your hooks / social + an email.)",
+    "Day -2  Share the why: tell the story, or the problem you solve.",
+    "Day -1  Behind the scenes: show the product; remind the waitlist it drops tomorrow.",
+    "",
+    "-- LAUNCH WEEK --",
+    `Day 1  GO LIVE: publish the ${
+      has("listing") || has("description") ? "product listing / description" : "product page"
+    } and send the launch email. Post the announcement everywhere.`,
+    `Day 2  Benefits: post a carousel or ${
+      has("social") ? "social set" : "benefit post"
+    } showing exactly what they get.`,
+    `Day 3  Show it in action: post the ${
+      has("video") || has("ad") ? "video / ad" : "demo"
+    } so people see it work.`,
+    "Day 4  Answer objections: an FAQ post, and reply to every comment and DM.",
+    "Day 5  Urgency: \"bonus or price changes soon\" — email + post.",
+    "Day 6  Social proof: share early wins, testimonials, or your own results.",
+    "Day 7  Last call + keep selling: final reminder, then pin an evergreen post.",
+    "",
+    "-- AFTER LAUNCH --",
+    "Keep 2-3 posts a week going and reuse your winners. Save this project so your next launch is a 10-minute copy-paste.",
+    "",
+    "CHECKLIST:",
+    "[ ] Product page / listing live",
+    "[ ] Launch email scheduled",
+    "[ ] 5-7 social posts queued",
+    "[ ] Video / ad ready",
+    "[ ] Urgency + last-call planned",
+    d.pricingUsage ? `[ ] Pricing rule followed: ${d.pricingUsage}` : null
+  ]
+    .filter((line) => line !== null)
+    .join("\n");
+}
+
+function build30DayCalendar(data) {
+  const d = premiumData(data);
+
+  const themes = [
+    "Educational — teach one quick win related to your product",
+    "Story — why you made it, or the problem it solves",
+    "Promo — a direct call to buy, leading with the outcome",
+    "Social proof — a result, review, or testimonial",
+    "Behind the scenes — how it's made or used",
+    "Engagement — ask your audience a question",
+    "Value bomb — a free tip they can use today"
+  ];
+
+  const lines = [
+    `30-DAY CONTENT CALENDAR — ${d.name}`,
+    `Audience: ${d.audience}  |  Tone: ${d.tone}`,
+    "",
+    "HOW TO USE: One idea per day. Rotate the themes so your feed stays fresh, and pull the actual copy from your generated Social / Hooks assets.",
+    ""
+  ];
+
+  for (let day = 1; day <= 30; day += 1) {
+    lines.push(`Day ${String(day).padStart(2, "0")}: ${themes[(day - 1) % themes.length]}.`);
+    if (day % 7 === 0) {
+      lines.push("");
+    }
+  }
+
+  lines.push(
+    "",
+    "TIP: Batch a whole week in one sitting, and repost your best performers a month later."
+  );
+
+  return lines.join("\n");
+}
+
 function buildPhotoAnimationPrompt(data) {
   const d = premiumData(data);
   const s = animationStyleFromVisual(d.visual, d.toneFirst);
@@ -4905,6 +5110,8 @@ function buildFullExport() {
 
   [
     ["FULL AD PACKAGE", premium.adpackage],
+    ["7-DAY LAUNCH PLAN", premium.launchplan],
+    ["30-DAY CONTENT CALENDAR", premium.calendar],
     ["MUSIC PROMPTS (SUNO)", premium.suno],
     ["VIDEO SCRIPT", premium.video],
     ["VOICEOVER SCRIPT", premium.voice],
@@ -4951,6 +5158,46 @@ function downloadAllOutputs() {
   URL.revokeObjectURL(url);
 
   showToast("Downloaded your full prompt pack.", "success");
+}
+
+// Opens a clean printable page of the full kit so the browser's "Save as PDF"
+// produces a tidy document (printing the textareas directly clips content).
+function printLaunchKit() {
+  if (!getOutputValue("finalPromptPackage").trim()) {
+    showToast("Generate your prompts before printing.", "warning");
+    return;
+  }
+
+  const printWindow = window.open("", "_blank");
+
+  if (!printWindow) {
+    showToast("Allow pop-ups to print or save as PDF.", "warning");
+    return;
+  }
+
+  const title = readValue("productName") || "Launch Kit";
+  const doc = printWindow.document;
+
+  doc.write(
+    "<!doctype html><html><head><meta charset='utf-8'><title>" +
+      escapeHtml(`Prompt to Profit — ${title}`) +
+      "</title><style>" +
+      "body{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;line-height:1.6;color:#12201f;max-width:820px;margin:0 auto;padding:36px;}" +
+      "h1{font-family:system-ui,-apple-system,sans-serif;font-size:22px;color:#0b5e59;margin:0 0 4px;}" +
+      ".sub{font-family:system-ui,sans-serif;color:#566360;margin:0 0 24px;font-size:13px;}" +
+      "pre{white-space:pre-wrap;word-wrap:break-word;margin:0;}" +
+      "</style></head><body>" +
+      "<h1>Prompt to Profit — Launch Kit</h1>" +
+      `<p class='sub'>${escapeHtml(title)}</p>` +
+      `<pre>${escapeHtml(buildFullExport())}</pre>` +
+      "</body></html>"
+  );
+
+  doc.close();
+  printWindow.focus();
+  printWindow.print();
+
+  showToast("Opened a printable version — choose 'Save as PDF'.", "success");
 }
 
 
