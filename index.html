@@ -2303,6 +2303,15 @@
         <button
           type="button"
           class="premium-tab"
+          data-premium-tab="voice"
+          role="tab"
+          aria-selected="false"
+        >
+          Voiceover Script
+        </button>
+        <button
+          type="button"
+          class="premium-tab"
           data-premium-tab="marketing"
           role="tab"
           aria-selected="false"
@@ -2338,7 +2347,8 @@
             </button>
           </div>
           <p class="field-note">
-            A complete style prompt plus full, structured lyrics — paste into Suno.
+            Two options for Suno: a full branded song (with lyrics), and an
+            instrumental background track to sit under a video or ad.
           </p>
           <textarea
             id="premiumSunoText"
@@ -2357,8 +2367,8 @@
             </button>
           </div>
           <p class="field-note">
-            A full short-form script: hook, scenes, voiceover, on-screen text,
-            shot list, caption, and hashtags.
+            What happens on screen — scene by scene, plus a shot list, caption,
+            and hashtags. The spoken words are in the Voiceover Script tab.
           </p>
           <textarea
             id="premiumVideoText"
@@ -2366,6 +2376,26 @@
             rows="20"
             readonly
             aria-label="Video script prompt"
+          ></textarea>
+        </div>
+
+        <div class="premium-panel" data-premium-panel="voice" hidden>
+          <div class="output-heading">
+            <h3>Voiceover Script</h3>
+            <button type="button" data-output-target="premiumVoiceText">
+              Copy
+            </button>
+          </div>
+          <p class="field-note">
+            Just the spoken words, timed to match the video scenes — record it
+            yourself or paste into a voice AI (ElevenLabs, Play.ht).
+          </p>
+          <textarea
+            id="premiumVoiceText"
+            class="premium-output"
+            rows="20"
+            readonly
+            aria-label="Voiceover script"
           ></textarea>
         </div>
 

@@ -3700,9 +3700,14 @@ function clearOutputElements() {
 
   renderSeparatePromptList([]);
 
-  ["premiumSunoText", "premiumVideoText", "premiumMarketingText", "premiumGptText", "premiumAnimateText"].forEach(
-    (id) => setOutputValue(id, "")
-  );
+  [
+    "premiumSunoText",
+    "premiumVideoText",
+    "premiumVoiceText",
+    "premiumMarketingText",
+    "premiumGptText",
+    "premiumAnimateText"
+  ].forEach((id) => setOutputValue(id, ""));
   appState.premiumOutputs = {};
 
   const optionContainer = getElement("generatorOptionsOutput");
@@ -3730,6 +3735,7 @@ function generatePremiumOutputs(data) {
   appState.premiumOutputs = {
     suno: buildSunoPrompt(data),
     video: buildVideoScriptPrompt(data),
+    voice: buildVoiceoverScript(data),
     marketing: buildMarketingPrompt(data),
     gpt: buildCustomGptConfig(data),
     animate: buildPhotoAnimationPrompt(data)
@@ -3742,6 +3748,7 @@ function renderPremiumOutputs(outputs) {
   const targets = {
     suno: "premiumSunoText",
     video: "premiumVideoText",
+    voice: "premiumVoiceText",
     marketing: "premiumMarketingText",
     gpt: "premiumGptText",
     animate: "premiumAnimateText"
@@ -3885,12 +3892,16 @@ function buildSunoPrompt(data) {
   const outcome = d.outcome || "getting the result they wanted";
 
   return [
-    "SUNO AI — MUSIC PROMPT",
+    "MUSIC PROMPTS — SUNO AI",
     `For: ${d.name} (${d.type})`,
     "",
-    'HOW TO USE: In Suno, paste STYLE into "Style of Music", TITLE into the title field, and the LYRICS block into the lyrics field. Keep "Instrumental" off.',
+    "Two ready options. Use Option A for a branded song, Option B for background music under a video or ad.",
     "",
-    "----------------------------------------",
+    "==================================================",
+    "OPTION A — FULL BRANDED SONG (with lyrics)",
+    "==================================================",
+    'In Suno, paste STYLE into "Style of Music", TITLE into the title field, and LYRICS into the lyrics field. Keep "Instrumental" OFF.',
+    "",
     "STYLE:",
     `${style.genre}, ${style.tempo}, ${style.instr}, ${style.vocal}, radio-ready commercial production, catchy and memorable`,
     "",
@@ -3939,58 +3950,147 @@ function buildSunoPrompt(data) {
     "",
     "[Outro]",
     `${d.name}... made for you`,
-    `${d.brand}... breaking through`
+    `${d.brand}... breaking through`,
+    "",
+    "==================================================",
+    "OPTION B — INSTRUMENTAL BACKGROUND TRACK (for a video or ad)",
+    "==================================================",
+    "Use this when music plays UNDER a voiceover — no vocals to compete. In Suno, turn 'Instrumental' ON and paste STYLE only.",
+    "",
+    "STYLE:",
+    `${style.genre} instrumental, ${style.tempo}, ${style.instr}, no vocals, clean minimal mix that leaves space for a voiceover, loopable, commercial background bed`,
+    "",
+    "STRUCTURE (aim for ~35s to match the video):",
+    "- 0:00-0:03  soft intro (a single instrument or light pad)",
+    "- 0:03-0:25  steady, low rhythmic bed (keep it under the voice)",
+    "- 0:25-0:33  gentle lift for the call to action",
+    "- 0:33-0:35  clean, resolved ending"
   ].join("\n");
+}
+
+// One scene model shared by the video script (visual) and the voiceover
+// script (spoken), so the two always line up beat-for-beat.
+function videoScenes(d) {
+  const cta = d.offer ? `Grab the ${lowerText(d.offer)} now` : `Get ${d.name} today`;
+
+  return [
+    {
+      label: "Hook",
+      time: "0:00-0:03",
+      onscreen: d.problem
+        ? capitalize(premiumFirstClause(d.problem)) + "?"
+        : "Struggling with your " + lowerText(d.type) + "?",
+      vo: `If you're ${lowerText(d.audience)}, stop scrolling — this changes everything.`,
+      shot: "Fast punch-in on face or product with a bold text overlay."
+    },
+    {
+      label: "Problem",
+      time: "0:03-0:09",
+      onscreen: "",
+      vo: d.problem
+        ? "You know the feeling: " + lowerText(d.problem) + "."
+        : "Most options overpromise and underdeliver.",
+      shot: "Quick b-roll of the frustration / the 'before'."
+    },
+    {
+      label: "Solution",
+      time: "0:09-0:20",
+      onscreen: "Meet " + d.name,
+      vo: `${d.name} is a ${lowerText(d.type)} that ${
+        d.outcome ? lowerText(d.outcome) : "gets you real results, fast"
+      }.${d.benefits ? " " + capitalize(premiumFirstClause(d.benefits)) + "." : ""}`,
+      shot: "Clean hero shots of the product in use."
+    },
+    {
+      label: "Proof",
+      time: "0:20-0:29",
+      onscreen: "",
+      vo: `${
+        d.keywords ? "It's " + lowerText(d.keywords) + "." : "It's simple, and it just works."
+      } Made for ${lowerText(d.audience)}.`,
+      shot: "Fast feature montage / results / testimonial-style clip."
+    },
+    {
+      label: "Call to action",
+      time: "0:29-0:35",
+      onscreen: cta,
+      vo: `${cta}. Link in bio.`,
+      shot: "Product with a button overlay and a confident smile."
+    }
+  ];
 }
 
 function buildVideoScriptPrompt(data) {
   const d = premiumData(data);
-  const cta = d.offer ? `Grab the ${lowerText(d.offer)} now` : `Get ${d.name} today`;
+  const scenes = videoScenes(d);
 
-  return [
-    "SHORT-FORM VIDEO SCRIPT",
+  const lines = [
+    "SHORT-FORM VIDEO SCRIPT (visuals)",
     `Product: ${d.name} (${d.type})  |  Audience: ${d.audience}  |  Tone: ${d.tone}`,
     "Length: ~35 seconds  |  Format: vertical 9:16 (TikTok / Reels / Shorts)",
     "",
-    "HOW TO USE: Film or generate each scene in order. [On-screen] = text overlay, [VO] = what you say, [Shot] = camera direction.",
-    "",
-    "HOOK — 0:00-0:03",
-    `[On-screen] ${d.problem ? capitalize(premiumFirstClause(d.problem)) + "?" : "Struggling with your " + lowerText(d.type) + "?"}`,
-    `[VO] If you're ${lowerText(d.audience)}, stop scrolling — this changes everything.`,
-    "[Shot] Fast punch-in on face or product with a bold text overlay.",
-    "",
-    "PROBLEM — 0:03-0:09",
-    `[VO] ${d.problem ? "You know the feeling: " + lowerText(d.problem) + "." : "Most options overpromise and underdeliver."}`,
-    "[Shot] Quick b-roll of the frustration / the 'before'.",
-    "",
-    "SOLUTION — 0:09-0:20",
-    `[On-screen] Meet ${d.name}`,
-    `[VO] ${d.name} is a ${lowerText(d.type)} that ${d.outcome ? lowerText(d.outcome) : "gets you real results, fast"}. ${d.benefits ? capitalize(premiumFirstClause(d.benefits)) + "." : ""}`.trim(),
-    "[Shot] Clean hero shots of the product in use.",
-    "",
-    "PROOF — 0:20-0:29",
-    `[VO] ${d.keywords ? "It's " + lowerText(d.keywords) + "." : "It's simple, and it just works."} Made for ${lowerText(d.audience)}.`,
-    "[Shot] Fast feature montage / results / testimonial-style clip.",
-    "",
-    "CALL TO ACTION — 0:29-0:35",
-    `[On-screen] ${cta}`,
-    `[VO] ${cta}. Link in bio.`,
-    "[Shot] Product with a button overlay and a confident smile.",
-    "",
-    "SHOT LIST:",
-    "1. Hook close-up (0-3s)",
-    "2. Problem b-roll (3-9s)",
-    "3. Product reveal (9-14s)",
-    "4. In-use demo (14-20s)",
-    "5. Feature montage (20-29s)",
-    "6. CTA card (29-35s)",
+    "HOW TO USE: This is what happens on screen. The spoken words are in the separate VOICEOVER SCRIPT tab — the timings match.",
+    ""
+  ];
+
+  scenes.forEach((scene) => {
+    lines.push(`${scene.label.toUpperCase()} — ${scene.time}`);
+    if (scene.onscreen) {
+      lines.push(`[On-screen] ${scene.onscreen}`);
+    }
+    lines.push(`[Shot] ${scene.shot}`, "");
+  });
+
+  lines.push("SHOT LIST:");
+  scenes.forEach((scene, index) => {
+    lines.push(`${index + 1}. ${scene.label} (${scene.time}) — ${scene.shot}`);
+  });
+
+  lines.push(
     "",
     "CAPTION:",
-    `${capitalize(d.outcome || "The " + d.type + " " + d.audience + " actually needs")} — meet ${d.name}. ${d.price ? "From " + d.price + "." : ""}`.trim(),
+    `${capitalize(
+      d.outcome || "The " + d.type + " " + d.audience + " actually needs"
+    )} — meet ${d.name}. ${d.price ? "From " + d.price + "." : ""}`.trim(),
     "",
     "HASHTAGS:",
     premiumHashtags(d)
-  ].join("\n");
+  );
+
+  return lines.join("\n");
+}
+
+function buildVoiceoverScript(data) {
+  const d = premiumData(data);
+  const scenes = videoScenes(d);
+
+  const lines = [
+    "VOICEOVER SCRIPT",
+    `Product: ${d.name}  |  Audience: ${d.audience}  |  Deliver in a ${d.tone} voice`,
+    "Length: ~35 seconds  |  Timings match the Video Script scenes",
+    "",
+    "HOW TO USE: Record it yourself, or paste into a voice AI (ElevenLabs, Play.ht, or your video tool's voiceover).",
+    ""
+  ];
+
+  scenes.forEach((scene) => {
+    lines.push(`[${scene.time}] (${scene.label}) "${scene.vo}"`);
+  });
+
+  lines.push(
+    "",
+    "DELIVERY NOTES:",
+    `- Voice & tone: ${d.tone}.`,
+    "- Pace: energetic in the hook, steady in the middle, confident on the call to action.",
+    `- Emphasize: "${d.name}"${d.outcome ? ' and "' + lowerText(d.outcome) + '"' : ""}.`,
+    "- Take a short breath before the final line.",
+    d.avoid ? `- Never say: ${d.avoid}.` : null,
+    "",
+    "FULL SCRIPT (one paragraph, for text-to-speech):",
+    scenes.map((scene) => scene.vo).join(" ")
+  );
+
+  return lines.filter((line) => line !== null).join("\n");
 }
 
 function buildMarketingPrompt(data) {
@@ -4443,8 +4543,9 @@ function buildFullExport() {
   const premium = appState.premiumOutputs || {};
 
   [
-    ["SUNO AI MUSIC PROMPT", premium.suno],
-    ["VIDEO SCRIPT PROMPT", premium.video],
+    ["MUSIC PROMPTS (SUNO)", premium.suno],
+    ["VIDEO SCRIPT", premium.video],
+    ["VOICEOVER SCRIPT", premium.voice],
     ["MARKETING CAMPAIGN PROMPT", premium.marketing],
     ["CUSTOM GPT BUILDER", premium.gpt],
     ["PHOTO ANIMATION & VIDEO", premium.animate]
