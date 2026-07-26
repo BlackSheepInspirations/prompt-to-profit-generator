@@ -1845,6 +1845,7 @@ function handleKnownButtonIds(button) {
 
   const actionMap = {
     generateBtn: generatePromptOptions,
+    railGenerateBtn: generatePromptOptions,
     clearAllBtn: requestClearAll,
     newProjectBtn: requestClearAll,
     randomizeBtn: randomizeAllUnlockedFields,
@@ -2770,6 +2771,54 @@ function validateProject(data = collectProjectData()) {
   };
 }
 
+// Keeps the sticky rail's readiness checklist and status in sync.
+function updateBuildRail() {
+  const container = getElement("railReadiness");
+
+  if (!container) {
+    return;
+  }
+
+  const data = collectProjectData();
+
+  const items = [
+    ["Product name", Boolean(data.product.name)],
+    ["Product type", Boolean(data.product.type)],
+    ["Description", Boolean(data.product.description)],
+    ["Audience", Boolean(data.audience.targetAudience)],
+    ["Brand tone", Boolean(data.brand.brandTone)],
+    ["Visual style", Boolean(data.brand.visualStyle)],
+    [
+      `Generators (${data.selectedGenerators.length}/${MAX_SELECTED_GENERATORS})`,
+      data.selectedGenerators.length > 0
+    ]
+  ];
+
+  const done = items.filter((item) => item[1]).length;
+
+  container.innerHTML = items
+    .map(
+      ([label, ok]) => `
+        <div class="rail-item ${ok ? "is-done" : ""}">
+          <span class="rail-item__mark" aria-hidden="true">${
+            ok ? "✓" : ""
+          }</span>
+          <span>${escapeHtml(label)}</span>
+        </div>
+      `
+    )
+    .join("");
+
+  const status = getElement("railStatus");
+
+  if (status) {
+    status.textContent =
+      done === items.length
+        ? "Everything's ready — generate your pack."
+        : `${done} of ${items.length} essentials added`;
+  }
+}
+
 function markFieldError(fieldId) {
   const field = getElement(fieldId);
 
@@ -2789,6 +2838,8 @@ function clearFieldErrors() {
 }
 
 function updateValidationSummary() {
+  updateBuildRail();
+
   const summary = getElement("validationSummary");
 
   if (!summary) {

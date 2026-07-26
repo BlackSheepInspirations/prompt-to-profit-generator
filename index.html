@@ -103,6 +103,7 @@
   </header>
 
   <main id="mainContent" class="main-content">
+    <div class="build-layout">
     <form id="generatorForm" novalidate>
       <div class="phase-divider">
         <p class="phase-divider__num">Phase 01</p>
@@ -2114,6 +2115,27 @@
         </div>
       </section>
     </form>
+
+      <aside class="build-rail" aria-label="Build summary">
+        <div class="build-rail__inner">
+          <p class="build-rail__eyebrow">Your pack</p>
+          <div id="railReadiness" class="build-rail__readiness"></div>
+          <button
+            id="railGenerateBtn"
+            type="button"
+            class="build-rail__generate"
+          >
+            Generate my pack
+          </button>
+          <p
+            id="railStatus"
+            class="build-rail__status"
+            role="status"
+            aria-live="polite"
+          ></p>
+        </div>
+      </aside>
+    </div>
 
     <!-- RESULTS -->
     <section
