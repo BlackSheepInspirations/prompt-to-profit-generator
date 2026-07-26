@@ -1,5 +1,10 @@
 "use strict";
 
+// Always open at the top on load/refresh (don't let the browser restore scroll).
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
+}
+
 /* =========================================================
    PROMPT TO PROFIT GENERATOR
    Complete application behavior
@@ -1347,6 +1352,28 @@ function initializeApplication() {
   initPremiumTabs();
   initJourney();
   initHeroVideo();
+  initBackToTop();
+  window.scrollTo(0, 0);
+}
+
+// Floating "back to top" button that appears once the user scrolls down.
+function initBackToTop() {
+  const button = getElement("backToTop");
+
+  if (!button) {
+    return;
+  }
+
+  const toggle = () => {
+    button.classList.toggle("is-visible", window.scrollY > 500);
+  };
+
+  window.addEventListener("scroll", toggle, { passive: true });
+  button.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  toggle();
 }
 
 // Start-here journey: tap a trail stop to reveal it, flip a card for the payoff.
