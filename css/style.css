@@ -1428,6 +1428,19 @@ summary:focus-visible,
   max-width: 42ch;
 }
 
+/* One-click "Copy Everything" — the culminating action */
+.copy-all-btn {
+  background: var(--color-primary);
+  color: var(--on-accent);
+  border-color: transparent;
+  font-weight: 700;
+}
+.copy-all-btn:hover {
+  filter: brightness(1.06);
+  background: var(--color-primary);
+  color: var(--on-accent);
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
