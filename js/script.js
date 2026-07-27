@@ -1382,7 +1382,8 @@ const appState = {
   modalAction: null,
   activeAccordion: null,
   isGenerating: false,
-  premiumOutputs: {}
+  premiumOutputs: {},
+  brandMode: "product"
 };
 
 
@@ -1408,6 +1409,7 @@ function initializeApplication() {
   initBackToTop();
   renderVault();
   renderRecent();
+  updateModeToggle();
   window.scrollTo(0, 0);
 }
 
@@ -1889,6 +1891,11 @@ function handleDocumentClick(event) {
     return;
   }
 
+  if (button.dataset.mode) {
+    setBrandMode(button.dataset.mode);
+    return;
+  }
+
   if (button.dataset.clearCategory) {
     requestClearCategory(button.dataset.clearCategory);
     return;
@@ -2014,6 +2021,7 @@ function handleKnownButtonIds(button) {
     saveFinalPromptBtn: saveFinalPackage,
     downloadAllBtn: downloadAllOutputs,
     printKitBtn: printLaunchKit,
+    importBrandDnaBtn: () => importBrandDna(readValue("brandDnaInput")),
     modalConfirmBtn: confirmModalAction,
     modalCancelBtn: closeModal
   };
@@ -2252,6 +2260,137 @@ function updateRecommendedGenerators() {
     card.classList.toggle("is-recommended", isRecommended);
     card.title = isRecommended ? "Recommended for your product type" : "";
   });
+}
+
+
+/* =========================================================
+   6c. BRAND MODE + BRAND DNA BRIDGE (from Brand Haus)
+   ========================================================= */
+
+function setBrandMode(mode) {
+  appState.brandMode = mode === "creator" ? "creator" : "product";
+  updateModeToggle();
+  markResultsOutdated();
+  saveCurrentProject();
+}
+
+function updateModeToggle() {
+  document.querySelectorAll(".mode-btn").forEach((button) => {
+    const active = button.dataset.mode === appState.brandMode;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
+// Selects up to three matching options in a multi-select from a free-text
+// value (e.g. "Warm, Friendly, Calm"), and keeps the raw text in the custom
+// field so nothing is lost.
+function matchIntoMultiSelect(selectId, customId, rawValue) {
+  const select = getElement(selectId);
+
+  if (!select || !rawValue) {
+    return;
+  }
+
+  const tokens = String(rawValue)
+    .toLowerCase()
+    .split(/[,;/]|\band\b/)
+    .map((token) => token.trim())
+    .filter(Boolean);
+
+  let chosen = 0;
+
+  Array.from(select.options).forEach((option) => {
+    const label = option.textContent.trim().toLowerCase();
+    const value = option.value.toLowerCase();
+    const hit =
+      chosen < 3 &&
+      tokens.some(
+        (token) =>
+          token &&
+          (label.includes(token) ||
+            token.includes(label) ||
+            value.includes(token.replace(/\s+/g, "-")))
+      );
+
+    option.selected = hit;
+    if (hit) {
+      chosen += 1;
+    }
+  });
+
+  if (customId) {
+    writeValue(customId, rawValue);
+  }
+}
+
+function importBrandDna(text) {
+  const raw = String(text || "").trim();
+
+  if (!raw) {
+    showToast("Paste your Brand DNA block first.", "warning");
+    return;
+  }
+
+  const field = (label) => {
+    const match = new RegExp(
+      "^\\s*" + label + "\\s*[:\\-]\\s*(.+)$",
+      "im"
+    ).exec(raw);
+    return match ? match[1].trim() : "";
+  };
+
+  const tone = field("brand tone") || field("tone") || field("voice");
+  const visual = field("visual style") || field("visual") || field("aesthetic");
+  const keywords = field("keywords") || field("brand keywords");
+  const avoid = field("avoid") || field("words to avoid");
+  const colors = field("colors") || field("color");
+  const mode = (field("mode") || field("direction")).toLowerCase();
+
+  let filled = 0;
+
+  if (tone) {
+    matchIntoMultiSelect("brandTone", "brandToneCustom", tone);
+    filled += 1;
+  }
+  if (visual) {
+    matchIntoMultiSelect("visualStyle", "visualStyleCustom", visual);
+    filled += 1;
+  }
+  if (keywords) {
+    writeValue("wordsToInclude", keywords);
+    filled += 1;
+  }
+  if (avoid) {
+    writeValue("wordsToAvoid", avoid);
+    filled += 1;
+  }
+  if (colors) {
+    writeValue("colorDirection", "brand-colors");
+    filled += 1;
+  }
+  if (mode) {
+    setBrandMode(/(brand|creator|influencer|i am)/.test(mode) ? "creator" : "product");
+    filled += 1;
+  }
+
+  syncAllPillSelects();
+  updateIngredientReview();
+  updateValidationSummary();
+  markResultsOutdated();
+  saveCurrentProject();
+
+  if (filled > 0) {
+    showToast(
+      `Imported your Brand DNA — ${filled} field${filled === 1 ? "" : "s"} filled.`,
+      "success"
+    );
+  } else {
+    showToast(
+      "Couldn't read that — paste the Brand DNA block from Brand Haus.",
+      "warning"
+    );
+  }
 }
 
 
@@ -2885,6 +3024,7 @@ function collectProjectData() {
       deliveryMode: readSelectLabel("deliveryMode")
     },
 
+    brandMode: appState.brandMode,
     selectedGenerators: [...appState.selectedGenerators],
     generatorSettings: structuredCloneSafe(appState.generatorSettings),
     timestamp: new Date().toISOString()
@@ -4792,8 +4932,16 @@ function buildFullAdPackage(data) {
   return lines.join("\n");
 }
 
+function kitPick(picks, keywords, fallback) {
+  const matches = picks.filter((p) =>
+    keywords.some((k) => p.toLowerCase().includes(k))
+  );
+  return matches.length ? matches.join(", ") : fallback;
+}
+
 function buildLaunchPlan(data) {
   const d = premiumData(data);
+  const creator = appState.brandMode === "creator";
   const picks = data.selectedGenerators.map(
     (key) => GENERATOR_DEFINITIONS[key]?.label || key
   );
@@ -4801,41 +4949,51 @@ function buildLaunchPlan(data) {
   const kit = picks.length ? picks.join(", ") : "your generated assets";
 
   return [
-    `7-DAY LAUNCH PLAN — ${d.name}`,
-    `Goal: ${d.goal}  |  Audience: ${d.audience}  |  Platform: ${d.platform}`,
-    `Your kit for this launch: ${kit}`,
+    `THE PROFIT PATH — LAUNCH PLAN for ${d.name}`,
+    `${creator ? "Mode: You are the brand (creator-led)" : "Mode: Product / niche"}  |  Goal: ${d.goal}  |  Platform: ${d.platform}`,
+    `Your kit: ${kit}`,
     "",
-    "HOW TO USE: Follow it day by day — each day says what to post and which piece of your kit to use. Shift the dates to fit your schedule.",
+    "The PROFIT Path is the 6-phase launch method: Prime, Reveal, Offer, Flood, Ignite, Tend. Follow it in order — shift the dates to fit you.",
     "",
-    "-- PRE-LAUNCH --",
-    "Day -3  Tease it: post a \"something's coming\" hook and open a waitlist. (Use your hooks / social + an email.)",
-    "Day -2  Share the why: tell the story, or the problem you solve.",
-    "Day -1  Behind the scenes: show the product; remind the waitlist it drops tomorrow.",
+    "== P - PRIME (earn trust before you sell) ==",
+    creator
+      ? "Days 1-3: Show up as YOU. Share your story, your point of view, and helpful takes to build the audience that will buy. Open a waitlist."
+      : "Days 1-3: Warm up your niche with pure value — helpful tips, no pitch. Open a waitlist so early fans can raise their hand.",
+    `Use: ${kitPick(picks, ["social", "hook", "content"], "social posts + hooks")}`,
     "",
-    "-- LAUNCH WEEK --",
-    `Day 1  GO LIVE: publish the ${
-      has("listing") || has("description") ? "product listing / description" : "product page"
-    } and send the launch email. Post the announcement everywhere.`,
-    `Day 2  Benefits: post a carousel or ${
-      has("social") ? "social set" : "benefit post"
-    } showing exactly what they get.`,
-    `Day 3  Show it in action: post the ${
-      has("video") || has("ad") ? "video / ad" : "demo"
-    } so people see it work.`,
-    "Day 4  Answer objections: an FAQ post, and reply to every comment and DM.",
-    "Day 5  Urgency: \"bonus or price changes soon\" — email + post.",
-    "Day 6  Social proof: share early wins, testimonials, or your own results.",
-    "Day 7  Last call + keep selling: final reminder, then pin an evergreen post.",
+    "== R - REVEAL (open the loop) ==",
+    "Day 4: Tease that something's coming — a \"launching soon\" post and a short teaser. Point everyone to the waitlist.",
+    `Use: ${kitPick(picks, ["teaser", "announcement"], "a teaser + announcement")}`,
     "",
-    "-- AFTER LAUNCH --",
-    "Keep 2-3 posts a week going and reuse your winners. Save this project so your next launch is a 10-minute copy-paste.",
+    "== O - OFFER (show the transformation) ==",
+    "Days 5-7: Reveal what it is and who it's for. Lead with the before-to-after, show proof, and spell out exactly what they get.",
+    `Use: ${kitPick(picks, ["sales", "video", "email"], "a sales page + a value email")}`,
     "",
-    "CHECKLIST:",
-    "[ ] Product page / listing live",
-    "[ ] Launch email scheduled",
-    "[ ] 5-7 social posts queued",
-    "[ ] Video / ad ready",
-    "[ ] Urgency + last-call planned",
+    "== F - FLOOD (go live everywhere) ==",
+    `Day 8 (GO LIVE): Publish the ${
+      has("listing") || has("description") ? "listing / product page" : "product page"
+    } and send the launch email. Post the announcement across every channel at once.`,
+    `Use: ${kitPick(picks, ["listing", "description", "ad", "announcement", "carousel"], "your listing + ad + announcement")}`,
+    "",
+    "== I - IGNITE (urgency + momentum) ==",
+    "Days 9-10: Add urgency — a bonus, a deadline, and social proof. Send a \"closing soon\" email and post last-call reminders.",
+    "Use: an urgency email + last-call posts",
+    "",
+    "== T - TEND (nurture + make it evergreen) ==",
+    creator
+      ? "Days 11+: Thank buyers, gather testimonials, and keep showing up. Turn your best launch content into evergreen posts, and save this project for your next drop."
+      : "Days 11+: Thank buyers, request reviews, and turn your winners into evergreen content. Save this project so your next product launches in minutes.",
+    has("gpt")
+      ? "Use: a follow-up email + reviews + your Custom GPT to keep answering buyers"
+      : "Use: a follow-up email + review request + evergreen social",
+    "",
+    "PROFIT PATH CHECKLIST:",
+    "[ ] Prime - value/story posts + waitlist live",
+    "[ ] Reveal - teaser posted",
+    "[ ] Offer - sales page + email ready",
+    "[ ] Flood - product live + announced everywhere",
+    "[ ] Ignite - urgency + last-call planned",
+    "[ ] Tend - follow-up + testimonials + saved for next time",
     d.pricingUsage ? `[ ] Pricing rule followed: ${d.pricingUsage}` : null
   ]
     .filter((line) => line !== null)
@@ -5294,6 +5452,7 @@ function restoreCurrentProject(showFeedback = false) {
     appState.generatedOptions = project.generatedOptions || {};
     appState.selectedOptions = project.selectedOptions || {};
     appState.premiumOutputs = project.premiumOutputs || {};
+    appState.brandMode = data.brandMode === "creator" ? "creator" : "product";
     appState.lastGeneratedSignature =
       project.lastGeneratedSignature || "";
 
@@ -5304,6 +5463,7 @@ function restoreCurrentProject(showFeedback = false) {
     updateIngredientReview();
     updateValidationSummary();
     syncAllPillSelects();
+    updateModeToggle();
 
     if (Object.keys(appState.generatedOptions).length > 0) {
       renderGeneratedOptions();

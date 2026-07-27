@@ -247,6 +247,31 @@
       <button type="button" class="quickstart__sample" data-preset="sample">&#10024; Try a sample</button>
     </div>
 
+    <div class="brand-setup">
+      <div class="mode-toggle" role="group" aria-label="What are you launching">
+        <span class="mode-toggle__label">You're launching:</span>
+        <button type="button" class="mode-btn" data-mode="product">A product / niche</button>
+        <button type="button" class="mode-btn" data-mode="creator">I am the brand</button>
+      </div>
+
+      <details class="brand-import">
+        <summary class="brand-import__summary">Coming from Brand Haus? Import your Brand DNA</summary>
+        <div class="brand-import__body">
+          <p class="field-note">
+            Paste the Brand DNA block from Brand Haus (its &ldquo;Copy for Prompt to Profit&rdquo;
+            button) to auto-fill your brand tone, visual style, colors, and keywords.
+          </p>
+          <textarea
+            id="brandDnaInput"
+            rows="6"
+            placeholder="Paste your Brand DNA block here..."
+            aria-label="Brand DNA to import"
+          ></textarea>
+          <button id="importBrandDnaBtn" type="button">Import Brand DNA</button>
+        </div>
+      </details>
+    </div>
+
     <div class="build-layout">
     <form id="generatorForm" novalidate>
       <div class="phase-divider">
@@ -2486,7 +2511,7 @@
           role="tab"
           aria-selected="false"
         >
-          Launch Plan
+          The PROFIT Path
         </button>
         <button
           type="button"
@@ -2577,14 +2602,14 @@
 
         <div class="premium-panel" data-premium-panel="launchplan" hidden>
           <div class="output-heading">
-            <h3>7-Day Launch Plan</h3>
+            <h3>The PROFIT Path &mdash; Launch Plan</h3>
             <button type="button" data-output-target="premiumLaunchPlanText">
               Copy
             </button>
           </div>
           <p class="field-note">
-            A day-by-day launch schedule that sequences your kit — what to post
-            each day, from tease to last-call, with a checklist.
+            Your launch, run on the 6-phase PROFIT Path (Prime, Reveal, Offer,
+            Flood, Ignite, Tend) &mdash; sequenced to your kit, with a checklist.
           </p>
           <textarea
             id="premiumLaunchPlanText"
