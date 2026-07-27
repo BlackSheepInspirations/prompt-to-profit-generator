@@ -229,6 +229,17 @@ summary:focus-visible,
   padding-bottom: clamp(24px, 4vw, 40px);
 }
 
+.site-header__family {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #86e7d6;
+}
+
 .wordmark {
   display: inline-flex;
   align-items: center;
