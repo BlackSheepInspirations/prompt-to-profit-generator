@@ -257,10 +257,10 @@
       </div>
 
       <details class="brand-import">
-        <summary class="brand-import__summary">Coming from Brand Haus? Import your Brand DNA</summary>
+        <summary class="brand-import__summary">Coming from Brand Haus? Load your Brand DNA Blueprint&trade;</summary>
         <div class="brand-import__body">
           <p class="field-note">
-            Paste the Brand DNA block from Brand Haus (its &ldquo;Copy for Prompt to Profit&rdquo;
+            Paste your Brand DNA Blueprint&trade; block from Brand Haus (its &ldquo;Copy for Prompt to Profit&rdquo;
             button) to auto-fill your brand tone, visual style, colors, and keywords.
           </p>
           <textarea
@@ -269,7 +269,7 @@
             placeholder="Paste your Brand DNA block here..."
             aria-label="Brand DNA to import"
           ></textarea>
-          <button id="importBrandDnaBtn" type="button">Import Brand DNA</button>
+          <button id="importBrandDnaBtn" type="button">Import Blueprint&trade;</button>
         </div>
       </details>
     </div>
@@ -1209,6 +1209,20 @@
               data-field-key="customBrandInstructions"
               data-category="brand"
               placeholder="Add brand personality, emotional direction, layout preferences, or other details."
+            ></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="uniqueSelling">
+              What makes it different? <span class="field-hint-inline">(your USP — powers the launch plan)</span>
+            </label>
+            <textarea
+              id="uniqueSelling"
+              name="uniqueSelling"
+              rows="3"
+              data-field-key="uniqueSelling"
+              data-category="brand"
+              placeholder="The one reason someone picks this over every alternative — a signature method, a specialized audience, a unique format, or a standout bonus."
             ></textarea>
           </div>
 
@@ -2277,6 +2291,8 @@
             aria-live="polite"
           ></p>
 
+          <div id="railBrandKit" class="rail-brandkit" hidden></div>
+
           <details class="rail-panel">
             <summary class="rail-panel__summary">
               <span>Your selections</span>
@@ -2300,6 +2316,10 @@
             </summary>
             <div id="railRecent" class="rail-panel__body"></div>
           </details>
+
+          <button id="railClearAllBtn" type="button" class="rail-clear-all">
+            Clear all &amp; start over
+          </button>
         </div>
       </aside>
     </div>
@@ -2750,9 +2770,11 @@
             </button>
           </div>
           <p class="field-note">
-            Bring a product photo to life. Paste into an image-to-video tool
-            (Runway, Kling, Luma, Pika, or Sora) with your image — an animation
-            (cinemagraph) prompt plus a short hero-video prompt.
+            The full photo workflow: a <b>still photo prompt</b> to create your
+            product image (text-to-image), then <b>animation</b> and
+            <b>hero-video</b> prompts to bring it to life. Want more photo
+            options? Add a <b>Lifestyle Image</b>, <b>Product Mockup</b>, or
+            <b>Hero Banner</b> generator above.
           </p>
           <textarea
             id="premiumAnimateText"
@@ -2812,9 +2834,7 @@
     </div>
   </div>
 
-  <button id="backToTop" class="back-to-top" type="button" aria-label="Back to top">
-    <span aria-hidden="true">&uarr;</span> Top
-  </button>
+  <!-- Back-to-top button removed for Shopify — the theme provides its own. -->
 
   <script src="js/script.js"></script>
 </body>

@@ -1391,6 +1391,135 @@ const appState = {
    3. INITIALIZATION
    ========================================================= */
 
+/* =========================================================
+   GENERATOR GUIDANCE + INFO ICONS
+   "What you'll receive" per generator, plus ⓘ tooltips on
+   generator categories and form sections.
+   ========================================================= */
+
+const GENERATOR_DELIVERS = {
+  "product-description": "A paste-ready product description — headline, summary, and persuasive body copy.",
+  "product-listing": "A full marketplace listing — title, bullet points, description, and tags.",
+  "sales-page": "A conversion-focused sales-page section — headline, story, benefits, and CTA.",
+  "social-post": "Platform-ready social posts with captions and calls to action.",
+  "hooks-captions": "Scroll-stopping hooks plus matching captions, ready to post.",
+  "pinterest-pin": "A Pinterest pin concept — title, description, and image direction.",
+  "seo-copy": "Search-optimized copy with your keywords woven in naturally.",
+  "tags-hashtags": "A ready list of marketplace tags and social hashtags.",
+  "geo-optimization": "AI-search copy + Q&A so ChatGPT, Gemini & co. recommend and cite you.",
+  "product-mockup": "An image-generator prompt for a clean, professional product mockup.",
+  "product-ad": "An image-generator prompt for a conversion-focused ad graphic.",
+  "promotional-flyer": "An image-generator prompt for a polished promotional flyer.",
+  "lead-magnet-cover": "An image-generator prompt for a high-value lead-magnet cover.",
+  "notebook-cover": "A print-ready image prompt for a notebook or journal cover.",
+  "infographic": "An image-generator prompt for a clear, educational infographic.",
+  "creative-direction": "A full creative brief — mood, color, type, and visual direction.",
+  "hero-banner": "A website hero image prompt plus a matching headline and subcopy.",
+  "video-motion": "A motion-graphic or short-video generation prompt.",
+  "short-video-script": "A complete short-form video script — hook, scenes, and caption.",
+  "voiceover-script": "A natural voiceover script, timed for your promo.",
+  "product-demo": "A step-by-step product demonstration video plan.",
+  "launch-campaign": "A coordinated, multi-channel launch campaign plan.",
+  "launch-carousel": "A slide-by-slide launch carousel, ready to design.",
+  "launch-announcement": "A compelling launch-day announcement post.",
+  "b-roll": "A practical B-roll shot list for your video.",
+  "cinematic-reveal": "A cinematic product-reveal image/video prompt.",
+  "landing-page": "A focused, conversion-ready landing page.",
+  "promotional-email": "A persuasive promotional email — subject line through CTA.",
+  "offer-summary": "A clear, persuasive summary of your offer.",
+  "pricing-positioning": "Copy that frames your price so it feels worth it.",
+  "content-series": "A multi-post content series planned around your launch.",
+  "listing-image": "An image-generator prompt for a marketplace listing photo.",
+  "lifestyle-image": "An image-generator prompt for a lifestyle photo — your product in a real setting.",
+  "product-video-ad": "A short product-ad video generation prompt.",
+  "launch-teaser": "A suspense-building teaser prompt for your launch."
+};
+
+const GENERATOR_CATEGORY_INFO = {
+  "sales-copy": "The words that sell — descriptions, listings, sales pages, emails, and offer copy.",
+  "social": "Get found and get scrolling — posts, hooks, pins, SEO, tags, and AI-search copy.",
+  "launch": "Everything for launch day — campaigns, carousels, announcements, and teasers.",
+  "design": "Ready-to-run image prompts — mockups, ads, covers, infographics, and lifestyle photos.",
+  "video": "Motion and voice — video scripts, voiceover, motion graphics, B-roll, and reveals."
+};
+
+const SECTION_INFO = {
+  productSectionTitle: "The core facts about what you're selling. These stay consistent across every prompt you generate.",
+  audienceSectionTitle: "Who it's for and the before → after transformation — this makes your copy land with the right person.",
+  pricingSectionTitle: "How price is handled in your copy, including whether to mention a number at all.",
+  brandSectionTitle: "Your voice, look, and words to use or avoid — so everything sounds like you. Load a Brand DNA Blueprint™ to auto-fill it.",
+  deliverySectionTitle: "How your prompts are packaged and which AI platform they're tuned for.",
+  validationSectionTitle: "A quick check that you've added the essentials before you generate.",
+  resultsSectionTitle: "Your generated prompts and premium outputs — copy, launch plan, media, and more."
+};
+
+// Fallback guidance from a generator's goal if it isn't in the map above.
+function deliversFromGoal(key) {
+  const goal = GENERATOR_DEFINITIONS[key] && GENERATOR_DEFINITIONS[key].goal;
+  if (!goal) return "";
+  const stripped = goal.replace(
+    /^(Create|Write|Build|Plan|Summarize|Position|Optimize|Turn)\s+(a |an |the )?/i,
+    ""
+  );
+  return stripped.charAt(0).toUpperCase() + stripped.slice(1) + ".";
+}
+
+function infoIconHtml(text) {
+  return `<button type="button" class="info-i" aria-label="More info" title="${escapeHtml(
+    text
+  )}">i</button>`;
+}
+
+function annotateGenerators() {
+  document.querySelectorAll(".generator-card").forEach((card) => {
+    if (card.dataset.annotated === "true") {
+      return;
+    }
+
+    const input = card.querySelector("input[data-generator-key]");
+    const nameSpan = card.querySelector("span");
+
+    if (!input || !nameSpan) {
+      return;
+    }
+
+    const key = input.dataset.generatorKey;
+    const info = GENERATOR_DELIVERS[key] || deliversFromGoal(key);
+
+    if (info && !card.querySelector(".generator-card__delivers")) {
+      const col = document.createElement("span");
+      col.className = "generator-card__text";
+      nameSpan.classList.add("generator-card__name");
+      nameSpan.replaceWith(col);
+      col.appendChild(nameSpan);
+
+      const sub = document.createElement("span");
+      sub.className = "generator-card__delivers";
+      sub.textContent = info;
+      col.appendChild(sub);
+    }
+
+    card.dataset.annotated = "true";
+  });
+
+  document.querySelectorAll(".generator-group").forEach((group) => {
+    const h3 = group.querySelector("h3");
+    const cat = group.dataset.generatorCategory;
+
+    if (h3 && cat && GENERATOR_CATEGORY_INFO[cat] && !h3.querySelector(".info-i")) {
+      h3.insertAdjacentHTML("beforeend", " " + infoIconHtml(GENERATOR_CATEGORY_INFO[cat]));
+    }
+  });
+
+  Object.keys(SECTION_INFO).forEach((id) => {
+    const heading = getElement(id);
+
+    if (heading && !heading.querySelector(".info-i")) {
+      heading.insertAdjacentHTML("beforeend", " " + infoIconHtml(SECTION_INFO[id]));
+    }
+  });
+}
+
 function initializeApplication() {
   normalizeGeneratorCheckboxes();
   initializeGeneratorSettings();
@@ -1403,6 +1532,7 @@ function initializeApplication() {
   updateValidationSummary();
   updateGeneratedVisibility();
   enhanceSelectsAsPills();
+  annotateGenerators();
   initPremiumTabs();
   initJourney();
   initHeroVideo();
@@ -1902,6 +2032,11 @@ function handleDocumentClick(event) {
     return;
   }
 
+  if (button.dataset.brandkitId) {
+    setActiveBrandKit(button.dataset.brandkitId);
+    return;
+  }
+
   if (button.dataset.randomizeCategory) {
     randomizeCategory(button.dataset.randomizeCategory);
     return;
@@ -1924,6 +2059,10 @@ function handleDocumentClick(event) {
 
     case "clear-category":
       requestClearCategory(button.dataset.category || "");
+      break;
+
+    case "load-brandkit":
+      loadBrandKit();
       break;
 
     case "copy-output":
@@ -2007,6 +2146,7 @@ function handleKnownButtonIds(button) {
     railGenerateBtn: generatePromptOptions,
     clearAllBtn: requestClearAll,
     newProjectBtn: requestClearAll,
+    railClearAllBtn: requestClearAll,
     randomizeBtn: randomizeAllUnlockedFields,
     randomizeAllBtn: randomizeAllUnlockedFields,
     refreshReviewBtn: updateIngredientReview,
@@ -2410,33 +2550,45 @@ function readBrandKitVault() {
 }
 
 function checkBrandKitVault() {
+  const kits = readBrandKitVault();
   const button = getElement("loadBrandKitBtn");
 
-  if (!button) {
-    return;
+  if (button) {
+    if (kits.length > 0) {
+      button.hidden = false;
+      button.textContent = `Load your Brand Kit (${kits.length})`;
+    } else {
+      button.hidden = true;
+    }
   }
 
-  const kits = readBrandKitVault();
-
-  if (kits.length > 0) {
-    button.hidden = false;
-    button.textContent = `Load your Brand Kit (${kits.length})`;
-  } else {
-    button.hidden = true;
-  }
+  renderRailBrandKit();
 }
 
-function loadBrandKit() {
+// The active kit: the one the user last switched to, else the most recent.
+function activeBrandKit() {
   const kits = readBrandKitVault();
+  if (!kits.length) return null;
+  if (appState.activeBrandKitId) {
+    const found = kits.find((k) => k.id === appState.activeBrandKitId);
+    if (found) return found;
+  }
+  return kits
+    .slice()
+    .sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt)))[0];
+}
 
-  if (kits.length === 0) {
+function setActiveBrandKit(id) {
+  appState.activeBrandKitId = id;
+  renderRailBrandKit(true);
+}
+
+// Map one kit's flattened fields into the form (voice/mood/values/colors).
+function applyBrandKit(kit) {
+  if (!kit) {
     showToast("No Brand Kit found from Brand Haus yet.", "warning");
     return;
   }
-
-  const kit = kits
-    .slice()
-    .sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt)))[0];
 
   let filled = 0;
 
@@ -2471,6 +2623,91 @@ function loadBrandKit() {
       : "That Brand Kit had nothing to map.",
     filled > 0 ? "success" : "warning"
   );
+}
+
+function loadBrandKit() {
+  applyBrandKit(activeBrandKit());
+}
+
+// Active Brand Kit panel in the Your Pack rail: name + up-to-3 switcher +
+// an expandable view of the kit's items (colors, fonts, voice, mood, values).
+function renderRailBrandKit(expand) {
+  const panel = getElement("railBrandKit");
+  if (!panel) return;
+
+  const kits = readBrandKitVault();
+  if (!kits.length) {
+    panel.hidden = true;
+    panel.innerHTML = "";
+    return;
+  }
+
+  panel.hidden = false;
+  const active = activeBrandKit();
+  const sorted = kits
+    .slice()
+    .sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt)))
+    .slice(0, 3);
+
+  const chips =
+    sorted.length > 1
+      ? `<div class="rail-bk__chips">${sorted
+          .map(
+            (k) =>
+              `<button type="button" class="rail-bk__chip ${
+                k.id === active.id ? "is-active" : ""
+              }" data-brandkit-id="${escapeHtml(String(k.id))}">${escapeHtml(
+                k.name || "Kit"
+              )}</button>`
+          )
+          .join("")}</div>`
+      : "";
+
+  const swatches =
+    Array.isArray(active.colors) && active.colors.length
+      ? `<div class="rail-bk__swatches">${active.colors
+          .slice(0, 8)
+          .map(
+            (c) =>
+              `<span class="rail-bk__swatch" style="background:${escapeHtml(
+                String(c)
+              )}" title="${escapeHtml(String(c))}"></span>`
+          )
+          .join("")}</div>`
+      : "";
+
+  const row = (label, val) =>
+    val && String(val).trim()
+      ? `<div class="rail-bk__row"><span class="rail-bk__k">${label}</span><span class="rail-bk__v">${escapeHtml(
+          String(val)
+        )}</span></div>`
+      : "";
+
+  const fonts = [active.headingFont, active.bodyFont].filter(Boolean).join(" / ");
+  const values = Array.isArray(active.coreValues) ? active.coreValues.join(", ") : "";
+
+  panel.innerHTML = `
+    <div class="rail-bk__head">
+      <span class="rail-bk__eyebrow">Active Brand Kit</span>
+      <span class="rail-bk__count">${kits.length} in vault</span>
+    </div>
+    ${chips}
+    <details class="rail-bk__card" ${expand ? "open" : ""}>
+      <summary class="rail-bk__summary">
+        <span class="rail-bk__dot" aria-hidden="true"></span>
+        <span class="rail-bk__name">${escapeHtml(active.name || "Your Brand Kit")}</span>
+        <span class="rail-bk__chev" aria-hidden="true">+</span>
+      </summary>
+      <div class="rail-bk__body">
+        ${swatches}
+        ${row("Voice", active.voice)}
+        ${row("Mood", active.mood)}
+        ${fonts ? row("Fonts", fonts) : ""}
+        ${row("Values", values)}
+        ${row("Mission", active.mission)}
+        <button type="button" class="rail-bk__load" data-action="load-brandkit">Load into form</button>
+      </div>
+    </details>`;
 }
 
 
@@ -3064,7 +3301,8 @@ function collectProjectData() {
       colorDirection: readValue("colorDirection"),
       typographyDirection: readValue("typographyDirection"),
       brandKeywords: readValue("wordsToInclude"),
-      wordsToAvoid: readValue("wordsToAvoid")
+      wordsToAvoid: readValue("wordsToAvoid"),
+      uniqueSelling: readValue("uniqueSelling")
     },
 
     reference: {
@@ -3306,19 +3544,36 @@ function updateBuildRail() {
   ];
 
   const done = items.filter((item) => item[1]).length;
+  const pct = Math.round((done / items.length) * 100);
+  const msg =
+    pct === 100 ? "Perfection — generate your pack! 👑"
+    : pct >= 70 ? "Almost launch-ready 🚀"
+    : pct >= 40 ? "Building momentum 🔥"
+    : pct > 0 ? "Nice start — keep going 🌱"
+    : "Let's build your pack ✨";
 
-  container.innerHTML = items
+  const checklist = items
     .map(
       ([label, ok]) => `
         <div class="rail-item ${ok ? "is-done" : ""}">
-          <span class="rail-item__mark" aria-hidden="true">${
-            ok ? "✓" : ""
-          }</span>
+          <span class="rail-item__mark" aria-hidden="true">${ok ? "✓" : ""}</span>
           <span>${escapeHtml(label)}</span>
-        </div>
-      `
+        </div>`
     )
     .join("");
+
+  container.innerHTML = `
+    <div class="rail-progress ${pct === 100 ? "is-complete" : ""}">
+      <div class="rail-progress__head">
+        <span class="rail-progress__label">Progress to perfection</span>
+        <span class="rail-progress__pct">${pct}%</span>
+      </div>
+      <div class="rail-progress__track">
+        <div class="rail-progress__fill" style="width:${pct}%"></div>
+      </div>
+      <p class="rail-progress__msg">${msg}</p>
+    </div>
+    <div class="rail-checklist">${checklist}</div>`;
 
   const status = getElement("railStatus");
 
@@ -4464,6 +4719,7 @@ function premiumData(data) {
     visual: data.display.visualStyle || "clean and modern",
     keywords: data.brand.brandKeywords || "",
     avoid: data.brand.wordsToAvoid || "",
+    usp: data.brand.uniqueSelling || "",
     platform: data.display.aiPlatform || "any AI platform"
   };
 }
@@ -5028,53 +5284,98 @@ function buildLaunchPlan(data) {
   const has = (word) => picks.some((p) => p.toLowerCase().includes(word));
   const kit = picks.length ? picks.join(", ") : "your generated assets";
 
+  // Fill helper: use captured value, else a clearly-labeled placeholder so the
+  // receiving AI never has to stop and ask — it fills the blank instead.
+  const fill = (val, hint) =>
+    val && String(val).trim() ? String(val).trim() : `[COMPLETE: ${hint}]`;
+
   return [
-    `THE PROFIT PATH — LAUNCH PLAN for ${d.name}`,
-    `${creator ? "Mode: You are the brand (creator-led)" : "Mode: Product / niche"}  |  Goal: ${d.goal}  |  Platform: ${d.platform}`,
-    `Your kit: ${kit}`,
+    `THE PROFIT PATH — LAUNCH BRIEF: ${d.name}`,
     "",
-    "The PROFIT Path is the 6-phase launch method: Prime, Reveal, Offer, Flood, Ignite, Tend. Follow it in order — shift the dates to fit you.",
+    "INSTRUCTIONS FOR THE AI:",
+    "Using the brief below, produce every deliverable listed under \"PRODUCE THESE ASSETS\" by working the 6-phase PROFIT Path in order. Do not ask clarifying questions — where a line is marked [COMPLETE], insert a clearly-labeled placeholder the reader can swap in. Never invent testimonials, reviews, results, or statistics; if proof would help and none is provided, describe the kind of proof to gather instead. Keep every asset in the brand voice below.",
     "",
-    "== P - PRIME (earn trust before you sell) ==",
+    "— THE PRODUCT —",
+    `Name: ${d.name}`,
+    `Type: ${d.type}`,
+    `What it is: ${fill(d.description, "one-paragraph description of the product")}`,
+    `What's included: ${fill(d.features, "the contents / inclusions")}`,
+    `Key benefits: ${fill(d.benefits, "the top 3 benefits")}`,
+    "",
+    "— THE CUSTOMER —",
+    `Who it's for: ${d.audience}`,
+    `Where they are now (before): ${fill(d.problem, "the problem or frustration they have today")}`,
+    `The transformation (after): ${fill(d.outcome, "the result they get with your product")}`,
+    d.motivation ? `Why they buy: ${d.motivation}` : null,
+    "",
+    "— POSITIONING —",
+    `What makes it different (USP): ${fill(d.usp, "the one reason to choose this over every alternative")}`,
+    `Brand voice: ${d.tone}`,
+    `Visual style: ${d.visual}`,
+    d.keywords ? `Words to weave in: ${d.keywords}` : null,
+    d.avoid ? `Words to avoid: ${d.avoid}` : null,
+    "",
+    "— THE OFFER —",
+    `Price handling: ${d.pricingUsage || "mention the value, not a specific number"}`,
+    d.price ? `Price: ${d.price}` : null,
+    d.offer ? `Offer type: ${d.offer}` : null,
+    "",
+    "— LAUNCH SETUP —",
+    `Sell on: ${d.platform}`,
+    "Channels: [COMPLETE: the channels you'll post on — e.g. Instagram, TikTok, Pinterest, email list]",
+    "Go-live date: [COMPLETE: choose your launch day (Day 8 below) and shift the other days around it]",
+    `Launch goal: ${d.goal}`,
+    "",
+    "— THE PROFIT PATH (run in order; the dates are a movable template) —",
+    "",
+    "P · PRIME — earn trust before you sell",
     creator
-      ? "Days 1-3: Show up as YOU. Share your story, your point of view, and helpful takes to build the audience that will buy. Open a waitlist."
-      : "Days 1-3: Warm up your niche with pure value — helpful tips, no pitch. Open a waitlist so early fans can raise their hand.",
-    `Use: ${kitPick(picks, ["social", "hook", "content"], "social posts + hooks")}`,
+      ? "Days 1-3: Show up as YOU — your story, POV, and helpful takes on the problem above to build the audience that will buy. Open a waitlist."
+      : "Days 1-3: Warm up your niche with pure value tied to the problem above — helpful tips, no pitch. Open a waitlist so early fans can raise their hand.",
+    `Produce: ${kitPick(picks, ["social", "hook", "content"], "3-5 value posts + a waitlist invite")}`,
     "",
-    "== R - REVEAL (open the loop) ==",
+    "R · REVEAL — open the loop",
     "Day 4: Tease that something's coming — a \"launching soon\" post and a short teaser. Point everyone to the waitlist.",
-    `Use: ${kitPick(picks, ["teaser", "announcement"], "a teaser + announcement")}`,
+    `Produce: ${kitPick(picks, ["teaser", "announcement"], "a teaser post + announcement")}`,
     "",
-    "== O - OFFER (show the transformation) ==",
-    "Days 5-7: Reveal what it is and who it's for. Lead with the before-to-after, show proof, and spell out exactly what they get.",
-    `Use: ${kitPick(picks, ["sales", "video", "email"], "a sales page + a value email")}`,
+    "O · OFFER — show the transformation",
+    "Days 5-7: Reveal what it is and who it's for. Lead with the before→after above and spell out exactly what they get.",
+    `Produce: ${kitPick(picks, ["sales", "landing", "email"], "a sales/landing page + a value email")}`,
     "",
-    "== F - FLOOD (go live everywhere) ==",
+    "F · FLOOD — go live everywhere",
     `Day 8 (GO LIVE): Publish the ${
       has("listing") || has("description") ? "listing / product page" : "product page"
     } and send the launch email. Post the announcement across every channel at once.`,
-    `Use: ${kitPick(picks, ["listing", "description", "ad", "announcement", "carousel"], "your listing + ad + announcement")}`,
+    `Produce: ${kitPick(picks, ["listing", "description", "ad", "graphic", "announcement", "carousel"], "your product page + ad graphic + announcement")}`,
     "",
-    "== I - IGNITE (urgency + momentum) ==",
-    "Days 9-10: Add urgency — a bonus, a deadline, and social proof. Send a \"closing soon\" email and post last-call reminders.",
-    "Use: an urgency email + last-call posts",
+    "I · IGNITE — urgency + momentum",
+    "Days 9-10: Add an honest reason to act now — a launch bonus, an expiring intro offer, or a genuine deadline (never invent scarcity). Send a \"closing soon\" email and last-call posts.",
+    "Produce: an urgency email + last-call posts",
     "",
-    "== T - TEND (nurture + make it evergreen) ==",
+    "T · TEND — nurture + make it evergreen",
     creator
-      ? "Days 11+: Thank buyers, gather testimonials, and keep showing up. Turn your best launch content into evergreen posts, and save this project for your next drop."
-      : "Days 11+: Thank buyers, request reviews, and turn your winners into evergreen content. Save this project so your next product launches in minutes.",
+      ? "Days 11+: Thank buyers, gather real testimonials, keep showing up, and turn your best launch content into evergreen posts. Save this project for your next drop."
+      : "Days 11+: Thank buyers, request reviews, and turn your winners into evergreen content. Save this project so your next launch takes minutes.",
     has("gpt")
-      ? "Use: a follow-up email + reviews + your Custom GPT to keep answering buyers"
-      : "Use: a follow-up email + review request + evergreen social",
+      ? "Produce: a follow-up email + review request + your Custom GPT to keep answering buyers"
+      : "Produce: a follow-up email + review request + evergreen social",
+    "",
+    "PRODUCE THESE ASSETS (your kit):",
+    picks.length ? "• " + picks.join("\n• ") : "• [COMPLETE: add generators to your kit]",
+    "Also plan (produce if it's in your kit, otherwise outline): waitlist invite, teaser, sales/landing page, launch email, urgency email, follow-up + review request, evergreen posts.",
+    "",
+    "RULES:",
+    d.pricingUsage ? `• Pricing: ${d.pricingUsage}` : "• Pricing: mention the value, not a specific number.",
+    "• Never invent testimonials, reviews, results, or statistics.",
+    "• Every asset stays in the brand voice above.",
     "",
     "PROFIT PATH CHECKLIST:",
-    "[ ] Prime - value/story posts + waitlist live",
-    "[ ] Reveal - teaser posted",
-    "[ ] Offer - sales page + email ready",
-    "[ ] Flood - product live + announced everywhere",
-    "[ ] Ignite - urgency + last-call planned",
-    "[ ] Tend - follow-up + testimonials + saved for next time",
-    d.pricingUsage ? `[ ] Pricing rule followed: ${d.pricingUsage}` : null
+    "[ ] Prime — value/story posts + waitlist live",
+    "[ ] Reveal — teaser posted",
+    "[ ] Offer — sales/landing page + email ready",
+    "[ ] Flood — product live + announced everywhere",
+    "[ ] Ignite — honest urgency + last-call planned",
+    "[ ] Tend — follow-up + testimonials + saved for next time"
   ]
     .filter((line) => line !== null)
     .join("\n");
@@ -5124,7 +5425,14 @@ function buildPhotoAnimationPrompt(data) {
     "PHOTO -> ANIMATION & VIDEO",
     `For: ${d.name} (${d.type})  |  Visual style: ${d.visual}  |  Tone: ${d.tone}`,
     "",
-    "HOW TO USE: Open an image-to-video tool (Runway Gen-3, Kling, Luma Dream Machine, Pika, or Sora). Upload your product photo, then paste the matching prompt below.",
+    "HOW TO USE (3 steps):",
+    "1. Generate the STILL PHOTO below in a text-to-image tool (Midjourney, DALL-E, Ideogram) — or add a Lifestyle Image / Product Mockup / Hero Banner generator above for more control.",
+    "2. Take that image into an image-to-video tool (Runway Gen-3, Kling, Luma, Pika, or Sora).",
+    "3. Paste the ANIMATION or HERO-VIDEO prompt below to bring it to life.",
+    "",
+    "----------------------------------------",
+    "0) STILL PHOTO PROMPT (make this first — text-to-image):",
+    `A high-end lifestyle product photo of ${d.name} (${d.type}), ${d.visual} aesthetic with a ${d.tone} mood. Style it in a real setting that fits ${d.audience}. Soft, directional natural light, shallow depth of field, the product as the clear hero, tasteful props and generous negative space. Photoreal, commercial quality, tack-sharp focus, no text and no logos.${d.keywords ? " Mood cues: " + d.keywords + "." : ""} Vertical 9:16 (or 1:1 for feed).`,
     "",
     "----------------------------------------",
     "1) ANIMATION PROMPT (subtle cinemagraph, 3-4s loop):",
