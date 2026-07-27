@@ -657,6 +657,19 @@ summary:focus-visible,
   color: var(--on-accent);
 }
 
+.load-kit-btn {
+  min-height: 0;
+  padding: 8px 15px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  color: var(--on-accent);
+}
+.load-kit-btn::before { content: "\1F9EC\00a0\00a0"; }
+.load-kit-btn:hover { filter: brightness(1.05); }
+
 .brand-import > summary {
   cursor: pointer;
   list-style: none;

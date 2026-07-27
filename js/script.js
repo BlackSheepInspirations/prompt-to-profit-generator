@@ -1410,6 +1410,7 @@ function initializeApplication() {
   renderVault();
   renderRecent();
   updateModeToggle();
+  checkBrandKitVault();
   window.scrollTo(0, 0);
 }
 
@@ -2022,6 +2023,7 @@ function handleKnownButtonIds(button) {
     downloadAllBtn: downloadAllOutputs,
     printKitBtn: printLaunchKit,
     importBrandDnaBtn: () => importBrandDna(readValue("brandDnaInput")),
+    loadBrandKitBtn: loadBrandKit,
     modalConfirmBtn: confirmModalAction,
     modalCancelBtn: closeModal
   };
@@ -2391,6 +2393,84 @@ function importBrandDna(text) {
       "warning"
     );
   }
+}
+
+// Reads the shared, read-only Brand Kit vault that Brand Haus mirrors on every
+// save. Empty until P2P is co-located on the same Shopify domain, then it lights
+// up automatically. Never writes to the vault (keeps it live, not a stale copy).
+function readBrandKitVault() {
+  try {
+    const parsed = JSON.parse(
+      localStorage.getItem("blackSheepBrandKitVault") || "{}"
+    );
+    return Array.isArray(parsed.brandHausKits) ? parsed.brandHausKits : [];
+  } catch {
+    return [];
+  }
+}
+
+function checkBrandKitVault() {
+  const button = getElement("loadBrandKitBtn");
+
+  if (!button) {
+    return;
+  }
+
+  const kits = readBrandKitVault();
+
+  if (kits.length > 0) {
+    button.hidden = false;
+    button.textContent = `Load your Brand Kit (${kits.length})`;
+  } else {
+    button.hidden = true;
+  }
+}
+
+function loadBrandKit() {
+  const kits = readBrandKitVault();
+
+  if (kits.length === 0) {
+    showToast("No Brand Kit found from Brand Haus yet.", "warning");
+    return;
+  }
+
+  const kit = kits
+    .slice()
+    .sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt)))[0];
+
+  let filled = 0;
+
+  if (kit.voice) {
+    matchIntoMultiSelect("brandTone", "brandToneCustom", kit.voice);
+    filled += 1;
+  }
+  if (kit.mood) {
+    matchIntoMultiSelect("visualStyle", "visualStyleCustom", kit.mood);
+    filled += 1;
+  }
+  if (Array.isArray(kit.coreValues) && kit.coreValues.length) {
+    writeValue("wordsToInclude", kit.coreValues.join(", "));
+    filled += 1;
+  }
+  if (Array.isArray(kit.colors) && kit.colors.length) {
+    writeValue("colorDirection", "brand-colors");
+    filled += 1;
+  }
+
+  syncAllPillSelects();
+  updateIngredientReview();
+  updateValidationSummary();
+  markResultsOutdated();
+  saveCurrentProject();
+
+  showToast(
+    filled > 0
+      ? `Loaded "${kit.name || "your Brand Kit"}" from Brand Haus — ${filled} field${
+          filled === 1 ? "" : "s"
+        } filled.`
+      : "That Brand Kit had nothing to map.",
+    filled > 0 ? "success" : "warning"
+  );
 }
 
 
