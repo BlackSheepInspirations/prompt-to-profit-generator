@@ -832,23 +832,16 @@ summary:focus-visible,
   top: var(--rail-sticky-top, 20px);
 }
 
-.build-rail__inner {
+/* Two widget blocks: a pinned progress card + a scrolling extras card. */
+.build-rail__card {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-large);
   background: var(--color-surface);
   box-shadow: var(--shadow-medium);
   padding: 22px;
-  /* Cap the pinned card to the viewport and scroll its own content, so the
-     readiness score stays visible even when the rail is taller than the
-     screen. Reset when the layout stacks (mobile) below. */
-  max-height: calc(100vh - var(--rail-sticky-top, 20px) - 28px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
 }
-.build-rail__inner::-webkit-scrollbar { width: 8px; }
-.build-rail__inner::-webkit-scrollbar-thumb {
-  background: var(--color-border-strong);
-  border-radius: var(--radius-pill);
+.build-rail__extras {
+  margin-top: 14px;
 }
 
 .build-rail__eyebrow {
@@ -1094,6 +1087,7 @@ summary:focus-visible,
   color: var(--color-text);
 }
 .rail-checklist { display: grid; gap: 4px; }
+.rail-journey { margin: 12px 0 14px; }
 
 /* Launch Readiness: tier + score */
 .rail-progress__tier {
@@ -1286,10 +1280,8 @@ summary:focus-visible,
     position: static;
   }
 
-  .build-rail__inner {
+  .build-rail__card {
     box-shadow: var(--shadow-small);
-    max-height: none;
-    overflow: visible;
   }
 }
 

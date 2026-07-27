@@ -2311,23 +2311,28 @@
     </form>
 
       <aside class="build-rail" aria-label="Build summary">
-        <div class="build-rail__inner">
-          <p class="build-rail__eyebrow">Your pack</p>
-          <div id="railReadiness" class="build-rail__readiness"></div>
-          <button
-            id="railGenerateBtn"
-            type="button"
-            class="build-rail__generate"
-          >
-            Generate my pack
-          </button>
-          <p
-            id="railStatus"
-            class="build-rail__status"
-            role="status"
-            aria-live="polite"
-          ></p>
+        <div class="build-rail__pinned">
+          <div class="build-rail__card">
+            <p class="build-rail__eyebrow">Your pack</p>
+            <div id="railReadiness" class="build-rail__readiness"></div>
+            <button
+              id="railGenerateBtn"
+              type="button"
+              class="build-rail__generate"
+            >
+              Generate my pack
+            </button>
+            <p
+              id="railStatus"
+              class="build-rail__status"
+              role="status"
+              aria-live="polite"
+            ></p>
+          </div>
+        </div>
 
+        <div class="build-rail__extras">
+          <div class="build-rail__card">
           <div id="railBrandKit" class="rail-brandkit" hidden></div>
 
           <details class="rail-panel">
@@ -2357,6 +2362,7 @@
           <button id="railClearAllBtn" type="button" class="rail-clear-all">
             Clear all &amp; start over
           </button>
+          </div>
         </div>
       </aside>
     </div>
