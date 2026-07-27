@@ -3283,7 +3283,9 @@ function collectProjectData() {
       customerProblem: readValue("buyerProblem"),
       desiredOutcome: readValue("buyerOutcome"),
       marketingGoal: readValue("marketingGoal"),
-      buyerMotivation: readValue("buyerMotivation")
+      buyerMotivation: readValue("buyerMotivation"),
+      launchChannels: readValue("launchChannels"),
+      launchDate: readValue("launchDate")
     },
 
     pricing: {
@@ -4709,6 +4711,8 @@ function premiumData(data) {
     outcome: data.audience.desiredOutcome || "",
     goal: data.display.marketingGoal || "grow sales",
     motivation: data.display.buyerMotivation || "",
+    channels: data.audience.launchChannels || "",
+    launchDate: data.audience.launchDate || "",
     price: data.pricing.currentPrice ? formatPrice(data.pricing.currentPrice) : "",
     tier: data.display.pricingTier || "",
     offer: data.display.offerType || "",
@@ -5322,8 +5326,8 @@ function buildLaunchPlan(data) {
     "",
     "— LAUNCH SETUP —",
     `Sell on: ${d.platform}`,
-    "Channels: [COMPLETE: the channels you'll post on — e.g. Instagram, TikTok, Pinterest, email list]",
-    "Go-live date: [COMPLETE: choose your launch day (Day 8 below) and shift the other days around it]",
+    `Channels: ${fill(d.channels, "the channels you'll post on — e.g. Instagram, TikTok, Pinterest, email list")}`,
+    `Go-live date: ${fill(d.launchDate, "choose your launch day (Day 8 below) and shift the other days around it")}`,
     `Launch goal: ${d.goal}`,
     "",
     "— THE PROFIT PATH (run in order; the dates are a movable template) —",
